@@ -1,0 +1,24 @@
+<main class="container page">
+  <div class="page-head">
+    <div>
+      <h1 class="display">Bookmarks</h1>
+      <p>Your saved dramas, stored locally in this browser.</p>
+    </div>
+    <span class="count">{{ dramas().length }} saved</span>
+  </div>
+
+  @if (dramas().length) {
+    <div class="drama-grid">
+      @for (d of dramas(); track d.id) {
+        <app-drama-card [drama]="d" />
+      }
+    </div>
+  } @else {
+    <app-empty-state
+      title="No bookmarks yet"
+      message="Tap the bookmark icon on any drama to save it here."
+    >
+      <a class="btn btn-primary" routerLink="/browse">Browse dramas</a>
+    </app-empty-state>
+  }
+</main>

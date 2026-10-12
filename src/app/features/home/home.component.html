@@ -1,0 +1,168 @@
+<section class="hero-slider" aria-label="Featured dramas">
+  @for (d of featured(); track d.id; let i = $index) {
+    <article class="hero-slide" [class.active]="i === current()" [style.--slide-tone]="d.tone">
+      <div class="hero-copy">
+        <p class="eyebrow">Editor&rsquo;s pick &middot; {{ d.platformId }}</p>
+        <h1>{{ d.title }}</h1>
+        <div class="hero-meta">
+          <span class="meta-pill">{{ d.releaseYear }}</span>
+          <span class="meta-pill">EP {{ d.latestEpisode }}</span>
+          @for (g of d.genres; track g) {
+            <span>{{ g }}</span>
+          }
+          <span>{{ d.platformId }}</span>
+          <span>SUB {{ d.subtitleLanguages[0] }}</span>
+        </div>
+        <p class="hero-description">{{ d.synopsis }}</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" [routerLink]="['/watch', d.slug, d.latestEpisode]"
+            >&#9654; Watch now</a
+          >
+          <a class="btn" [routerLink]="['/drama', d.slug]">Details</a>
+        </div>
+      </div>
+      <div class="hero-art" [attr.data-monogram]="monogram(d.title)"></div>
+    </article>
+  }
+  <button
+    class="slider-arrow slider-arrow-prev"
+    type="button"
+    aria-label="Previous slide"
+    (click)="step(-1)"
+  >
+    &#8592;
+  </button>
+  <div class="slider-dots">
+    @for (d of featured(); track d.id; let i = $index) {
+      <button
+        class="slider-dot"
+        [class.active]="i === current()"
+        type="button"
+        [attr.aria-label]="'Slide ' + (i + 1)"
+        (click)="go(i)"
+      ></button>
+    }
+  </div>
+  <button
+    class="slider-arrow slider-arrow-next"
+    type="button"
+    aria-label="Next slide"
+    (click)="step(1)"
+  >
+    &#8594;
+  </button>
+</section>
+
+<div class="container page">
+  <section class="section">
+    <div class="section-heading">
+      <h2 class="display">Trending Now</h2>
+      <a routerLink="/browse">View all &rarr;</a>
+    </div>
+    <div class="carousel">
+      @for (d of trending(); track d.id) {
+        <app-drama-card [drama]="d" />
+      }
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-heading">
+      <h2 class="display">Recently Updated</h2>
+      <a routerLink="/browse">View all &rarr;</a>
+    </div>
+    <div class="carousel">
+      @for (d of recent(); track d.id) {
+        <app-drama-card [drama]="d" />
+      }
+    </div>
+  </section>
+
+  <section class="section ranking-band">
+    <div>
+      <div class="section-heading"><h2 class="display">Most Viewed</h2></div>
+      <div class="rank-list">
+        @for (d of mostViewed(); track d.id; let i = $index) {
+          <a class="rank-row" [routerLink]="['/drama', d.slug]" [style.--card-tone]="d.tone">
+            <span class="rank-num">{{ i + 1 }}</span>
+            <span class="rank-thumb"></span>
+            <span class="rank-info">
+              <h3>{{ d.title }}</h3>
+              <p>{{ d.genres[0] }} &middot; {{ d.platformId }} &middot; {{ d.latestEpisode }} EP</p>
+            </span>
+          </a>
+        }
+      </div>
+    </div>
+    <div>
+      <div class="section-heading"><h2 class="display">Most Liked</h2></div>
+      <div class="rank-list">
+        @for (d of mostLiked(); track d.id; let i = $index) {
+          <a class="rank-row" [routerLink]="['/drama', d.slug]" [style.--card-tone]="d.tone">
+            <span class="rank-num">{{ i + 1 }}</span>
+            <span class="rank-thumb"></span>
+            <span class="rank-info">
+              <h3>{{ d.title }}</h3>
+              <p>{{ d.genres[0] }} &middot; {{ d.platformId }} &middot; {{ d.latestEpisode }} EP</p>
+            </span>
+          </a>
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-heading">
+      <h2 class="display">Browse by Genre</h2>
+      <a routerLink="/genre">View all &rarr;</a>
+    </div>
+    <div class="genre-tabs" role="tablist" aria-label="Browse by genre">
+      @for (g of genreOptions(); track g) {
+        <button type="button" [class.active]="activeGenre() === g" (click)="activeGenre.set(g)">
+          {{ g }}
+        </button>
+      }
+    </div>
+    <div class="carousel" style="margin-top: 16px">
+      @for (d of genreDramas(); track d.id) {
+        <app-drama-card [drama]="d" />
+      }
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-heading">
+      <h2 class="display">Browse by Platform</h2>
+      <a routerLink="/platform">View all &rarr;</a>
+    </div>
+    <div class="platform-tabs">
+      @for (p of catalog.platforms; track p.id) {
+        <a class="filter-chip" [routerLink]="['/browse']" [queryParams]="{ platform: p.name }">{{
+          p.name
+        }}</a>
+      }
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-heading">
+      <h2 class="display">Coming Up This Week</h2>
+      <a routerLink="/release-schedule">Full schedule &rarr;</a>
+    </div>
+    <div class="schedule-list">
+      @for (item of schedulePreview(); track item.id) {
+        <a class="schedule-item" [routerLink]="['/watch', item.dramaSlug, item.episodeNumber]">
+          <span class="schedule-mark">{{ item.dayLabel }}</span>
+          <span>
+            <h3>{{ item.dramaTitle }}</h3>
+            <p>
+              Episode {{ item.episodeNumber }} &middot; {{ item.platformId }} &middot; Sub
+              {{ item.subtitleStatus }}
+            </p>
+          </span>
+          <span class="schedule-time">{{ item.releaseTime }}</span>
+        </a>
+      }
+    </div>
+  </section>
+</div>

@@ -1,0 +1,256 @@
+@if (drama(); as d) {
+  <main class="container watch-page">
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+      <a routerLink="/">Home</a> / <a [routerLink]="['/drama', d.slug]">{{ d.title }}</a> /
+      <span>Episode {{ episodeNumber() }}</span>
+    </nav>
+
+    <section class="watch-grid">
+      <div class="watch-main-col">
+        <div class="player-shell">
+          <div class="video-player" [style.--card-tone]="d.tone">
+            <button
+              class="play-button"
+              type="button"
+              [attr.aria-label]="playing() ? 'Pause' : 'Play'"
+              (click)="togglePlay()"
+            >
+              @if (playing()) {
+                <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
+                  <path d="M6 5h4v14H6zM14 5h4v14h-4z" />
+                </svg>
+              } @else {
+                <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
+                  <path d="M8 5v14l11-7z" />
+                </svg>
+              }
+            </button>
+            <div class="player-controls">
+              <div class="timeline"><span [style.width.%]="progress()"></span></div>
+              <div class="controls-row">
+                <span>VOL &middot; {{ elapsed() }} / {{ duration() }}</span>
+                <span>SUB {{ subtitle() }} &middot; HD &middot; FS</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="playback-toolbar">
+            <div class="toolbar-group">
+              <button
+                class="toolbar-button"
+                type="button"
+                [class.active]="server() === 1"
+                (click)="server.set(1)"
+              >
+                Server 1
+              </button>
+              <button
+                class="toolbar-button"
+                type="button"
+                [class.active]="server() === 2"
+                (click)="server.set(2)"
+              >
+                Server 2
+              </button>
+            </div>
+            <div class="toolbar-group">
+              <div class="vote-group">
+                <button
+                  class="vote-btn vote-like"
+                  type="button"
+                  [attr.aria-pressed]="vote() === 'like'"
+                  (click)="choose('like')"
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    width="16"
+                    height="16"
+                  >
+                    <path
+                      d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"
+                    />
+                    <path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3" />
+                  </svg>
+                  <span class="vote-count">3.2rb</span>
+                </button>
+                <span class="vote-divider"></span>
+                <button
+                  class="vote-btn vote-dislike"
+                  type="button"
+                  [attr.aria-pressed]="vote() === 'dislike'"
+                  (click)="choose('dislike')"
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    width="16"
+                    height="16"
+                  >
+                    <path
+                      d="M10 15V19a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3H10z"
+                    />
+                    <path d="M17 2h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17" />
+                  </svg>
+                  <span class="vote-count">478</span>
+                </button>
+              </div>
+              @if (hasPrev()) {
+                <a class="toolbar-button" [routerLink]="['/watch', d.slug, episodeNumber() - 1]"
+                  >&#8249; Previous</a
+                >
+              }
+              @if (hasNext()) {
+                <a class="toolbar-button" [routerLink]="['/watch', d.slug, episodeNumber() + 1]"
+                  >Next &#8250;</a
+                >
+              }
+            </div>
+          </div>
+
+          <div class="player-toggles">
+            <label class="toggle-label"><input type="checkbox" checked /> Auto play</label>
+            <label class="toggle-label"><input type="checkbox" checked /> Auto next</label>
+            <label class="toggle-label"><input type="checkbox" /> Lights out</label>
+          </div>
+        </div>
+
+        <article class="watch-detail">
+          <div class="watch-detail-inner">
+            <div class="watch-poster" [style.--card-tone]="d.tone">
+              <span class="drama-art"
+                ><span class="drama-monogram">{{ monogram(d.title) }}</span></span
+              >
+            </div>
+            <div class="watch-detail-body">
+              <p class="eyebrow">{{ d.platformId }}</p>
+              <h1 class="watch-detail-title">{{ d.title }}</h1>
+              <div class="metadata-grid">
+                <span class="metadata-item"
+                  ><strong>{{ d.releaseYear }}</strong> release</span
+                >
+                <span class="metadata-item"
+                  ><strong>{{ d.totalEpisodes }}</strong> episodes</span
+                >
+                <span class="metadata-item"
+                  ><strong>{{ d.durationMinutes ?? 1 }}m</strong> duration</span
+                >
+                <span class="metadata-item"
+                  ><strong>{{ d.platformId }}</strong> source</span
+                >
+                <span class="metadata-item"
+                  ><strong>SUB {{ subtitle() }}</strong></span
+                >
+                <span class="metadata-item"
+                  ><strong>{{ d.genres.join(' &middot; ') }}</strong></span
+                >
+              </div>
+              <p class="synopsis">{{ d.synopsis }}</p>
+              <div class="detail-actions">
+                <button
+                  class="btn"
+                  type="button"
+                  [class.btn-primary]="bookmarked()"
+                  (click)="toggleBookmark()"
+                >
+                  {{ bookmarked() ? '&#9733; Bookmarked' : '&#9734; Bookmark' }}
+                </button>
+                <button class="btn" type="button" (click)="share()">Share</button>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <section class="watch-comments">
+          <div class="section-heading">
+            <h2 class="display">Comments</h2>
+            <span class="count">{{ comments().length }} comments</span>
+          </div>
+          <div class="comment-form">
+            <div class="comment-avatar"><span>U</span></div>
+            <div>
+              <textarea
+                class="comment-input"
+                rows="2"
+                placeholder="Write a comment..."
+                [value]="draft()"
+                (input)="onDraft($event)"
+              ></textarea>
+              <div class="flex justify-end mt-2">
+                <button class="btn btn-compact btn-primary" type="button" (click)="submitComment()">
+                  Send
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="comment-list">
+            @for (c of comments(); track $index) {
+              <article class="comment-item">
+                <div class="comment-avatar">
+                  <span>{{ c.author.charAt(0) }}</span>
+                </div>
+                <div class="comment-body">
+                  <div class="comment-head">
+                    <strong>{{ c.author }}</strong
+                    ><time>{{ c.time }}</time>
+                  </div>
+                  <p>{{ c.body }}</p>
+                  <div class="comment-actions">
+                    <button class="comment-action" type="button">Like</button
+                    ><button class="comment-action" type="button">Reply</button>
+                  </div>
+                </div>
+              </article>
+            }
+          </div>
+        </section>
+      </div>
+
+      <aside class="episode-panel">
+        <div class="panel-head">
+          <h2>Episodes</h2>
+          <p>{{ d.title }} &middot; {{ d.totalEpisodes }} episodes</p>
+        </div>
+        <div class="episode-scroll">
+          <div class="episode-list">
+            @for (ep of episodeNumbers(); track ep) {
+              <a
+                class="episode-button"
+                [class.active]="ep === episodeNumber()"
+                [routerLink]="['/watch', d.slug, ep]"
+                >{{ ep }}</a
+              >
+            }
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    @if (related().length) {
+      <section class="section">
+        <div class="section-heading">
+          <h2 class="display">Related Dramas</h2>
+          <a routerLink="/browse">View all</a>
+        </div>
+        <div class="rail">
+          @for (r of related(); track r.id) {
+            <app-drama-card [drama]="r" />
+          }
+        </div>
+      </section>
+    }
+  </main>
+} @else {
+  <main class="container page">
+    <app-empty-state
+      title="Drama not found"
+      message="This drama does not exist or may have been removed."
+    >
+      <a class="btn btn-primary" routerLink="/browse">Browse all dramas</a>
+    </app-empty-state>
+  </main>
+}

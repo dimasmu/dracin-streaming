@@ -1,0 +1,331 @@
+<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>DRA.CIN — Browse</title><link rel="stylesheet" href="assets/app.css"></head><body class="page-browse">
+<header class="topnav" data-od-id="global-header"><div class="container topnav-inner"><a class="logo" href="index.html" data-od-id="brand-logo">DRA<b>.CIN</b></a><nav class="nav-links" aria-label="Navigasi utama" data-od-id="main-navigation"><a href="index.html" data-od-id="nav-home"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/><polyline points="9 21 9 14 15 14 15 21"/></svg>Home</a><a href="genre.html" data-od-id="nav-genre"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Genre</a><a href="platform.html" data-od-id="nav-platform"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>Platform</a><a href="release-schedule.html" data-od-id="nav-schedule"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Schedule</a><button type="button" class="nav-random" data-od-id="nav-random"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5M4 20L20.5 3.5M21 16v5h-5M15 15l6.1 6.1M4 4l5 5"/></svg>Random</button></nav><div class="header-tools"><input class="search" placeholder="Cari judul drama" data-od-id="header-search"><div class="language-toggle" data-od-id="subtitle-language-toggle"><button class="active" data-lang="EN">EN</button><button data-lang="ID">ID</button></div><button class="theme-toggle" data-od-id="theme-toggle" type="button" role="switch" aria-checked="false" aria-label="Ganti ke mode siang"><span class="theme-track" aria-hidden="true"><span class="theme-icon theme-icon-sun"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg></span><span class="theme-icon theme-icon-moon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></span><span class="theme-knob"></span></span></button></div></div></header>
+<main class="container page"><div class="browse-layout" data-od-id="browse-layout"><aside class="browse-sidebar" data-od-id="browse-sidebar">
+<details class="filter-group" data-od-id="filter-genre" open><summary class="filter-label">Genre</summary><div class="multi-select" data-genre-multiselect><button type="button" class="ms-trigger" data-ms-trigger aria-haspopup="listbox" aria-expanded="false"><span class="ms-value" data-ms-value>Semua genre</span><span class="ms-caret" aria-hidden="true"></span></button><div class="ms-menu" data-ms-menu role="listbox" aria-multiselectable="true" hidden></div></div></details>
+<details class="filter-group" data-od-id="filter-platform" open><summary class="filter-label">Platform</summary><div class="multi-select" data-platform-multiselect><button type="button" class="ms-trigger" data-ms-trigger aria-haspopup="listbox" aria-expanded="false"><span class="ms-value" data-ms-value>Semua platform</span><span class="ms-caret" aria-hidden="true"></span></button><div class="ms-menu" data-ms-menu role="listbox" aria-multiselectable="true" hidden></div></div></details>
+<details class="filter-group" data-od-id="filter-date-range" open><summary class="filter-label">Rentang Tanggal</summary><div class="date-range-row" data-od-id="date-range-inputs"><label class="date-range-label"><span class="date-range-caption">Dari</span><input type="date" class="date-range-input" data-date-from data-od-id="date-range-from"></label><span class="date-range-sep" aria-hidden="true">–</span><label class="date-range-label"><span class="date-range-caption">Sampai</span><input type="date" class="date-range-input" data-date-to data-od-id="date-range-to"></label></div></details>
+<details class="filter-group" data-od-id="filter-year" open><summary class="filter-label">Tahun Rilis</summary><div class="multi-select" data-year-multiselect><button type="button" class="ms-trigger" data-ms-trigger aria-haspopup="listbox" aria-expanded="false"><span class="ms-value" data-ms-value>Semua tahun</span><span class="ms-caret" aria-hidden="true"></span></button><div class="ms-menu" data-ms-menu role="listbox" aria-multiselectable="true" hidden></div></div></details>
+<details class="filter-group" data-od-id="filter-subtitle" open><summary class="filter-label">Subtitle</summary><div class="multi-select" data-sub-multiselect><button type="button" class="ms-trigger" data-ms-trigger aria-haspopup="listbox" aria-expanded="false"><span class="ms-value" data-ms-value>Semua subtitle</span><span class="ms-caret" aria-hidden="true"></span></button><div class="ms-menu" data-ms-menu role="listbox" aria-multiselectable="true" hidden></div></div></details>
+<button class="facet-clear" type="button" data-facet-clear data-od-id="browse-clear-all">Reset Semua Filter</button></aside>
+<div class="browse-content" data-od-id="browse-content"><div class="browse-toolbar" data-od-id="browse-toolbar"><input class="search" placeholder="Cari judul, genre, platform" data-browse-search data-od-id="browse-search"><div class="toolbar-sort" data-od-id="filter-sort"><label class="toolbar-sort-label" for="browse-sort">Urutan</label><select class="toolbar-sort-select" id="browse-sort" data-sort-select><option value="popular" selected>Terpopuler</option><option value="new">Terbaru</option><option value="az">A–Z</option><option value="full">Episode lengkap</option></select></div><span class="count" data-browse-count>Memuat katalog…</span></div><section class="section" data-od-id="browse-results"><div class="drama-grid" data-browse-grid data-browse-page="browse" data-per-page="24"></div><nav class="pagination" data-browse-pagination data-od-id="browse-pagination" aria-label="Navigasi halaman"></nav></section></div></div></main><footer class="pagefoot" data-od-id="global-footer"><div class="container footer-grid"><div class="footer-brand"><a class="logo" href="index.html">DRA<b>.CIN</b></a><p>Direktori drama pendek dari berbagai platform.</p></div><nav class="footer-col"><h2>Jelajahi</h2><a href="genre.html">Genre</a><a href="platform.html">Platform</a><a href="release-schedule.html">Schedule</a></nav><nav class="footer-col" aria-label="Bantuan"><h2>Bantuan</h2><a href="faq.html">FAQ</a><a href="contact.html">Kontak</a></nav><nav class="footer-col" aria-label="Legal"><h2>Legal</h2><a href="terms.html">TOS</a><a href="dmca.html">DMCA</a><a href="privacy.html">Privacy</a></nav></div><div class="container footer-bottom"><span>© 2026 DRA.CIN · Prototype visual</span><span>Metadata · Platform sumber · Subtitle</span></div></footer><script src="assets/dracin-data.js"></script><script src="assets/dracin.js"></script><script>
+(function(){
+  if(!window.DRACIN_CATALOGUE)return;
+  var grid=document.querySelector('[data-browse-grid]');
+  if(!grid)return;
+
+  var genreMS=document.querySelector('[data-genre-multiselect]');
+  var platformMS=document.querySelector('[data-platform-multiselect]');
+  var yearMS=document.querySelector('[data-year-multiselect]');
+  var subMS=document.querySelector('[data-sub-multiselect]');
+  var dateFrom=document.querySelector('[data-date-from]');
+  var dateTo=document.querySelector('[data-date-to]');
+  var sortSelect=document.querySelector('[data-sort-select]');
+  var countEl=document.querySelector('[data-browse-count]');
+  var pagEl=document.querySelector('[data-browse-pagination]');
+  var searchInput=document.querySelector('[data-browse-search]');
+  var clearBtn=document.querySelector('[data-facet-clear]');
+  var selectedGenres=new Set();
+  var selectedPlatforms=new Set();
+  var selectedYears=new Set();
+  var selectedSubs=new Set();
+  var sort='popular';
+  var query=new URLSearchParams(location.search).get('q')||'';
+  var perPage=24;
+
+  /* Build genre multi-select dropdown */
+  var syncGenreValue=function(){};
+  if(genreMS){
+    var genres=window.DRACIN_CATALOGUE.map(function(d){return d.genre}).filter(function(v,i,a){return a.indexOf(v)===i}).sort();
+    var genreTrigger=genreMS.querySelector('[data-ms-trigger]');
+    var genreValue=genreMS.querySelector('[data-ms-value]');
+    var genreMenu=genreMS.querySelector('[data-ms-menu]');
+    genreMenu.innerHTML=genres.map(function(name){
+      var n=window.DRACIN_CATALOGUE.filter(function(d){return d.genre===name}).length;
+      return '<label class="ms-option" role="option" aria-selected="false"><input type="checkbox" value="'+name+'" data-genre-cb><span>'+name+' <small>('+n+')</small></span></label>';
+    }).join('');
+    syncGenreValue=function(){
+      if(selectedGenres.size===0){genreValue.textContent='Semua genre'}
+      else if(selectedGenres.size===1){genreValue.textContent=Array.from(selectedGenres)[0]}
+      else{genreValue.textContent=selectedGenres.size+' genre dipilih'}
+      genreTrigger.classList.toggle('has-value',selectedGenres.size>0);
+    };
+    genreTrigger.addEventListener('click',function(){
+      var open=genreMenu.hidden;
+      genreMenu.hidden=!open;
+      genreTrigger.setAttribute('aria-expanded',String(open));
+      genreMS.classList.toggle('open',open);
+    });
+    genreMenu.querySelectorAll('[data-genre-cb]').forEach(function(cb){
+      cb.addEventListener('change',function(){
+        if(cb.checked){selectedGenres.add(cb.value)}else{selectedGenres.delete(cb.value)}
+        cb.closest('.ms-option').setAttribute('aria-selected',String(cb.checked));
+        syncGenreValue();
+        update();
+      });
+    });
+    document.addEventListener('click',function(e){if(!genreMS.contains(e.target)){genreMenu.hidden=true;genreTrigger.setAttribute('aria-expanded','false');genreMS.classList.remove('open')}});
+    syncGenreValue();
+  }
+
+  /* Build platform multi-select dropdown */
+  if(platformMS){
+    var platforms=window.DRACIN_CATALOGUE.map(function(d){return d.platform}).filter(function(v,i,a){return a.indexOf(v)===i}).sort();
+    var msTrigger=platformMS.querySelector('[data-ms-trigger]');
+    var msValue=platformMS.querySelector('[data-ms-value]');
+    var msMenu=platformMS.querySelector('[data-ms-menu]');
+    msMenu.innerHTML=platforms.map(function(name){
+      var n=window.DRACIN_CATALOGUE.filter(function(d){return d.platform===name}).length;
+      return '<label class="ms-option" role="option" aria-selected="false"><input type="checkbox" value="'+name+'" data-platform-cb><span>'+name+' <small>('+n+')</small></span></label>';
+    }).join('');
+    function syncMsValue(){
+      if(selectedPlatforms.size===0){msValue.textContent='Semua platform'}
+      else if(selectedPlatforms.size===1){msValue.textContent=Array.from(selectedPlatforms)[0]}
+      else{msValue.textContent=selectedPlatforms.size+' platform dipilih'}
+      msTrigger.classList.toggle('has-value',selectedPlatforms.size>0);
+    }
+    msTrigger.addEventListener('click',function(){
+      var open=msMenu.hidden;
+      msMenu.hidden=!open;
+      msTrigger.setAttribute('aria-expanded',String(open));
+      platformMS.classList.toggle('open',open);
+    });
+    msMenu.querySelectorAll('[data-platform-cb]').forEach(function(cb){
+      cb.addEventListener('change',function(){
+        if(cb.checked){selectedPlatforms.add(cb.value)}else{selectedPlatforms.delete(cb.value)}
+        cb.closest('.ms-option').setAttribute('aria-selected',String(cb.checked));
+        syncMsValue();
+        update();
+      });
+    });
+    document.addEventListener('click',function(e){if(!platformMS.contains(e.target)){msMenu.hidden=true;msTrigger.setAttribute('aria-expanded','false');platformMS.classList.remove('open')}});
+    syncMsValue();
+  }
+
+  /* Build year multi-select dropdown */
+  var syncYearValue=function(){};
+  if(yearMS){
+    var years=window.DRACIN_CATALOGUE.map(function(d){return d.year}).filter(function(v,i,a){return a.indexOf(v)===i}).sort(function(a,b){return b-a});
+    var yearTrigger=yearMS.querySelector('[data-ms-trigger]');
+    var yearValue=yearMS.querySelector('[data-ms-value]');
+    var yearMenu=yearMS.querySelector('[data-ms-menu]');
+    yearMenu.innerHTML=years.map(function(yr){
+      var n=window.DRACIN_CATALOGUE.filter(function(d){return d.year===yr}).length;
+      return '<label class="ms-option" role="option" aria-selected="false"><input type="checkbox" value="'+yr+'" data-year-cb><span>'+yr+' <small>('+n+')</small></span></label>';
+    }).join('');
+    syncYearValue=function(){
+      if(selectedYears.size===0){yearValue.textContent='Semua tahun'}
+      else if(selectedYears.size===1){yearValue.textContent=Array.from(selectedYears)[0]}
+      else{yearValue.textContent=selectedYears.size+' tahun dipilih'}
+      yearTrigger.classList.toggle('has-value',selectedYears.size>0);
+    };
+    yearTrigger.addEventListener('click',function(){
+      var open=yearMenu.hidden;
+      yearMenu.hidden=!open;
+      yearTrigger.setAttribute('aria-expanded',String(open));
+      yearMS.classList.toggle('open',open);
+    });
+    yearMenu.querySelectorAll('[data-year-cb]').forEach(function(cb){
+      cb.addEventListener('change',function(){
+        var year=Number(cb.value);
+        if(cb.checked){selectedYears.add(year)}else{selectedYears.delete(year)}
+        cb.closest('.ms-option').setAttribute('aria-selected',String(cb.checked));
+        syncYearValue();
+        update();
+      });
+    });
+    document.addEventListener('click',function(e){if(!yearMS.contains(e.target)){yearMenu.hidden=true;yearTrigger.setAttribute('aria-expanded','false');yearMS.classList.remove('open')}});
+    syncYearValue();
+  }
+
+  /* Build subtitle multi-select dropdown */
+  var syncSubValue=function(){};
+  if(subMS){
+    var subs=window.DRACIN_CATALOGUE.map(function(d){return d.sub}).filter(function(v,i,a){return a.indexOf(v)===i}).sort();
+    var subTrigger=subMS.querySelector('[data-ms-trigger]');
+    var subValue=subMS.querySelector('[data-ms-value]');
+    var subMenu=subMS.querySelector('[data-ms-menu]');
+    subMenu.innerHTML=subs.map(function(name){
+      var n=window.DRACIN_CATALOGUE.filter(function(d){return d.sub===name}).length;
+      return '<label class="ms-option" role="option" aria-selected="false"><input type="checkbox" value="'+name+'" data-sub-cb><span>Subtitle '+name+' <small>('+n+')</small></span></label>';
+    }).join('');
+    syncSubValue=function(){
+      if(selectedSubs.size===0){subValue.textContent='Semua subtitle'}
+      else if(selectedSubs.size===1){subValue.textContent='Subtitle '+Array.from(selectedSubs)[0]}
+      else{subValue.textContent=selectedSubs.size+' subtitle dipilih'}
+      subTrigger.classList.toggle('has-value',selectedSubs.size>0);
+    };
+    subTrigger.addEventListener('click',function(){
+      var open=subMenu.hidden;
+      subMenu.hidden=!open;
+      subTrigger.setAttribute('aria-expanded',String(open));
+      subMS.classList.toggle('open',open);
+    });
+    subMenu.querySelectorAll('[data-sub-cb]').forEach(function(cb){
+      cb.addEventListener('change',function(){
+        if(cb.checked){selectedSubs.add(cb.value)}else{selectedSubs.delete(cb.value)}
+        cb.closest('.ms-option').setAttribute('aria-selected',String(cb.checked));
+        syncSubValue();
+        update();
+      });
+    });
+    document.addEventListener('click',function(e){if(!subMS.contains(e.target)){subMenu.hidden=true;subTrigger.setAttribute('aria-expanded','false');subMS.classList.remove('open')}});
+    syncSubValue();
+  }
+
+  /* Release date range */
+  function releaseDateOf(d){
+    if(d.aired)return String(d.aired);
+    var hash=0,source=String(d.id||d.title||'');
+    for(var i=0;i<source.length;i++)hash=(hash*31+source.charCodeAt(i))>>>0;
+    var month=(hash%12)+1;
+    var day=(Math.floor(hash/12)%28)+1;
+    return String(d.year)+'-'+String(month).padStart(2,'0')+'-'+String(day).padStart(2,'0');
+  }
+  var releaseDates=window.DRACIN_CATALOGUE.map(releaseDateOf).sort();
+  var earliestRelease=releaseDates[0];
+  var latestRelease=releaseDates[releaseDates.length-1];
+  if(dateFrom){dateFrom.min=earliestRelease;dateFrom.max=latestRelease}
+  if(dateTo){dateTo.min=earliestRelease;dateTo.max=latestRelease}
+  function syncDateRange(){
+    if(dateFrom&&dateTo){
+      dateTo.min=dateFrom.value||earliestRelease;
+      dateFrom.max=dateTo.value||latestRelease;
+      if(dateFrom.value&&dateTo.value&&dateFrom.value>dateTo.value)dateTo.value=dateFrom.value;
+    }
+    if(dateFrom)dateFrom.classList.toggle('has-value',!!dateFrom.value);
+    if(dateTo)dateTo.classList.toggle('has-value',!!dateTo.value);
+  }
+  if(dateFrom)dateFrom.addEventListener('change',function(){syncDateRange();update()});
+  if(dateTo)dateTo.addEventListener('change',function(){syncDateRange();update()});
+  syncDateRange();
+
+  /* Sort select */
+  if(sortSelect)sortSelect.addEventListener('change',function(){sort=sortSelect.value;update()});
+
+  /* Reset all */
+  if(clearBtn)clearBtn.addEventListener('click',function(){
+     selectedGenres.clear();selectedPlatforms.clear();selectedYears.clear();selectedSubs.clear();
+     if(dateFrom)dateFrom.value='';
+     if(dateTo)dateTo.value='';
+     document.querySelectorAll('[data-genre-cb],[data-platform-cb],[data-year-cb],[data-sub-cb]').forEach(function(c){c.checked=false});
+    document.querySelectorAll('.multi-select .ms-option').forEach(function(o){o.setAttribute('aria-selected','false')});
+    document.querySelectorAll('.multi-select').forEach(function(ms){ms.classList.remove('open');var m=ms.querySelector('[data-ms-menu]');if(m)m.hidden=true;var t=ms.querySelector('[data-ms-trigger]');if(t)t.setAttribute('aria-expanded','false')});
+    if(typeof syncGenreValue==='function')syncGenreValue();
+    if(typeof syncMsValue==='function')syncMsValue();
+     if(typeof syncYearValue==='function')syncYearValue();
+     if(typeof syncSubValue==='function')syncSubValue();
+     syncDateRange();
+     if(sortSelect)sortSelect.value='popular';
+    sort='popular';
+    if(searchInput)searchInput.value='';
+    query='';
+    update();
+  });
+
+  /* Search */
+  if(searchInput){if(query)searchInput.value=query;searchInput.addEventListener('input',function(){query=searchInput.value.trim().toLowerCase();update()})}
+
+  function filtered(){
+    return window.DRACIN_CATALOGUE.filter(function(d){
+      if(selectedGenres.size&&!selectedGenres.has(d.genre))return false;
+      if(selectedPlatforms.size&&!selectedPlatforms.has(d.platform))return false;
+      if(selectedYears.size&&!selectedYears.has(d.year))return false;
+      if(selectedSubs.size&&!selectedSubs.has(d.sub))return false;
+       var releaseDate=releaseDateOf(d);
+       if(dateFrom&&dateFrom.value&&releaseDate<dateFrom.value)return false;
+       if(dateTo&&dateTo.value&&releaseDate>dateTo.value)return false;
+      if(query){
+        var hay=(d.title+' '+d.platform+' '+d.genre).toLowerCase();
+        if(hay.indexOf(query)<0)return false;
+      }
+      return true;
+    }).sort(function(a,b){
+      if(sort==='new')return b.year-a.year||b.episodes-a.episodes;
+      if(sort==='full')return b.episodes-a.episodes;
+      if(sort==='az')return a.title.localeCompare(b.title);
+      return b.episodes*1000+b.year-a.episodes*1000-a.year;
+    });
+  }
+
+  function cardMarkup(d){
+    var alt=(d.title.match(/[A-Za-z]/g)||['D']).slice(0,2).join('').toUpperCase();
+    var episodeCount=String(d.episodes);
+    var synopsis=d.synopsis||'Metadata drama, platform, subtitle, dan jumlah episode tersedia di halaman detail.';
+    var mins=d.episodes*2;
+    var dur=(mins>=60?(Math.floor(mins/60)+'j '+(''+(mins%60)).padStart(2,'0')+'m'):(mins+'m'));
+    var ratingHtml=window.dracinRatingStars?window.dracinRatingStars(d.rating):'';
+    var airedHtml=window.dracinFormatAired?window.dracinFormatAired(d):(d.year?String(d.year):'');
+    return '<a class="drama-card" href="#" style="--card-tone:'+d.tone+'" data-od-id="browse-card-'+d.id+'"'+
+      ' data-id="'+d.id+'" data-title="'+d.title+'" data-genre="'+d.genre+'" data-platform="'+d.platform+'" data-sub="'+d.sub+'" data-episodes="'+d.episodes+'" data-year="'+d.year+'">'+
+      '<span class="card-thumb"><span class="drama-art" data-monogram="'+alt+'"></span><span class="card-shade"></span>'+
+      '<span class="card-platform">'+d.platform+'</span><span class="card-locale">'+d.sub+'</span>'+
+      '<span class="card-play-overlay" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor" width="28" height="28"><path d="M8 5v14l11-7z"/></svg></span></span>'+
+      '<span class="card-copy card-info">'+
+      '<h3 class="card-title">'+d.title+'</h3><p class="card-episode-line"><i class="episode-dot"></i> Episode '+episodeCount+' \u00b7 '+d.genre+'</p></span>'+
+      '<span class="card-tooltip">'+
+        '<span class="card-tooltip-skeleton"><span class="skel-title"></span><span class="skel-meta"><span></span><span></span><span></span></span><span class="skel-synopsis"></span><span class="skel-aired"></span><span class="skel-genre"></span><span class="skel-sub"></span></span>'+
+        '<span class="card-tooltip-title">'+d.title+'</span>'+
+        '<span class="card-tooltip-meta">'+ratingHtml+
+          '<span class="tag-episode">'+episodeCount+' EP</span>'+
+          '<span class="tag-platform">'+d.platform+'</span>'+
+        '</span>'+
+        '<span class="card-tooltip-synopsis">'+synopsis+'</span>'+
+        '<span class="card-tooltip-aired">Tayang: '+airedHtml+'</span>'+
+        '<span class="card-tooltip-genre"><span>'+d.genre+'</span></span>'+
+        '<span class="card-tooltip-sub">Subtitle: '+d.sub+' \u00b7 '+dur+' total tayang</span>'+
+      '</span></a>';
+  }
+
+  var currentPage=1;
+  function update(resetPage){
+    var list=filtered();
+    if(resetPage!==false)currentPage=1;
+    var pages=Math.max(1,Math.ceil(list.length/perPage));
+    if(currentPage>pages)currentPage=pages;
+    var slice=list.slice((currentPage-1)*perPage,currentPage*perPage);
+
+    grid.innerHTML=slice.length?slice.map(cardMarkup).join(''):'<p class="browse-empty">Tidak ada judul yang cocok dengan filter ini. Coba kurangi pilihan atau tekan Reset.</p>';
+
+    grid.querySelectorAll('.drama-card').forEach(function(card){
+      var h3=card.querySelector('h3'),plat=card.querySelector('.card-platform'),loc=card.querySelector('.card-locale');
+      if(h3){
+        var rec=window.DRACIN_CATALOGUE.filter(function(d){return d.title===h3.textContent.trim()})[0];
+        var q='title='+encodeURIComponent(h3.textContent.trim())+'&platform='+encodeURIComponent(plat?plat.textContent.trim():'DramaBox')+'&sub='+encodeURIComponent(loc?loc.textContent.trim():'EN')+'&episode=1';
+        if(rec)q+='&id='+encodeURIComponent(rec.id);
+        card.href='dracin-watch.html?'+q;
+      }
+    });
+
+    if(countEl){
+      var filterCount=(selectedGenres.size+selectedPlatforms.size+selectedYears.size+selectedSubs.size);
+      if(dateFrom&&dateFrom.value)filterCount++;
+      if(dateTo&&dateTo.value)filterCount++;
+      countEl.textContent=list.length+' drama ditemukan'+(filterCount?' \u00b7 '+filterCount+' filter aktif':'');
+    }
+
+    if(pagEl){
+      if(pages<=1){pagEl.innerHTML='';return}
+      var html='<button class="page-btn" type="button" data-goto="'+(currentPage-1)+'"'+(currentPage===1?' disabled':'')+'>&#8249;</button>';
+      for(var i=1;i<=pages;i++){
+        if(pages>7&&i>2&&i<pages-1&&Math.abs(i-currentPage)>1){if(i===3)html+='<span class="page-gap">\u2026</span>';continue}
+        html+='<button class="page-btn'+(i===currentPage?' active':'')+'" type="button" data-goto="'+i+'">'+i+'</button>';
+      }
+      html+='<button class="page-btn" type="button" data-goto="'+(currentPage+1)+'"'+(currentPage===pages?' disabled':'')+'>&#8250;</button>';
+      pagEl.innerHTML=html;
+      pagEl.querySelectorAll('[data-goto]').forEach(function(button){
+        button.addEventListener('click',function(){
+          var go=Number(button.dataset.goto);
+          if(go<1||go>pages||go===currentPage)return;
+          currentPage=go;update(false);
+          grid.scrollIntoView({behavior:'smooth',block:'start'});
+        });
+      });
+    }
+
+    /* Re-run tooltip edge-flip after grid repaint */
+    if(typeof applyTooltipEdges==='function')applyTooltipEdges();
+  }
+
+  update();
+})();
+</script></body></html>

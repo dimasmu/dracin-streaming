@@ -1,0 +1,145 @@
+<main>
+  <div class="contact-hero">
+    <div class="container">
+      <p class="eyebrow">Contact Us</p>
+      <h1 class="display">DRA.CIN Support</h1>
+      <p>
+        Questions, bug reports or content requests? Fill in the form below or reach out directly.
+      </p>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="contact-grid">
+      <div class="contact-info">
+        <div class="contact-info-card">
+          <h3>Email</h3>
+          <p>Send general questions and issue reports by email.</p>
+          <p class="contact-value">hello&#64;dracin.example</p>
+        </div>
+        <div class="contact-info-card">
+          <h3>Copyright (DMCA)</h3>
+          <p>For copyright removal requests, see our <a routerLink="/dmca">DMCA policy</a>.</p>
+          <p class="contact-value">dmca&#64;dracin.example</p>
+        </div>
+        <div class="contact-info-card">
+          <h3>Response Time</h3>
+          <p>
+            We aim to respond to every message within 2&ndash;5 business days. Copyright requests
+            may take longer to verify.
+          </p>
+        </div>
+        <div class="contact-info-card">
+          <h3>Prototype Site</h3>
+          <p>
+            DRA.CIN currently operates as a visual prototype. There is no live streaming service or
+            active user account system.
+          </p>
+        </div>
+        <div class="contact-info-card">
+          <h3>Legal Links</h3>
+          <p>
+            <a routerLink="/terms">Terms of Service</a> &middot;
+            <a routerLink="/dmca">DMCA Policy</a> &middot; <a routerLink="/faq">FAQ</a>
+          </p>
+        </div>
+      </div>
+
+      <div class="contact-form-wrap">
+        <h2 class="display">Send a Message</h2>
+        <p>Fields marked with * are required.</p>
+
+        @if (!submitted()) {
+          <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+            <div class="contact-field">
+              <label for="cf-name">Full Name *</label>
+              <input
+                pInputText
+                id="cf-name"
+                type="text"
+                formControlName="name"
+                placeholder="Your name"
+                autocomplete="name"
+                [class.invalid]="isInvalid('name')"
+              />
+            </div>
+            <div class="contact-field">
+              <label for="cf-email">Email Address *</label>
+              <input
+                pInputText
+                id="cf-email"
+                type="email"
+                formControlName="email"
+                placeholder="email@example.com"
+                autocomplete="email"
+                [class.invalid]="isInvalid('email')"
+              />
+            </div>
+            <div class="contact-field">
+              <label for="cf-subject">Subject *</label>
+              <input
+                pInputText
+                id="cf-subject"
+                type="text"
+                formControlName="subject"
+                placeholder="Topic of your message"
+                [class.invalid]="isInvalid('subject')"
+              />
+            </div>
+            <div class="contact-field">
+              <label for="cf-category">Category *</label>
+              <p-select
+                inputId="cf-category"
+                [options]="categoryOptions"
+                optionLabel="label"
+                optionValue="value"
+                placeholder="Choose a category&hellip;"
+                [formControl]="form.controls.category"
+                [style]="{ width: '100%' }"
+                [class.invalid]="isInvalid('category')"
+              />
+            </div>
+            <div class="contact-field">
+              <label for="cf-message">Message</label>
+              <textarea
+                id="cf-message"
+                formControlName="message"
+                placeholder="Describe your question or issue in detail&hellip;"
+              ></textarea>
+            </div>
+            <div class="contact-form-footer">
+              <p class="contact-note">
+                Your data is not shared with third parties. Only the subtitle language preference
+                (EN/ID) is stored locally in this browser.
+              </p>
+              <button class="btn btn-primary" type="submit" [disabled]="sending()">
+                {{ sending() ? 'Sending&hellip;' : 'Send Message' }}
+              </button>
+            </div>
+          </form>
+        } @else {
+          <div
+            style="
+              margin-top: 20px;
+              padding: 16px;
+              background: color-mix(in oklch, var(--success) 10%, var(--surface));
+              border: 1px solid color-mix(in oklch, var(--success) 30%, var(--border));
+              border-radius: 8px;
+              color: var(--fg);
+              font-size: 12px;
+            "
+          >
+            <strong class="display" style="display: block; margin-bottom: 6px"
+              >Message recorded</strong
+            >
+            Thanks for reaching out. This is a prototype &mdash; no message has actually been sent
+            to a server.
+            <div style="margin-top: 14px">
+              <button class="btn btn-compact" type="button" (click)="reset()">Send another</button>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</main>

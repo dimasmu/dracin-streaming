@@ -1,0 +1,78 @@
+<main>
+  <div class="faq-hero">
+    <div class="container">
+      <p class="eyebrow">Help Center</p>
+      <h1 class="display">How can we help?</h1>
+      <p>Search for answers or browse the categories below.</p>
+      <div class="faq-search-wrap">
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <circle cx="11" cy="11" r="8" />
+          <path d="m21 21-4.35-4.35" />
+        </svg>
+        <input
+          class="faq-search"
+          type="search"
+          placeholder="Type a question or keyword&hellip;"
+          aria-label="Search the help center"
+          [value]="query()"
+          (input)="onQuery($event)"
+        />
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="faq-categories">
+      <h2 class="faq-categories-heading display">Browse Categories</h2>
+      <div class="faq-category-grid">
+        @for (c of categories(); track c.id) {
+          <button
+            type="button"
+            class="faq-category-card"
+            [class.selected]="activeCategory() === c.id"
+            (click)="setCategory(c.id)"
+          >
+            <div class="faq-cat-icon"><i [class]="c.icon" aria-hidden="true"></i></div>
+            <div class="text-left">
+              <p class="faq-cat-title">{{ c.name }}</p>
+              <p class="faq-cat-count">{{ c.count }} questions</p>
+            </div>
+          </button>
+        }
+      </div>
+    </div>
+
+    <div class="faq-accordion">
+      <h2 class="faq-accordion-heading display">Common Questions</h2>
+      @if (visible().length) {
+        <p-accordion [(value)]="openPanels" [multiple]="true">
+          @for (item of visible(); track $index; let i = $index) {
+            <p-accordion-panel [value]="itemKey(item)">
+              <p-accordion-header>{{ item.q }}</p-accordion-header>
+              <p-accordion-content>{{ item.a }}</p-accordion-content>
+            </p-accordion-panel>
+          }
+        </p-accordion>
+      } @else {
+        <p class="faq-no-results">
+          No results for &ldquo;{{ query() }}&rdquo;. Try another keyword or contact support.
+        </p>
+      }
+    </div>
+
+    <div style="text-align: center; padding: 0 0 80px">
+      <p style="color: var(--muted); font-size: 13px; margin: 0 0 14px">
+        Didn&rsquo;t find what you were looking for?
+      </p>
+      <a class="btn btn-primary" routerLink="/contact">Contact Support</a>
+    </div>
+  </div>
+</main>

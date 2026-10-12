@@ -1,0 +1,74 @@
+<div class="drama-card" [style.--card-tone]="drama().tone">
+  <div class="drama-art">
+    <span class="drama-monogram">{{ monogram() }}</span>
+  </div>
+  <span class="card-shade"></span>
+  <span class="card-platform">{{ drama().platformId }}</span>
+  <span class="card-locale">{{ subtitle() }}</span>
+
+  <span class="card-play-overlay" aria-hidden="true">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
+  </span>
+
+  <span class="card-copy">
+    <h3>{{ drama().title }}</h3>
+    <p><i class="episode-dot"></i> Episode {{ episode() }} &middot; {{ genre() }}</p>
+  </span>
+
+  <span class="card-tooltip" aria-hidden="true">
+    <span class="card-tooltip-title">{{ drama().title }}</span>
+    <span class="card-tooltip-meta">
+      @if (drama().rating) {
+        <span class="card-tooltip-rating">
+          @for (s of stars(); track $index) {
+            <svg
+              class="star{{ $index < filled() ? ' star-on' : '' }}"
+              viewBox="0 0 24 24"
+              width="9"
+              height="9"
+            >
+              <path
+                d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+              />
+            </svg>
+          }
+          <b>{{ drama().rating?.toFixed(1) }}</b>
+        </span>
+      }
+      <span class="tag-episode">{{ episode() }} EP</span>
+      <span class="tag-platform">{{ drama().platformId }}</span>
+    </span>
+    <span class="card-tooltip-synopsis">{{ drama().synopsis }}</span>
+    <span class="card-tooltip-aired">Aired: {{ aired() }}</span>
+    <span class="card-tooltip-genre">
+      @for (g of drama().genres; track g) {
+        <span>{{ g }}</span>
+      }
+    </span>
+    <span class="card-tooltip-sub">Subtitle: {{ subtitle() }} &middot; {{ duration() }} total</span>
+  </span>
+
+  <button
+    type="button"
+    class="card-bookmark"
+    [class.active]="bookmarked()"
+    [attr.aria-pressed]="bookmarked()"
+    [attr.aria-label]="bookmarked() ? 'Remove from bookmarks' : 'Add to bookmarks'"
+    (click)="toggleBookmark()"
+  >
+    <svg
+      viewBox="0 0 24 24"
+      [attr.fill]="bookmarked() ? 'currentColor' : 'none'"
+      stroke="currentColor"
+      stroke-width="2"
+    >
+      <path d="M6 4.5A2.5 2.5 0 0 1 8.5 2h7A2.5 2.5 0 0 1 18 4.5V21l-6-3.5L6 21z" />
+    </svg>
+  </button>
+
+  <a
+    class="drama-card-link"
+    [routerLink]="['/drama', drama().slug]"
+    [attr.aria-label]="drama().title"
+  ></a>
+</div>

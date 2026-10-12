@@ -1,0 +1,118 @@
+@if (drama(); as d) {
+  <section class="detail-hero" [style.--detail-tone]="d.tone">
+    <div class="container">
+      <nav class="breadcrumbs" aria-label="Breadcrumb">
+        <a routerLink="/">Home</a> / <a routerLink="/browse">Dramas</a> / <span>{{ d.title }}</span>
+      </nav>
+      <div class="detail-inner">
+        <div class="detail-poster">
+          <span class="drama-art" [style.--card-tone]="d.tone"
+            ><span class="drama-monogram">{{ monogram(d.title) }}</span></span
+          >
+        </div>
+        <div>
+          <h1 class="detail-title">{{ d.title }}</h1>
+          <p class="alternative-title">
+            {{ d.genres.join(' &middot; ') }} &middot; {{ d.country ?? 'China' }} &middot;
+            {{ d.releaseYear }}
+          </p>
+          <div class="metadata-grid">
+            <span class="metadata-item"
+              ><strong>{{ d.releaseYear }}</strong> release</span
+            >
+            <span class="metadata-item"
+              ><strong>{{ d.totalEpisodes }}</strong> episodes</span
+            >
+            <span class="metadata-item"
+              ><strong>{{ d.latestEpisode }}</strong> latest</span
+            >
+            <span class="metadata-item"
+              ><strong>{{ d.platformId }}</strong> source</span
+            >
+            <span class="metadata-item"
+              ><strong>SUB {{ d.subtitleLanguages.join(' / ') }}</strong></span
+            >
+            <span class="metadata-item"
+              ><strong>{{ statusLabel() }}</strong> status</span
+            >
+          </div>
+          @if (d.rating) {
+            <div class="metadata-grid">
+              <span class="metadata-item">
+                <strong>{{ d.rating.toFixed(1) }} / 10</strong>
+                @for (s of stars; track $index) {
+                  <svg
+                    class="star{{ $index < ratingFilled() ? ' star-on' : '' }}"
+                    viewBox="0 0 24 24"
+                    width="10"
+                    height="10"
+                    style="display: inline-block"
+                  >
+                    <path
+                      d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+                    />
+                  </svg>
+                }
+                &middot; demo rating
+              </span>
+            </div>
+          }
+          <p class="synopsis">{{ d.synopsis }}</p>
+          <div class="detail-actions">
+            <a class="btn btn-primary" [routerLink]="['/watch', d.slug, 1]">&#9654; Watch now</a>
+            <button
+              class="btn"
+              type="button"
+              [class.btn-primary]="bookmarked()"
+              (click)="toggleBookmark()"
+            >
+              {{ bookmarked() ? '&#9733; Bookmarked' : '&#9734; Bookmark' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="container page">
+    <section class="section">
+      <div class="section-heading">
+        <h2 class="display">Episodes</h2>
+        <span class="count">{{ d.totalEpisodes }} episodes</span>
+      </div>
+      <div class="episode-list">
+        @for (ep of episodeNumbers(); track ep) {
+          <a
+            class="episode-button"
+            [class.active]="ep === d.latestEpisode"
+            [routerLink]="['/watch', d.slug, ep]"
+            >{{ ep }}</a
+          >
+        }
+      </div>
+    </section>
+
+    @if (related().length) {
+      <section class="section">
+        <div class="section-heading">
+          <h2 class="display">Related Dramas</h2>
+          <a routerLink="/browse">View all</a>
+        </div>
+        <div class="rail">
+          @for (r of related(); track r.id) {
+            <app-drama-card [drama]="r" />
+          }
+        </div>
+      </section>
+    }
+  </div>
+} @else {
+  <main class="container page">
+    <app-empty-state
+      title="Drama not found"
+      message="This drama does not exist or may have been removed."
+    >
+      <a class="btn btn-primary" routerLink="/browse">Browse all dramas</a>
+    </app-empty-state>
+  </main>
+}

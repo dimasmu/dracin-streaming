@@ -1,0 +1,85 @@
+<main class="container page">
+  <div class="page-head">
+    <div>
+      <h1 class="display">Platforms</h1>
+      <p>
+        Explore dramas by their source platform. DRA.CIN is a directory only &mdash; no affiliation
+        or partnership with these platforms is implied.
+      </p>
+    </div>
+  </div>
+
+  <section class="grid gap-4" style="grid-template-columns: repeat(auto-fill, minmax(200px, 1fr))">
+    @for (p of catalog.platforms; track p.id) {
+      <a
+        class="genre-card"
+        [routerLink]="['/browse']"
+        [queryParams]="{ platform: p.name }"
+        [style.--card-tone]="p.tone"
+      >
+        <div class="genre-card-art" [attr.data-monogram]="monogram(p.name)"></div>
+        <div class="p-4">
+          <h2 class="display" style="font-size: 22px; margin: 0">{{ p.name }}</h2>
+          <p class="text-muted" style="font-size: 11px; margin: 4px 0 8px">{{ p.description }}</p>
+          <span class="count">{{ count(p.name) }} dramas</span>
+        </div>
+      </a>
+    }
+  </section>
+
+  <section class="section">
+    <div class="section-heading">
+      <h2 class="display">Browse by Platform</h2>
+      <span class="count">{{ filtered().length }} dramas</span>
+    </div>
+    <div class="facet-bar facet-bar--split" aria-label="Filter by platform">
+      <span class="facet-chips-label">Platform</span>
+      <div class="facet-scroller">
+        <div class="facet-chips">
+          <button
+            class="filter-chip"
+            type="button"
+            [class.active]="activePlatform() === 'All'"
+            (click)="selectPlatform('All')"
+          >
+            All
+          </button>
+          @for (p of catalog.platforms; track p.id) {
+            <button
+              class="filter-chip"
+              type="button"
+              [class.active]="activePlatform() === p.name"
+              (click)="selectPlatform(p.name)"
+            >
+              {{ p.name }} <span class="chip-count">{{ count(p.name) }}</span>
+            </button>
+          }
+        </div>
+      </div>
+      <div class="facet-status">
+        <span class="count">{{ filtered().length }} dramas</span>
+        <button class="facet-clear" type="button" (click)="selectPlatform('All')">Reset</button>
+      </div>
+    </div>
+
+    @if (filtered().length) {
+      <div class="drama-grid" style="margin-top: 18px">
+        @for (d of paged(); track d.id) {
+          <app-drama-card [drama]="d" />
+        }
+      </div>
+      @if (pageCount() > 1) {
+        <div class="pagination">
+          <p-paginator
+            [rows]="rows()"
+            [totalRecords]="filtered().length"
+            [first]="first()"
+            (onPageChange)="onPageChange($event)"
+          />
+        </div>
+      }
+    } @else {
+      <app-empty-state title="No dramas on this platform" message="Try a different platform." />
+    }
+  </section>
+</main>

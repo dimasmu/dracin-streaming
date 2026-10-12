@@ -1,0 +1,359 @@
+<header class="topnav">
+  <div class="container topnav-inner">
+    <a class="logo" routerLink="/">DRA<b>.CIN</b></a>
+
+    <nav class="nav-links" aria-label="Main navigation">
+      <a routerLink="/" [attr.aria-current]="isActive('/') ? 'page' : null">
+        <svg
+          class="nav-icon"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z" />
+          <polyline points="9 21 9 14 15 14 15 21" />
+        </svg>
+        Home
+      </a>
+      <a routerLink="/genre" [attr.aria-current]="isActive('/genre') ? 'page' : null">
+        <svg
+          class="nav-icon"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <rect x="3" y="3" width="7" height="7" rx="1" />
+          <rect x="14" y="3" width="7" height="7" rx="1" />
+          <rect x="3" y="14" width="7" height="7" rx="1" />
+          <rect x="14" y="14" width="7" height="7" rx="1" />
+        </svg>
+        Genre
+      </a>
+      <a routerLink="/platform" [attr.aria-current]="isActive('/platform') ? 'page' : null">
+        <svg
+          class="nav-icon"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <rect x="2" y="3" width="20" height="14" rx="2" />
+          <path d="M8 21h8M12 17v4" />
+        </svg>
+        Platform
+      </a>
+      <a
+        routerLink="/release-schedule"
+        [attr.aria-current]="isActive('/release-schedule') ? 'page' : null"
+      >
+        <svg
+          class="nav-icon"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <rect x="3" y="4" width="18" height="18" rx="2" />
+          <path d="M16 2v4M8 2v4M3 10h18" />
+        </svg>
+        Schedule
+      </a>
+      <button type="button" class="nav-random" (click)="random()">
+        <svg
+          class="nav-icon"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M16 3h5v5M4 20L20.5 3.5M21 16v5h-5M15 15l6.1 6.1M4 4l5 5" />
+        </svg>
+        Random
+      </button>
+    </nav>
+
+    <button
+      type="button"
+      class="nav-burger"
+      aria-label="Open menu"
+      (click)="drawerVisible.set(true)"
+    >
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+      >
+        <line x1="3" y1="6" x2="21" y2="6" />
+        <line x1="3" y1="12" x2="21" y2="12" />
+        <line x1="3" y1="18" x2="21" y2="18" />
+      </svg>
+    </button>
+
+    <div class="header-tools">
+      <input
+        class="search"
+        aria-label="Search dramas"
+        placeholder="Search drama titles"
+        [value]="query()"
+        (input)="onSearchInput($event)"
+        (keydown.enter)="submitSearch()"
+        (keydown.escape)="closeSearch()"
+      />
+      @if (searchOpen()) {
+        <div class="search-dropdown">
+          @if (searchLoading()) {
+            @for (i of [0, 1, 2, 3]; track i) {
+              <div class="search-result">
+                <p-skeleton shape="rectangle" width="56px" height="72px" />
+                <div class="flex flex-col gap-2 w-full">
+                  <p-skeleton width="60%" height="12px" />
+                  <p-skeleton width="85%" height="12px" />
+                  <p-skeleton width="45%" height="12px" />
+                </div>
+              </div>
+            }
+          } @else if (searchResults().length) {
+            @for (d of searchResults(); track d.id) {
+              <a class="search-result" [routerLink]="['/drama', d.slug]" (click)="closeSearch()">
+                <span class="search-result-thumb" [style.--card-tone]="d.tone"
+                  ><span class="drama-art"></span
+                ></span>
+                <span class="search-result-body">
+                  <span class="search-result-title">{{ d.title }}</span>
+                  <span class="search-result-meta">
+                    @if (d.rating) {
+                      <span class="tag-episode">{{ d.rating.toFixed(1) }} &#9733;</span>
+                    }
+                    <span class="tag-episode">{{ d.latestEpisode }} EP</span>
+                    <span class="tag-platform">{{ d.platformId }}</span>
+                  </span>
+                  <span class="search-result-synopsis">{{ d.synopsis }}</span>
+                  <span class="search-result-foot">
+                    <span>{{ d.genres[0] }}</span>
+                    <span>Subtitle: {{ d.subtitleLanguages[0] }}</span>
+                  </span>
+                </span>
+              </a>
+            }
+          } @else {
+            <div class="search-dropdown-empty">
+              No dramas found for &ldquo;{{ query() }}&rdquo;.
+            </div>
+          }
+        </div>
+      }
+
+      <div class="language-toggle" role="group" aria-label="Subtitle language preference">
+        <button
+          type="button"
+          [class.active]="prefs.subtitle() === 'EN'"
+          (click)="setSubtitle('EN')"
+        >
+          EN
+        </button>
+        <button
+          type="button"
+          [class.active]="prefs.subtitle() === 'ID'"
+          (click)="setSubtitle('ID')"
+        >
+          ID
+        </button>
+      </div>
+
+      <button
+        type="button"
+        class="theme-toggle"
+        role="switch"
+        [attr.aria-checked]="prefs.theme() === 'light'"
+        [attr.aria-label]="
+          prefs.theme() === 'light' ? 'Switch to dark mode' : 'Switch to light mode'
+        "
+        (click)="prefs.toggleTheme()"
+      >
+        <span class="theme-track" aria-hidden="true">
+          <span class="theme-icon theme-icon-moon"
+            ><svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" /></svg
+          ></span>
+          <span class="theme-icon theme-icon-sun"
+            ><svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle cx="12" cy="12" r="4" />
+              <path
+                d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"
+              /></svg
+          ></span>
+          <span class="theme-knob"></span>
+        </span>
+      </button>
+
+      <div class="account-menu">
+        <button
+          type="button"
+          class="account-trigger"
+          [attr.aria-expanded]="accountOpen()"
+          (click)="accountOpen.set(!accountOpen())"
+        >
+          <span class="account-avatar" aria-hidden="true"
+            ><svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle cx="12" cy="8" r="3.2" />
+              <path d="M5.5 20c.8-3.2 3-5 6.5-5s5.7 1.8 6.5 5" /></svg
+            ><span class="account-status"></span
+          ></span>
+          <span class="account-label">Account</span>
+          <svg
+            class="account-chevron"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="m6 9 6 6 6-6" />
+          </svg>
+        </button>
+        @if (accountOpen()) {
+          <div class="account-dropdown" role="menu" aria-label="Profile menu">
+            <div class="account-summary">
+              <span class="account-summary-name">Prototype profile</span
+              ><span class="account-summary-status">Local demo</span>
+            </div>
+            <a
+              class="account-item"
+              role="menuitem"
+              routerLink="/bookmarks"
+              (click)="accountOpen.set(false)"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M6 4.5A2.5 2.5 0 0 1 8.5 2h7A2.5 2.5 0 0 1 18 4.5V21l-6-3.5L6 21z" />
+              </svg>
+              Bookmarks
+            </a>
+            <button
+              type="button"
+              class="account-item"
+              role="menuitem"
+              (click)="prototypeNotice('Settings are stored locally in this browser.')"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path
+                  d="M12 3v2M12 19v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M3 12h2M19 12h2M4.93 19.07l1.41-1.41M17.66 6.34l-1.41-1.41"
+                />
+                <circle cx="12" cy="12" r="3.5" />
+              </svg>
+              Settings
+            </button>
+            <button
+              type="button"
+              class="account-item"
+              role="menuitem"
+              (click)="prototypeNotice('There is no account system in this prototype.')"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path
+                  d="M10 4H5.5A1.5 1.5 0 0 0 4 5.5v13A1.5 1.5 0 0 0 5.5 20H10M15 16l4-4-4-4M19 12H9"
+                />
+              </svg>
+              Sign out
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</header>
+
+<p-drawer [(visible)]="drawerVisible" position="right" [style]="{ width: 'min(320px, 86vw)' }">
+  <ng-template #header
+    ><span class="logo">DRA<b>.CIN</b></span></ng-template
+  >
+  <nav class="flex flex-col gap-1 pt-2" aria-label="Mobile navigation">
+    @for (item of navItems(); track item.path) {
+      <a
+        [routerLink]="item.path"
+        class="mobile-nav-item"
+        [class.active]="isActive(item.path)"
+        (click)="drawerVisible.set(false)"
+      >
+        <span>{{ item.label }}</span>
+      </a>
+    }
+    <a routerLink="/bookmarks" class="mobile-nav-item" (click)="drawerVisible.set(false)"
+      >Bookmarks</a
+    >
+  </nav>
+  <div class="pt-4 mt-4" style="border-top: 1px solid var(--border)">
+    <p class="eyebrow">Subtitle preference</p>
+    <div class="language-toggle" role="group" aria-label="Subtitle language preference">
+      <button type="button" [class.active]="prefs.subtitle() === 'EN'" (click)="setSubtitle('EN')">
+        EN
+      </button>
+      <button type="button" [class.active]="prefs.subtitle() === 'ID'" (click)="setSubtitle('ID')">
+        ID
+      </button>
+    </div>
+  </div>
+  <button type="button" class="mobile-nav-item mt-4" (click)="prefs.toggleTheme()">
+    Appearance: {{ prefs.theme() === 'dark' ? 'Dark' : 'Light' }}
+  </button>
+</p-drawer>

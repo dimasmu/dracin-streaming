@@ -1,0 +1,477 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pusat Bantuan — DRA.CIN</title>
+  <link rel="stylesheet" href="assets/app.css">
+</head>
+<body class="page-faq">
+
+<header class="topnav">
+  <div class="container topnav-inner">
+    <a class="logo" href="index.html">DRA<b>.CIN</b></a>
+    <nav class="nav-links" aria-label="Navigasi utama">
+      <a href="index.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/><polyline points="9 21 9 14 15 14 15 21"/></svg>Home</a>
+      <a href="genre.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Genre</a>
+      <a href="platform.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>Platform</a>
+      <a href="release-schedule.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Schedule</a>
+      <button type="button" class="nav-random"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5M4 20L20.5 3.5M21 16v5h-5M15 15l6.1 6.1M4 4l5 5"/></svg>Random</button>
+    </nav>
+    <div class="header-tools">
+      <input class="search" placeholder="Cari judul drama">
+      <div class="language-toggle">
+        <button data-lang="EN">EN</button>
+        <button class="active" data-lang="ID">ID</button>
+      </div>
+      <button class="theme-toggle" type="button" role="switch" aria-checked="false" aria-label="Ganti ke mode siang">
+        <span class="theme-track" aria-hidden="true">
+          <span class="theme-icon theme-icon-moon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></span>
+          <span class="theme-icon theme-icon-sun"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg></span>
+          <span class="theme-knob"></span>
+        </span>
+      </button>
+      <div class="account-menu">
+        <button class="account-trigger" type="button" aria-expanded="false" aria-controls="account-dropdown">
+          <span class="account-avatar" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.2"/><path d="M5.5 20c.8-3.2 3-5 6.5-5s5.7 1.8 6.5 5"/></svg><span class="account-status"></span></span>
+          <span class="account-label">Account</span>
+          <svg class="account-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <div class="account-dropdown" id="account-dropdown" role="menu" aria-label="Menu akun" hidden>
+          <div class="account-summary"><span class="account-summary-name">Your account</span><span class="account-summary-status">Active profile</span></div>
+          <button type="button" class="account-item" role="menuitem" data-account-action="bookmark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4.5A2.5 2.5 0 0 1 8.5 2h7A2.5 2.5 0 0 1 18 4.5V21l-6-3.5L6 21z"/></svg>Bookmark</button>
+          <button type="button" class="account-item" role="menuitem" data-account-action="setting"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v2M12 19v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M3 12h2M19 12h2M4.93 19.07l1.41-1.41M17.66 6.34l-1.41-1.41"/><circle cx="12" cy="12" r="3.5"/></svg>Setting</button>
+          <button type="button" class="account-item" role="menuitem" data-account-action="logout"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 4H5.5A1.5 1.5 0 0 0 4 5.5v13A1.5 1.5 0 0 0 5.5 20H10M15 16l4-4-4-4M19 12H9"/></svg>Logout</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="faq-hero">
+    <div class="container">
+      <p class="eyebrow" style="margin-bottom:9px;">Pusat Bantuan</p>
+      <h1>Bagaimana kami bisa membantu?</h1>
+      <p>Cari jawaban atas pertanyaan umum atau jelajahi kategori di bawah.</p>
+      <div class="faq-search-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input class="faq-search" type="search" placeholder="Ketik pertanyaan atau kata kunci…" aria-label="Cari di pusat bantuan" data-faq-search>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="faq-categories">
+      <h2 class="faq-categories-heading">Jelajahi Kategori</h2>
+      <div class="faq-category-grid">
+        <a class="faq-category-card" href="#cat-general" data-faq-cat-link>
+          <div class="faq-cat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg></div>
+          <div>
+            <p class="faq-cat-title">Umum</p>
+            <p class="faq-cat-count">5 pertanyaan</p>
+          </div>
+        </a>
+        <a class="faq-category-card" href="#cat-account" data-faq-cat-link>
+          <div class="faq-cat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+          <div>
+            <p class="faq-cat-title">Akun</p>
+            <p class="faq-cat-count">4 pertanyaan</p>
+          </div>
+        </a>
+        <a class="faq-category-card" href="#cat-content" data-faq-cat-link>
+          <div class="faq-cat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div>
+          <div>
+            <p class="faq-cat-title">Konten &amp; Metadata</p>
+            <p class="faq-cat-count">5 pertanyaan</p>
+          </div>
+        </a>
+        <a class="faq-category-card" href="#cat-legal" data-faq-cat-link>
+          <div class="faq-cat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></div>
+          <div>
+            <p class="faq-cat-title">Legal &amp; Kebijakan</p>
+            <p class="faq-cat-count">3 pertanyaan</p>
+          </div>
+        </a>
+        <a class="faq-category-card" href="#cat-technical" data-faq-cat-link>
+          <div class="faq-cat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M3 12h18M5.64 5.64l12.72 12.72M18.36 5.64 5.64 18.36"/></svg></div>
+          <div>
+            <p class="faq-cat-title">Teknis</p>
+            <p class="faq-cat-count">3 pertanyaan</p>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <div class="faq-accordion">
+      <h2 class="faq-accordion-heading">Pertanyaan Umum</h2>
+      <div class="faq-list" data-faq-list>
+
+        <!-- Umum -->
+        <div class="faq-item" data-faq-group="cat-general">
+          <button class="faq-question" type="button" aria-expanded="false" data-faq-toggle>
+            Apa itu DRA.CIN?
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="faq-answer" hidden>
+            <div class="faq-answer-inner">
+              <p>DRA.CIN adalah direktori metadata drama pendek yang membantu kamu menemukan dan menelusuri serial berdasarkan genre dan platform asal. Platform ini menampilkan judul, sinopsis, jumlah episode, genre, dan platform sumber — namun tidak menyediakan konten video streaming.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item" data-faq-group="cat-general">
+          <button class="faq-question" type="button" aria-expanded="false" data-faq-toggle>
+            Apakah DRA.CIN gratis digunakan?
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="faq-answer" hidden>
+            <div class="faq-answer-inner">
+              <p>Ya, mengakses dan menggunakan DRA.CIN tidak dikenakan biaya. DRA.CIN adalah prototype visual yang berfungsi sebagai direktori metadata. Kami tidak mengoperasikan layanan streaming berbayar.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item" data-faq-group="cat-general">
+          <button class="faq-question" type="button" aria-expanded="false" data-faq-toggle>
+            Di mana saya bisa menonton drama yang terdaftar?
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="faq-answer" hidden>
+            <div class="faq-answer-inner">
+              <p>Setiap judul drama di DRA.CIN dicatat dengan platform sumbernya (misalnya DramaBox, ReelShort, Anireels). Kunjungi platform terkait untuk menonton. DRA.CIN menyediakan tautan referensinya untuk kemudahan navigasi, namun tidak menjamin ketersediaan konten di platform tersebut.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item" data-faq-group="cat-general">
+          <button class="faq-question" type="button" aria-expanded="false" data-faq-toggle>
+            Apakah metadata di DRA.CIN selalu akurat?
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="faq-answer" hidden>
+            <div class="faq-answer-inner">
+              <p>DRA.CIN mengumpulkan metadata dari berbagai sumber dan berusaha menampilkannya seakurat mungkin. Namun, kami tidak menjamin kelengkapan atau keakuratan penuh setiap entri. Jika kamu menemukan ketidaksesuaian, silakan laporkan melalui halaman <a href="contact.html">Kontak</a>.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item" data-faq-group="cat-general">
+          <button class="faq-question" type="button" aria-expanded="false" data-faq-toggle>
+            Bahasa subtitle apa yang tersedia?
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="faq-answer" hidden>
+            <div class="faq-answer-inner">
+              <p>DRA.CIN mendukung subtitle dalam bahasa Inggris (EN) dan bahasa Indonesia (ID). Pilihan bahasa subtitle disimpan secara lokal pada browser kamu dan tidak memerlukan login.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Akun -->
+        <div class="faq-item" data-faq-group="cat-account">
+          <button class="faq-question" type="button" aria-expanded="false" data-faq-toggle>
+            Apakah saya perlu membuat akun untuk menggunakan DRA.CIN?
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="faq-answer" hidden>
+            <div class="faq-answer-inner">
+              <p>Tidak wajib. Kebanyakan fitur DRA.CIN — termasuk penelusuran, penjelajahan berdasarkan genre dan platform, serta melihat metadata drama — dapat digunakan tanpa akun. Fitur bookmark memerlukan akun.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item" data-faq-group="cat-account">
+          <button class="faq-question" type="button" aria-expanded="false" data-faq-toggle>
+            Bagaimana cara membuat akun?
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="faq-answer" hidden>
+            <div class="faq-answer-inner">
+              <p>Klik menu "Account" di bagian kanan navbar, lalu pilih opsi untuk membuat akun. DRA.CIN adalah prototype; formulir pendaftaran dan alur verifikasi mungkin terbatas pada elemen visual saja.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item" data-faq-group="cat-account">
+          <button class="faq-question" type="button" aria-expanded="false" data-faq-toggle>
+            Apakah saya bisa mereset kata sandi?
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="faq-answer" hidden>
+            <div class="faq-answer-inner">
+              <p>Pada fase prototype ini, fitur reset kata sandi belum diimplementasikan. Jika kamu lupa kata sandi, hubungi kami melalui halaman <a href="contact.html">Kontak</a> untuk bantuan lebih lanjut.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item" data-faq-group="cat-account">
+          <button class="faq-question" type="button" aria-expanded="false" data-faq-toggle>
+            Apakah data pribadi saya aman?
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="faq-answer" hidden>
+            <div class="faq-answer-inner">
+              <p>DRA.CIN hanya menyimpan preferensi bahasa subtitle secara lokal di browser kamu melalui <code>localStorage</code>. Tidak ada data pribadi yang dikirimkan ke server kami. Silakan lihat <a href="terms.html">Ketentuan Layanan</a> dan <a href="privacy.html">Kebijakan Privasi</a> untuk detail lebih lanjut.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Konten & Metadata -->
+        <div class="faq-item" data-faq-group="cat-content">
+          <button class="faq-question" type="button" aria-expanded="false" data-faq-toggle>
+            Bagaimana cara mencari drama tertentu?
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="faq-answer" hidden>
+            <div class="faq-answer-inner">
+              <p>Gunakan kotak pencarian di navbar untuk mengetik judul drama. Kamu juga bisa menelusuri berdasarkan genre (Romance, CEO, Revenge, dll.), platform (DramaBox, ReelShort, dll.), atau jadwal tayang di halaman Schedule.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item" data-faq-group="cat-content">
+          <button class="faq-question" type="button" aria-expanded="false" data-faq-toggle>
+            Apakah saya bisa melihat drama terbaru?
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="faq-answer" hidden>
+            <div class="faq-answer-inner">
+              <p>Ya. Di halaman utama DRA.CIN, bagian "Episode Terbaru" menampilkan drama-drama yang baru ditambahkan atau diperbarui. Kamu juga bisa menggunakan filter "Terbaru" di halaman Browse.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item" data-faq-group="cat-content">
+          <button class="faq-question" type="button" aria-expanded="false" data-faq-toggle>
+            Apa perbedaan episode dan season di DRA.CIN?
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="faq-answer" hidden>
+            <div class="faq-answer-inner">
+              <p>DRA.CIN menampilkan jumlah episode per serial. Jika drama memiliki lebih dari satu season, jumlah episode yang ditampilkan adalah total dari semua season yang tersedia di platform sumber. Detail season tidak selalu dipisahkan di fase prototype ini.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item" data-faq-group="cat-content">
+          <button class="faq-question" type="button" aria-expanded="false" data-faq-toggle>
+            Apakah rating drama sudah diverifikasi?
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="faq-answer" hidden>
+            <div class="faq-answer-inner">
+              <p>Rating yang ditampilkan bersumber dari platform asal dan/atau agregator eksternal. DRA.CIN tidak memverifikasi rating secara independen. Gunakan rating sebagai referensi umum, bukan patokan mutlak.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item" data-faq-group="cat-content">
+          <button class="faq-question" type="button" aria-expanded="false" data-faq-toggle>
+            Bagaimana cara melaporkan drama yang tidak ada atau salah?
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="faq-answer" hidden>
+            <div class="faq-answer-inner">
+              <p>Gunakan halaman <a href="contact.html">Kontak</a> untuk melaporkan metadata yang tidak akurat, judul duplikat, atau drama yang sudah tidak tersedia di platform sumber. Sertakan judul drama dan detail masalah yang kamu temui.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Legal & Kebijakan -->
+        <div class="faq-item" data-faq-group="cat-legal">
+          <button class="faq-question" type="button" aria-expanded="false" data-faq-toggle>
+            Apakah DRA.CIN melanggar hak cipta?
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="faq-answer" hidden>
+            <div class="faq-answer-inner">
+              <p>DRA.CIN adalah direktori metadata — bukan platform streaming. Platform ini tidak menyimpan atau menayangkan file video. Metadata yang ditampilkan (judul, sinopsis, genre, platform) bersifat informatif. Hak atas materi asli tetap berada pada pemiliknya masing-masing. Jika kamu adalah pemilik materi dan ingin mengajukan permintaan penghapusan, lihat <a href="dmca.html">Kebijakan DMCA</a> kami.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item" data-faq-group="cat-legal">
+          <button class="faq-question" type="button" aria-expanded="false" data-faq-toggle>
+            Apakah ada biaya untuk penggunaan konten?
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="faq-answer" hidden>
+            <div class="faq-answer-inner">
+              <p>Menggunakan DRA.CIN untuk menelusuri metadata drama tidak dikenakan biaya. Namun, untuk menonton drama di platform streaming pihak ketiga, biaya langganan mungkin berlaku sesuai kebijakan platform terkait.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item" data-faq-group="cat-legal">
+          <button class="faq-question" type="button" aria-expanded="false" data-faq-toggle>
+            Di mana saya bisa membaca ketentuan lengkap?
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="faq-answer" hidden>
+            <div class="faq-answer-inner">
+              <p>Ketentuan Layanan lengkap tersedia di halaman <a href="terms.html">Ketentuan Layanan</a>. Kebijakan Privasi dapat dilihat di <a href="privacy.html">sini</a> (dalam pengembangan). Kebijakan DMCA tersedia di <a href="dmca.html">halaman ini</a>.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Teknis -->
+        <div class="faq-item" data-faq-group="cat-technical">
+          <button class="faq-question" type="button" aria-expanded="false" data-faq-toggle>
+            Mengapa halaman tidak tampil dengan benar?
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="faq-answer" hidden>
+            <div class="faq-answer-inner">
+              <p>Pastikan kamu menggunakan browser versi terbaru (Chrome, Firefox, Edge, atau Safari). Jika masalah berlanjut, coba bersihkan cache browser. Jika masih bermasalah, laporkan melalui halaman <a href="contact.html">Kontak</a>.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item" data-faq-group="cat-technical">
+          <button class="faq-question" type="button" aria-expanded="false" data-faq-toggle>
+            Apakah DRA.CIN tersedia di perangkat mobile?
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="faq-answer" hidden>
+            <div class="faq-answer-inner">
+              <p>Ya. DRA.CIN dirancang responsif dan dapat diakses melalui perangkat mobile, tablet, dan desktop. Navigasi dan tata letak akan menyesuaikan dengan ukuran layar perangkatmu.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item" data-faq-group="cat-technical">
+          <button class="faq-question" type="button" aria-expanded="false" data-faq-toggle>
+            Mengapa video tidak bisa diputar di DRA.CIN?
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="faq-answer" hidden>
+            <div class="faq-answer-inner">
+              <p>DRA.CIN bukan platform streaming dan tidak menyediakan pemutar video. Klik "Mulai nonton" untuk diarahkan ke halaman detail dan episode, lalu lanjutkan ke platform streaming terkait untuk menonton drama.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Contact support -->
+    <div style="text-align:center;padding:0 0 80px;">
+      <p style="color:var(--muted);font-size:13px;margin:0 0 14px;">Tidak menemukan jawaban yang kamu cari?</p>
+      <a class="btn btn-primary" href="contact.html">Hubungi Tim Dukungan</a>
+    </div>
+  </div>
+</main>
+
+<footer class="pagefoot">
+  <div class="container footer-grid">
+    <div class="footer-brand">
+      <a class="logo" href="index.html">DRA<b>.CIN</b></a>
+      <p>Direktori drama pendek dari berbagai platform. Metadata konten ditampilkan untuk membantu kamu menemukan serial dengan lebih cepat.</p>
+    </div>
+    <nav class="footer-col" aria-label="Jelajahi">
+      <h2>Jelajahi</h2>
+      <a href="genre.html">Genre</a>
+      <a href="platform.html">Platform</a>
+      <a href="release-schedule.html">Schedule</a>
+    </nav>
+    <nav class="footer-col" aria-label="Bantuan">
+      <h2>Bantuan</h2>
+      <a href="faq.html">FAQ</a>
+      <a href="contact.html">Kontak</a>
+    </nav>
+    <nav class="footer-col" aria-label="Legal">
+      <h2>Legal</h2>
+      <a href="terms.html">Ketentuan Layanan</a>
+      <a href="dmca.html">DMCA</a>
+      <a href="privacy.html">Privasi</a>
+    </nav>
+  </div>
+  <div class="container footer-bottom">
+    <span>&copy; 2026 DRA.CIN &middot; Prototype visual</span>
+    <span>Metadata &middot; Platform sumber &middot; Subtitle</span>
+  </div>
+</footer>
+
+<script src="assets/dracin-data.js"></script>
+<script src="assets/dracin.js"></script>
+<script>
+(function(){
+  /* FAQ accordion */
+  document.querySelectorAll('[data-faq-toggle]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var expanded = btn.getAttribute('aria-expanded') === 'true';
+      var answer = btn.nextElementSibling;
+      btn.setAttribute('aria-expanded', String(!expanded));
+      if (answer) {
+        if (!expanded) {
+          answer.hidden = false;
+          answer.style.maxHeight = answer.scrollHeight + 'px';
+        } else {
+          answer.style.maxHeight = '0';
+          setTimeout(function(){ answer.hidden = true; }, 280);
+        }
+      }
+    });
+  });
+
+  /* FAQ search filter */
+  var searchInput = document.querySelector('[data-faq-search]');
+  var faqList = document.querySelector('[data-faq-list]');
+  if (searchInput && faqList) {
+    searchInput.addEventListener('input', function(){
+      var query = searchInput.value.trim().toLowerCase();
+      var items = faqList.querySelectorAll('.faq-item');
+      var visibleCount = 0;
+      items.forEach(function(item){
+        var question = item.querySelector('.faq-question');
+        var answer = item.querySelector('.faq-answer-inner');
+        var qText = question ? question.textContent.trim().toLowerCase() : '';
+        var aText = answer ? answer.textContent.trim().toLowerCase() : '';
+        var match = !query || qText.indexOf(query) >= 0 || aText.indexOf(query) >= 0;
+        item.style.display = match ? '' : 'none';
+        if (match) visibleCount++;
+      });
+      var noResults = faqList.querySelector('.faq-no-results');
+      if (visibleCount === 0) {
+        if (!noResults) {
+          noResults = document.createElement('p');
+          noResults.className = 'faq-no-results';
+          noResults.textContent = 'Tidak ada hasil untuk "' + searchInput.value.trim() + '". Coba kata kunci lain atau hubungi tim dukungan.';
+          faqList.appendChild(noResults);
+        }
+        noResults.hidden = false;
+      } else {
+        if (noResults) noResults.hidden = true;
+      }
+    });
+  }
+
+  /* FAQ category jump links */
+  document.querySelectorAll('[data-faq-cat-link]').forEach(function(link){
+    link.addEventListener('click', function(e){
+      e.preventDefault();
+      var target = link.getAttribute('href').replace('#', '');
+      var items = faqList.querySelectorAll('[data-faq-group]');
+      var firstMatch = null;
+      items.forEach(function(item){
+        if (item.getAttribute('data-faq-group') === target) {
+          item.style.display = '';
+          if (!firstMatch) firstMatch = item;
+        }
+      });
+      if (firstMatch) {
+        var btn = firstMatch.querySelector('[data-faq-toggle]');
+        if (btn) {
+          btn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          setTimeout(function(){
+            btn.click();
+          }, 400);
+        }
+      }
+    });
+  });
+})();
+</script>
+</body>
+</html>

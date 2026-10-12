@@ -1,0 +1,52 @@
+<main class="container page">
+  <div class="page-head">
+    <div>
+      <h1 class="display">Release Schedule</h1>
+      <p>Upcoming episode releases grouped by day. Times are shown in WIB.</p>
+    </div>
+  </div>
+
+  <div class="legal-callout info" style="margin: 0 0 20px">
+    <p>
+      <strong>Demo schedule:</strong> these air-times and episode numbers are illustrative and are
+      not sourced release information. Titles link to their catalogue pages.
+    </p>
+  </div>
+
+  <div class="day-tabs" role="tablist" aria-label="Select a day">
+    @for (d of days(); track d.iso) {
+      <button
+        type="button"
+        [class.active]="selectedIso() === d.iso"
+        (click)="selectedIso.set(d.iso)"
+      >
+        {{ d.label }}
+      </button>
+    }
+  </div>
+
+  <section class="section" style="margin-top: 22px">
+    @if (selectedItems().length) {
+      <div class="schedule-list">
+        @for (item of selectedItems(); track item.id) {
+          <a class="schedule-item" [routerLink]="['/watch', item.dramaSlug, item.episodeNumber]">
+            <span class="schedule-mark">{{ dayMark(item) }}</span>
+            <span>
+              <h3>{{ item.dramaTitle }}</h3>
+              <p>
+                Episode {{ item.episodeNumber }} &middot; {{ item.platformId }} &middot; Sub
+                {{ item.subtitleStatus }}
+              </p>
+            </span>
+            <span class="schedule-time">{{ item.releaseTime }}</span>
+          </a>
+        }
+      </div>
+    } @else {
+      <app-empty-state
+        title="No releases this day"
+        message="Pick another day to see the schedule."
+      />
+    }
+  </section>
+</main>

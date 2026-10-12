@@ -1,0 +1,130 @@
+<main class="container page">
+  <div class="page-head">
+    <div>
+      <h1 class="display">Browse Dramas</h1>
+      <p>
+        Search and filter the full Chinese short-drama catalogue by genre, platform, year and
+        subtitle language.
+      </p>
+    </div>
+    <span class="count">{{ filtered().length }} dramas found</span>
+  </div>
+
+  <div class="browse-layout">
+    <aside class="browse-sidebar" aria-label="Filters">
+      <div class="filter-group">
+        <span class="filter-label">Genre</span>
+        <p-select
+          [options]="genreOptions"
+          optionLabel="label"
+          optionValue="value"
+          [multiple]="true"
+          [ngModel]="selectedGenres()"
+          (ngModelChange)="setGenres($event)"
+          placeholder="All genres"
+          [showClear]="true"
+          [style]="{ width: '100%' }"
+        />
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">Platform</span>
+        <p-select
+          [options]="platformOptions"
+          optionLabel="label"
+          optionValue="value"
+          [multiple]="true"
+          [ngModel]="selectedPlatforms()"
+          (ngModelChange)="setPlatforms($event)"
+          placeholder="All platforms"
+          [showClear]="true"
+          [style]="{ width: '100%' }"
+        />
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">Release Year</span>
+        <p-select
+          [options]="yearOptions"
+          optionLabel="label"
+          optionValue="value"
+          [multiple]="true"
+          [ngModel]="selectedYears()"
+          (ngModelChange)="setYears($event)"
+          placeholder="All years"
+          [showClear]="true"
+          [style]="{ width: '100%' }"
+        />
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">Subtitle</span>
+        <p-select
+          [options]="subtitleOptions"
+          optionLabel="label"
+          optionValue="value"
+          [multiple]="true"
+          [ngModel]="selectedSubtitles()"
+          (ngModelChange)="setSubtitles($event)"
+          placeholder="All subtitles"
+          [showClear]="true"
+          [style]="{ width: '100%' }"
+        />
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">Release Date</span>
+        <div class="grid grid-cols-2 gap-2">
+          <input type="date" class="date-input" [(ngModel)]="dateFrom" aria-label="From date" />
+          <input type="date" class="date-input" [(ngModel)]="dateTo" aria-label="To date" />
+        </div>
+      </div>
+      <button class="facet-clear" type="button" (click)="reset()">Reset all filters</button>
+    </aside>
+
+    <div class="browse-content">
+      <div class="browse-toolbar">
+        <input
+          class="search"
+          placeholder="Search title, genre, platform"
+          [value]="query()"
+          (input)="onQuery($event)"
+          aria-label="Search the catalogue"
+        />
+        <div class="toolbar-sort">
+          <label class="toolbar-sort-label" for="sort">Sort</label>
+          <p-select
+            inputId="sort"
+            [options]="sortOptions"
+            optionLabel="label"
+            optionValue="value"
+            [(ngModel)]="sort"
+            [style]="{ minWidth: '150px' }"
+          />
+        </div>
+      </div>
+
+      @if (filtered().length) {
+        <div class="drama-grid">
+          @for (d of paged(); track d.id) {
+            <app-drama-card [drama]="d" />
+          }
+        </div>
+        @if (pageCount() > 1) {
+          <div class="pagination">
+            <p-paginator
+              [rows]="rows()"
+              [totalRecords]="filtered().length"
+              [first]="first()"
+              [showCurrentPageReport]="false"
+              (onPageChange)="onPageChange($event)"
+            />
+          </div>
+        }
+      } @else {
+        <app-empty-state
+          title="No matching dramas"
+          message="Try adjusting or clearing your filters."
+        >
+          <button class="btn btn-primary" type="button" (click)="reset()">Reset filters</button>
+        </app-empty-state>
+      }
+    </div>
+  </div>
+</main>
