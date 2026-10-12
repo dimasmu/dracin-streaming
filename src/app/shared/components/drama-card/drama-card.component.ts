@@ -1,9 +1,14 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import type { Drama } from '../../core/models/drama';
-import { BookmarkService } from '../../core/services/bookmark.service';
+import type { Drama } from '../../../core/models/drama';
+import { BookmarkService } from '../../../core/services/bookmark.service';
 import { MessageService } from 'primeng/api';
-import { formatAired, formatDuration, monogram, ratingStars } from '../../core/utils/format';
+import {
+  formatAired,
+  formatDuration,
+  monogram,
+  ratingStars,
+} from '../../../core/utils/format';
 
 @Component({
   selector: 'app-drama-card',

@@ -3,9 +3,9 @@ import { Router, RouterLink } from '@angular/router';
 import { DrawerModule } from 'primeng/drawer';
 import { SkeletonModule } from 'primeng/skeleton';
 import { MessageService } from 'primeng/api';
-import { CatalogService } from '../../core/services/catalog.service';
-import { PreferencesService, SubtitlePreference } from '../../core/services/preferences.service';
-import type { Drama } from '../../core/models/drama';
+import { CatalogService } from '../../../core/services/catalog.service';
+import { PreferencesService, SubtitlePreference } from '../../../core/services/preferences.service';
+import type { Drama } from '../../../core/models/drama';
 
 @Component({
   selector: 'app-header',

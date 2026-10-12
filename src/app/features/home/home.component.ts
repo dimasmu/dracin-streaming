@@ -9,7 +9,7 @@ import {
 } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CatalogService } from '../../core/services/catalog.service';
-import { DramaCardComponent } from '../../shared/components/drama-card.component';
+import { DramaCardComponent } from '../../shared/components/drama-card/drama-card.component';
 import type { Drama } from '../../core/models/drama';
 import { monogram } from '../../core/utils/format';
 

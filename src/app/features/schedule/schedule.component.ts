@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CatalogService } from '../../core/services/catalog.service';
-import { EmptyStateComponent } from '../../shared/components/empty-state.component';
+import { EmptyStateComponent } from '../../shared/components/empty-state/empty-state.component';
 import { buildScheduleItems, SCHEDULE_SLOTS } from '../../data/schedule';
 import type { ReleaseScheduleItem } from '../../core/models/schedule';
 

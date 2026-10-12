@@ -2,8 +2,8 @@ import { ChangeDetectionStrategy, Component, computed, inject, input } from '@an
 import { RouterLink } from '@angular/router';
 import { CatalogService } from '../../core/services/catalog.service';
 import { BookmarkService } from '../../core/services/bookmark.service';
-import { DramaCardComponent } from '../../shared/components/drama-card.component';
-import { EmptyStateComponent } from '../../shared/components/empty-state.component';
+import { DramaCardComponent } from '../../shared/components/drama-card/drama-card.component';
+import { EmptyStateComponent } from '../../shared/components/empty-state/empty-state.component';
 import { monogram, ratingStars } from '../../core/utils/format';
 
 @Component({

@@ -11,8 +11,8 @@ import { FormsModule } from '@angular/forms';
 import { SelectModule } from 'primeng/select';
 import { PaginatorModule } from 'primeng/paginator';
 import { CatalogService, SortKey } from '../../core/services/catalog.service';
-import { DramaCardComponent } from '../../shared/components/drama-card.component';
-import { EmptyStateComponent } from '../../shared/components/empty-state.component';
+import { DramaCardComponent } from '../../shared/components/drama-card/drama-card.component';
+import { EmptyStateComponent } from '../../shared/components/empty-state/empty-state.component';
 
 interface Option {
   label: string;

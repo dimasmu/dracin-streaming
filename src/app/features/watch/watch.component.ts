@@ -13,8 +13,8 @@ import { CatalogService } from '../../core/services/catalog.service';
 import { BookmarkService } from '../../core/services/bookmark.service';
 import { PreferencesService } from '../../core/services/preferences.service';
 import { MessageService } from 'primeng/api';
-import { DramaCardComponent } from '../../shared/components/drama-card.component';
-import { EmptyStateComponent } from '../../shared/components/empty-state.component';
+import { DramaCardComponent } from '../../shared/components/drama-card/drama-card.component';
+import { EmptyStateComponent } from '../../shared/components/empty-state/empty-state.component';
 import { monogram } from '../../core/utils/format';
 
 interface Comment {
