@@ -1,0 +1,107 @@
+<div class="drama-preview-host">
+  @if (origin(); as org) {
+    <ng-template
+      cdkConnectedOverlay
+      [cdkConnectedOverlayOrigin]="org"
+      [cdkConnectedOverlayOpen]="!!preview.state()"
+      [cdkConnectedOverlayPositions]="positions"
+      [cdkConnectedOverlayScrollStrategy]="scrollStrategy"
+      [cdkConnectedOverlayViewportMargin]="viewportMargin"
+      [cdkConnectedOverlayPush]="false"
+      [cdkConnectedOverlayHasBackdrop]="false"
+      [cdkConnectedOverlayPanelClass]="panelClasses"
+      (detach)="preview.close()"
+    >
+      @if (preview.state(); as state) {
+        <article
+          class="drama-preview"
+          role="tooltip"
+          [style.--card-tone]="state.drama.tone"
+          (pointerenter)="onEnter()"
+          (pointerleave)="onLeave()"
+          (focusin)="onEnter()"
+          (focusout)="onLeave()"
+          (keydown)="onKeydown($event)"
+        >
+          <div class="drama-preview-art">
+            <span class="drama-monogram">{{ monogram(state.drama.title) }}</span>
+            @if (preview.loading()) {
+              <div class="drama-preview-art-skeleton" aria-hidden="true">
+                <p-skeleton shape="rectangle" width="100%" height="100%" />
+              </div>
+            }
+          </div>
+
+          <div class="drama-preview-body">
+            @if (preview.loading()) {
+              <div class="drama-preview-skeleton" aria-hidden="true">
+                <p-skeleton shape="rectangle" width="72%" height="16px" />
+                <p-skeleton shape="rectangle" width="48%" height="11px" />
+                <p-skeleton shape="rectangle" width="100%" height="11px" />
+                <p-skeleton shape="rectangle" width="92%" height="11px" />
+                <p-skeleton shape="rectangle" width="60%" height="22px" />
+              </div>
+            } @else {
+              <h3 class="drama-preview-title">{{ state.drama.title }}</h3>
+
+              <div class="drama-preview-meta">
+                @if (state.drama.rating) {
+                  <span class="drama-preview-rating">
+                    <span class="stars" aria-hidden="true">
+                      @for (s of stars; track $index) {
+                        <svg class="star{{ $index < ratingFilled() ? ' star-on' : '' }}" viewBox="0 0 24 24" width="9" height="9">
+                          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                        </svg>
+                      }
+                    </span>
+                    <b>{{ state.drama.rating.toFixed(1) }}</b>
+                  </span>
+                }
+                @if (state.drama.releaseYear) {
+                  <span class="drama-preview-pill">{{ state.drama.releaseYear }}</span>
+                }
+                @if (state.drama.status) {
+                  <span class="drama-preview-pill">{{ state.drama.status }}</span>
+                }
+              </div>
+
+              <dl class="drama-preview-facts">
+                @if (state.drama.totalEpisodes) {
+                  <div><dt>Episodes</dt><dd>{{ state.drama.totalEpisodes }}</dd></div>
+                }
+                @if (state.drama.latestEpisode) {
+                  <div><dt>Latest</dt><dd>EP {{ state.drama.latestEpisode }}</dd></div>
+                }
+                @if (state.drama.platformId) {
+                  <div><dt>Platform</dt><dd>{{ state.drama.platformId }}</dd></div>
+                }
+                @if (state.drama.subtitleLanguages.length) {
+                  <div><dt>Subtitles</dt><dd>{{ state.drama.subtitleLanguages.join(' / ') }}</dd></div>
+                }
+              </dl>
+
+              @if (state.drama.genres.length) {
+                <div class="drama-preview-genres">
+                  @for (g of state.drama.genres; track g) {
+                    <span>{{ g }}</span>
+                  }
+                </div>
+              }
+
+              @if (state.drama.synopsis) {
+                <p class="drama-preview-synopsis">{{ state.drama.synopsis }}</p>
+              }
+
+              <div class="drama-preview-foot">
+                <span class="drama-preview-aired">Aired {{ aired() }}</span>
+                <a class="btn btn-compact btn-primary" [routerLink]="['/drama', state.drama.slug]" (click)="preview.close()">
+                  View details
+                </a>
+              </div>
+            }
+          </div>
+        </article>
+      }
+    </ng-template>
+  }
+</div>

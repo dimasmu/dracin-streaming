@@ -15,6 +15,7 @@ import { PreferencesService } from '../../core/services/preferences.service';
 import { MessageService } from 'primeng/api';
 import { DramaCardComponent } from '../../shared/components/drama-card/drama-card.component';
 import { EmptyStateComponent } from '../../shared/components/empty-state/empty-state.component';
+import { DragScrollDirective } from '../../shared/directives/drag-scroll.directive';
 import { monogram } from '../../core/utils/format';
 
 interface Comment {
@@ -24,7 +25,7 @@ interface Comment {
 }
 
 @Component({
-  imports: [RouterLink, DramaCardComponent, EmptyStateComponent],
+  imports: [RouterLink, DramaCardComponent, EmptyStateComponent, DragScrollDirective],
   templateUrl: './watch.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

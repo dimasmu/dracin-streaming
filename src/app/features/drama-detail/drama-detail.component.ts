@@ -4,10 +4,11 @@ import { CatalogService } from '../../core/services/catalog.service';
 import { BookmarkService } from '../../core/services/bookmark.service';
 import { DramaCardComponent } from '../../shared/components/drama-card/drama-card.component';
 import { EmptyStateComponent } from '../../shared/components/empty-state/empty-state.component';
+import { DragScrollDirective } from '../../shared/directives/drag-scroll.directive';
 import { monogram, ratingStars } from '../../core/utils/format';
 
 @Component({
-  imports: [RouterLink, DramaCardComponent, EmptyStateComponent],
+  imports: [RouterLink, DramaCardComponent, EmptyStateComponent, DragScrollDirective],
   templateUrl: './drama-detail.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

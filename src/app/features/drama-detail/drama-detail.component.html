@@ -98,7 +98,7 @@
           <h2 class="display">Related Dramas</h2>
           <a routerLink="/browse">View all</a>
         </div>
-        <div class="rail">
+        <div class="rail" appDragScroll>
           @for (r of related(); track r.id) {
             <app-drama-card [drama]="r" />
           }
