@@ -13,8 +13,14 @@ import { formatAired, monogram, ratingStars } from '../../../core/utils/format';
  * preview immune to `overflow: hidden` on carousels, grids and rails.
  *
  * Placement is delegated to CDK's flexible-connected strategy: right side,
- * then left side, then below, each clamped to the viewport margin. The
- * reposition scroll strategy keeps it aligned while the page scrolls.
+ * then left side, then below, each clamped to the viewport margin.
+ *
+ * The scroll strategy is `close()` rather than `reposition()`. Scrolling moves
+ * the card out from under a stationary cursor *without* firing
+ * `pointerleave`, so a repositioning preview trailed the card and could never
+ * be dismissed by hover. Closing on scroll matches what the pointer actually
+ * did. Navigation is covered by `disposeOnNavigation` plus the service's
+ * NavigationEnd subscription.
  */
 @Component({
   selector: 'app-drama-preview',
@@ -60,7 +66,7 @@ export class DramaPreviewComponent {
     },
   ];
 
-  protected readonly scrollStrategy = this.scrollStrategies.reposition();
+  protected readonly scrollStrategy = this.scrollStrategies.close();
   protected readonly viewportMargin = 12;
 
   protected readonly ratingFilled = computed(() => ratingStars(this.preview.state()?.drama.rating));

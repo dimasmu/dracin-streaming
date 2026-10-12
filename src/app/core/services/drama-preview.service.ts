@@ -1,4 +1,7 @@
-import { Injectable, signal } from '@angular/core';
+import { DestroyRef, Injectable, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { NavigationEnd, Router } from '@angular/router';
+import { filter } from 'rxjs';
 import type { Drama } from '../models/drama';
 
 export interface PreviewState {
@@ -27,9 +30,33 @@ export class DramaPreviewService {
   readonly state = signal<PreviewState | null>(null);
   readonly loading = signal(false);
 
+  private readonly destroyRef = inject(DestroyRef);
+
   private openTimer: ReturnType<typeof setTimeout> | null = null;
   private closeTimer: ReturnType<typeof setTimeout> | null = null;
   private skeletonTimer: ReturnType<typeof setTimeout> | null = null;
+
+  constructor() {
+    // The preview is anchored to a card element; navigating away destroys that
+    // element but would otherwise leave the overlay stranded on screen.
+    inject(Router)
+      .events.pipe(
+        filter((event) => event instanceof NavigationEnd),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe(() => this.close());
+
+    // Leaving the window or switching tabs does not fire pointerleave, so the
+    // preview would otherwise stay open until the next hover.
+    if (typeof window !== 'undefined') {
+      const onHide = () => this.close();
+      window.addEventListener('blur', onHide);
+      window.document.addEventListener('visibilitychange', () => {
+        if (window.document.hidden) onHide();
+      });
+      this.destroyRef.onDestroy(() => window.removeEventListener('blur', onHide));
+    }
+  }
 
   /** True only for devices that can actually hover (mouse/trackpad). */
   private get hoverCapable(): boolean {
@@ -76,9 +103,23 @@ export class DramaPreviewService {
     }, SKELETON_MS);
   }
 
-  /** Hover left the card but the pointer may still be over the preview. */
+  /**
+   * Hover left the card, but the pointer may still be travelling to the
+   * preview itself — so the close is deferred.
+   *
+   * Critically this also cancels a *pending open*. Without that, sweeping the
+   * cursor across a card would fire `open()` (380 ms timer) and then
+   * `scheduleClose()` on leave; the open timer survived and popped the preview
+   * open after the pointer had already gone, with no further pointerleave to
+   * ever close it.
+   */
   scheduleClose(): void {
+    this.cancelOpen();
     this.cancelClose();
+
+    // Nothing is on screen yet, so there is nothing to fade out.
+    if (!this.state()) return;
+
     this.closeTimer = setTimeout(() => {
       this.closeTimer = null;
       this.state.set(null);
@@ -94,6 +135,7 @@ export class DramaPreviewService {
   close(): void {
     this.cancelOpen();
     this.cancelClose();
+    this.clearSkeleton();
     this.state.set(null);
     this.loading.set(false);
   }

@@ -1,5 +1,17 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import {
+  NavigationEnd,
+  Router,
+  RouterLink,
+} from '@angular/router';
+import { filter, map } from 'rxjs';
 import { DrawerModule } from 'primeng/drawer';
 import { SkeletonModule } from 'primeng/skeleton';
 import { MessageService } from 'primeng/api';
@@ -36,9 +48,29 @@ export class AppHeaderComponent {
 
   private debounceTimer: ReturnType<typeof setTimeout> | null = null;
 
+  /**
+   * The current URL as a *signal*.
+   *
+   * `router.url` is a plain getter, so reading it from the template created no
+   * reactive dependency. Under OnPush + zoneless the header therefore only
+   * refreshed when one of its own events fired, leaving the active underline
+   * pointing at the previously active item whenever navigation was triggered
+   * from outside the header (footer, cards, hero CTAs, browser history).
+   * Deriving it from NavigationEnd makes the binding update on every
+   * navigation, wherever it came from.
+   */
+  protected readonly currentUrl = toSignal(
+    this.router.events.pipe(
+      filter((event): event is NavigationEnd => event instanceof NavigationEnd),
+      map((event) => event.urlAfterRedirects),
+    ),
+    { initialValue: this.router.url },
+  );
+
   protected isActive(path: string): boolean {
-    if (path === '/') return this.router.url === '/';
-    return this.router.url.startsWith(path);
+    const url = this.currentUrl();
+    if (path === '/') return url === '/';
+    return url === path || url.startsWith(`${path}/`);
   }
 
   protected setSubtitle(value: SubtitlePreference): void {

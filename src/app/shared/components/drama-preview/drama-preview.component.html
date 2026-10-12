@@ -10,6 +10,7 @@
       [cdkConnectedOverlayPush]="false"
       [cdkConnectedOverlayHasBackdrop]="false"
       [cdkConnectedOverlayPanelClass]="panelClasses"
+      [cdkConnectedOverlayDisposeOnNavigation]="true"
       (detach)="preview.close()"
     >
       @if (preview.state(); as state) {
