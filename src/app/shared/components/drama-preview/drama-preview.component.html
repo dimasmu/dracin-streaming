@@ -95,9 +95,41 @@
 
               <div class="drama-preview-foot">
                 <span class="drama-preview-aired">Aired {{ aired() }}</span>
-                <a class="btn btn-compact btn-primary" [routerLink]="['/drama', state.drama.slug]" (click)="preview.close()">
-                  View details
-                </a>
+                <div class="drama-preview-actions">
+                  <button
+                    type="button"
+                    class="btn btn-icon"
+                    [class.active]="bookmarked()"
+                    [attr.aria-pressed]="bookmarked()"
+                    [attr.aria-label]="bookmarked() ? 'Remove from bookmarks' : 'Add to bookmarks'"
+                    [attr.title]="bookmarked() ? 'Remove from bookmarks' : 'Add to bookmarks'"
+                    (click)="toggleBookmark()"
+                  >
+                    <svg
+                      viewBox="0 0 24 24"
+                      width="15"
+                      height="15"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linejoin="round"
+                      [attr.fill]="bookmarked() ? 'currentColor' : 'none'"
+                      aria-hidden="true"
+                    >
+                      <path d="M6 4.5A2.5 2.5 0 0 1 8.5 2h7A2.5 2.5 0 0 1 18 4.5V21l-6-3.5L6 21z" />
+                    </svg>
+                  </button>
+                  <a
+                    class="btn btn-icon btn-primary"
+                    [routerLink]="['/watch', state.drama.slug, watchEpisode()]"
+                    [attr.aria-label]="'Watch ' + state.drama.title"
+                    title="Watch now"
+                    (click)="preview.close()"
+                  >
+                    <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true">
+                      <path d="M8 5v14l11-7z" />
+                    </svg>
+                  </a>
+                </div>
               </div>
             }
           </div>

@@ -19,28 +19,9 @@
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
     </span>
 
-    <button
-      type="button"
-      class="card-bookmark"
-      data-no-drag
-      [class.active]="bookmarked()"
-      [attr.aria-pressed]="bookmarked()"
-      [attr.aria-label]="bookmarked() ? 'Remove from bookmarks' : 'Add to bookmarks'"
-      (click)="toggleBookmark()"
-    >
-      <svg
-        viewBox="0 0 24 24"
-        [attr.fill]="bookmarked() ? 'currentColor' : 'none'"
-        stroke="currentColor"
-        stroke-width="2"
-      >
-        <path d="M6 4.5A2.5 2.5 0 0 1 8.5 2h7A2.5 2.5 0 0 1 18 4.5V21l-6-3.5L6 21z" />
-      </svg>
-    </button>
-
     <a
       class="card-hit"
-      [routerLink]="['/drama', drama().slug]"
+      [routerLink]="['/watch', drama().slug, watchEpisode()]"
       [attr.aria-label]="drama().title"
     ></a>
   </div>

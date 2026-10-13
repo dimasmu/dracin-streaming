@@ -7,9 +7,7 @@ import {
   input,
 } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { MessageService } from 'primeng/api';
 import type { Drama } from '../../../core/models/drama';
-import { BookmarkService } from '../../../core/services/bookmark.service';
 import { DramaPreviewService } from '../../../core/services/drama-preview.service';
 import { monogram } from '../../../core/utils/format';
 
@@ -22,8 +20,6 @@ import { monogram } from '../../../core/utils/format';
 export class DramaCardComponent {
   readonly drama = input.required<Drama>();
 
-  private readonly bookmarks = inject(BookmarkService);
-  private readonly messages = inject(MessageService);
   protected readonly preview = inject(DramaPreviewService);
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
 
@@ -33,7 +29,7 @@ export class DramaCardComponent {
   protected readonly episode = computed(
     () => this.drama().latestEpisode ?? this.drama().totalEpisodes ?? 0,
   );
-  protected readonly bookmarked = computed(() => this.bookmarks.isBookmarked(this.drama().id));
+  protected readonly watchEpisode = computed(() => Math.max(1, this.episode()));
 
   protected onPointerEnter(): void {
     // The service ignores hover-capable devices that cannot actually hover.
@@ -45,15 +41,5 @@ export class DramaCardComponent {
     // Keyboard focus opens the preview immediately so it reads as an
     // accessible alternative to hovering.
     this.preview.openImmediate(this.drama(), this.host.nativeElement);
-  }
-
-  protected toggleBookmark(): void {
-    const added = this.bookmarks.toggle(this.drama().id);
-    this.messages.add({
-      severity: 'success',
-      summary: added ? 'Added to bookmarks' : 'Removed from bookmarks',
-      detail: this.drama().title,
-      life: 2500,
-    });
   }
 }

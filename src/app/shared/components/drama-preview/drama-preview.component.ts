@@ -1,7 +1,9 @@
 import { ChangeDetectionStrategy, Component, ElementRef, computed, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { OverlayModule, ScrollStrategyOptions } from '@angular/cdk/overlay';
+import { MessageService } from 'primeng/api';
 import { SkeletonModule } from 'primeng/skeleton';
+import { BookmarkService } from '../../../core/services/bookmark.service';
 import { DramaPreviewService } from '../../../core/services/drama-preview.service';
 import { formatAired, monogram, ratingStars } from '../../../core/utils/format';
 
@@ -31,6 +33,8 @@ import { formatAired, monogram, ratingStars } from '../../../core/utils/format';
 export class DramaPreviewComponent {
   protected readonly preview = inject(DramaPreviewService);
   private readonly scrollStrategies = inject(ScrollStrategyOptions);
+  private readonly bookmarks = inject(BookmarkService);
+  private readonly messages = inject(MessageService);
 
   protected readonly monogram = monogram;
   protected readonly stars = [0, 1, 2, 3, 4];
@@ -74,8 +78,29 @@ export class DramaPreviewComponent {
     formatAired(this.preview.state()?.drama.releaseDate, this.preview.state()?.drama.releaseYear),
   );
 
+  protected readonly watchEpisode = computed(() => {
+    const d = this.preview.state()?.drama;
+    return Math.max(1, d?.latestEpisode ?? d?.totalEpisodes ?? 1);
+  });
+  protected readonly bookmarked = computed(() => {
+    const d = this.preview.state()?.drama;
+    return d ? this.bookmarks.isBookmarked(d.id) : false;
+  });
+
   /** Hide the preview once the hovered card scrolls out of the viewport. */
   protected readonly panelClasses = 'drama-preview-panel';
+
+  protected toggleBookmark(): void {
+    const d = this.preview.state()?.drama;
+    if (!d) return;
+    const added = this.bookmarks.toggle(d.id);
+    this.messages.add({
+      severity: 'success',
+      summary: added ? 'Added to bookmarks' : 'Removed from bookmarks',
+      detail: d.title,
+      life: 2500,
+    });
+  }
 
   protected onEnter(): void {
     this.preview.keepOpen();

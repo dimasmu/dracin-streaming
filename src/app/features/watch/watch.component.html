@@ -1,219 +1,376 @@
 @if (drama(); as d) {
-  <main class="container watch-page">
-    <nav class="breadcrumbs" aria-label="Breadcrumb">
-      <a routerLink="/">Home</a> / <a [routerLink]="['/drama', d.slug]">{{ d.title }}</a> /
-      <span>Episode {{ episodeNumber() }}</span>
-    </nav>
+  <main class="container watch-page" [class.lights-out]="lightsOut()">
+    <header class="watch-head">
+      <nav class="breadcrumbs" aria-label="Breadcrumb">
+        <a routerLink="/">Home</a><span aria-hidden="true">/</span>
+        <a routerLink="/browse">Dramas</a><span aria-hidden="true">/</span>
+        <span class="crumb-current">{{ d.title }}</span>
+      </nav>
+      <div class="watch-title-row">
+        <h1 class="watch-title">{{ d.title }}</h1>
+        <span class="chip chip-accent">Episode {{ episodeNumber() }}</span>
+        @if (statusLabel()) {
+          <span class="chip">{{ statusLabel() }}</span>
+        }
+      </div>
+    </header>
 
     <section class="watch-grid">
       <div class="watch-main-col">
         <div class="player-shell">
-          <div class="video-player" [style.--card-tone]="d.tone">
+          <div #player class="video-player" [style.--card-tone]="d.tone">
+            <div class="player-top">
+              <span class="player-title">{{ d.title }}</span>
+              <span class="player-ep">Episode {{ episodeNumber() }} of {{ totalEpisodes() }}</span>
+            </div>
+            <span class="player-demo-badge">Demo player &middot; no video source</span>
+
             <button
               class="play-button"
               type="button"
-              [attr.aria-label]="playing() ? 'Pause' : 'Play'"
+              [attr.aria-label]="playing() ? 'Pause demo' : 'Play demo'"
               (click)="togglePlay()"
             >
               @if (playing()) {
-                <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
+                <svg viewBox="0 0 24 24" fill="currentColor" width="26" height="26">
                   <path d="M6 5h4v14H6zM14 5h4v14h-4z" />
                 </svg>
               } @else {
-                <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
+                <svg viewBox="0 0 24 24" fill="currentColor" width="26" height="26">
                   <path d="M8 5v14l11-7z" />
                 </svg>
               }
             </button>
+
             <div class="player-controls">
-              <div class="timeline"><span [style.width.%]="progress()"></span></div>
+              <div
+                class="timeline"
+                role="slider"
+                aria-label="Seek"
+                aria-valuemin="0"
+                aria-valuemax="100"
+                [attr.aria-valuenow]="progress().toFixed(0)"
+                (click)="seek($event)"
+              >
+                <span class="timeline-fill" [style.width.%]="progress()"></span>
+                <span class="timeline-thumb" [style.left.%]="progress()"></span>
+              </div>
               <div class="controls-row">
-                <span>VOL &middot; {{ elapsed() }} / {{ duration() }}</span>
-                <span>SUB {{ subtitle() }} &middot; HD &middot; FS</span>
+                <div class="controls-group">
+                  <button
+                    type="button"
+                    class="ctl-btn"
+                    [attr.aria-label]="playing() ? 'Pause' : 'Play'"
+                    (click)="togglePlay()"
+                  >
+                    @if (playing()) {
+                      <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
+                        <path d="M6 5h4v14H6zM14 5h4v14h-4z" />
+                      </svg>
+                    } @else {
+                      <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
+                        <path d="M8 5v14l11-7z" />
+                      </svg>
+                    }
+                  </button>
+                  <button
+                    type="button"
+                    class="ctl-btn"
+                    [attr.aria-label]="muted() ? 'Unmute' : 'Mute'"
+                    [attr.aria-pressed]="muted()"
+                    (click)="muted.set(!muted())"
+                  >
+                    <svg
+                      viewBox="0 0 24 24"
+                      width="18"
+                      height="18"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M11 5 6 9H3v6h3l5 4z" fill="currentColor" />
+                      @if (muted()) {
+                        <path d="m17 9 5 6M22 9l-5 6" />
+                      } @else {
+                        <path d="M16 9a4.5 4.5 0 0 1 0 6M19 6.5a8 8 0 0 1 0 11" />
+                      }
+                    </svg>
+                  </button>
+                  <span class="time-label">{{ elapsed() }} / {{ duration() }}</span>
+                </div>
+                <div class="controls-group">
+                  @if (subtitle()) {
+                    <span class="ctl-tag" title="Subtitle language">SUB {{ subtitle() }}</span>
+                  }
+                  <button
+                    type="button"
+                    class="ctl-btn ctl-text"
+                    title="Toggle quality (demo)"
+                    (click)="toggleQuality()"
+                  >
+                    {{ quality() }}
+                  </button>
+                  <button
+                    type="button"
+                    class="ctl-btn"
+                    aria-label="Toggle fullscreen"
+                    title="Fullscreen"
+                    (click)="toggleFullscreen()"
+                  >
+                    <svg
+                      viewBox="0 0 24 24"
+                      width="18"
+                      height="18"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3" />
+                    </svg>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
 
           <div class="playback-toolbar">
-            <div class="toolbar-group">
-              <button
-                class="toolbar-button"
-                type="button"
-                [class.active]="server() === 1"
-                (click)="server.set(1)"
+            <div class="episode-nav">
+              <a
+                class="btn btn-icon"
+                aria-label="Previous episode"
+                title="Previous episode"
+                [attr.aria-disabled]="!hasPrev()"
+                [attr.tabindex]="hasPrev() ? null : -1"
+                [routerLink]="['/watch', d.slug, hasPrev() ? episodeNumber() - 1 : episodeNumber()]"
               >
-                Server 1
-              </button>
-              <button
-                class="toolbar-button"
-                type="button"
-                [class.active]="server() === 2"
-                (click)="server.set(2)"
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="m15 18-6-6 6-6" />
+                </svg>
+              </a>
+              <span class="ep-indicator">EP {{ episodeNumber() }} / {{ totalEpisodes() }}</span>
+              <a
+                class="btn btn-icon"
+                aria-label="Next episode"
+                title="Next episode"
+                [attr.aria-disabled]="!hasNext()"
+                [attr.tabindex]="hasNext() ? null : -1"
+                [routerLink]="['/watch', d.slug, hasNext() ? episodeNumber() + 1 : episodeNumber()]"
               >
-                Server 2
-              </button>
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="m9 18 6-6-6-6" />
+                </svg>
+              </a>
             </div>
+
             <div class="toolbar-group">
-              <div class="vote-group">
+              <div class="segmented" role="group" aria-label="Server">
                 <button
-                  class="vote-btn vote-like"
+                  class="seg-btn"
                   type="button"
-                  [attr.aria-pressed]="vote() === 'like'"
-                  (click)="choose('like')"
+                  [class.active]="server() === 1"
+                  [attr.aria-pressed]="server() === 1"
+                  (click)="server.set(1)"
                 >
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    width="16"
-                    height="16"
-                  >
-                    <path
-                      d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"
-                    />
-                    <path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3" />
-                  </svg>
-                  <span class="vote-count">3.2rb</span>
+                  Server 1
                 </button>
-                <span class="vote-divider"></span>
                 <button
-                  class="vote-btn vote-dislike"
+                  class="seg-btn"
                   type="button"
-                  [attr.aria-pressed]="vote() === 'dislike'"
-                  (click)="choose('dislike')"
+                  [class.active]="server() === 2"
+                  [attr.aria-pressed]="server() === 2"
+                  (click)="server.set(2)"
                 >
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    width="16"
-                    height="16"
-                  >
-                    <path
-                      d="M10 15V19a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3H10z"
-                    />
-                    <path d="M17 2h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17" />
-                  </svg>
-                  <span class="vote-count">478</span>
+                  Server 2
                 </button>
               </div>
-              @if (hasPrev()) {
-                <a class="toolbar-button" [routerLink]="['/watch', d.slug, episodeNumber() - 1]"
-                  >&#8249; Previous</a
-                >
-              }
-              @if (hasNext()) {
-                <a class="toolbar-button" [routerLink]="['/watch', d.slug, episodeNumber() + 1]"
-                  >Next &#8250;</a
-                >
-              }
             </div>
           </div>
 
-          <div class="player-toggles">
-            <label class="toggle-label"><input type="checkbox" checked /> Auto play</label>
-            <label class="toggle-label"><input type="checkbox" checked /> Auto next</label>
-            <label class="toggle-label"><input type="checkbox" /> Lights out</label>
+          <div class="player-settings">
+            <div class="switch-group">
+              <button
+                type="button"
+                class="switch"
+                role="switch"
+                [attr.aria-checked]="autoPlay()"
+                (click)="autoPlay.set(!autoPlay())"
+              >
+                <span class="switch-track"><span class="switch-knob"></span></span>Auto play
+              </button>
+              <button
+                type="button"
+                class="switch"
+                role="switch"
+                [attr.aria-checked]="autoNext()"
+                (click)="autoNext.set(!autoNext())"
+              >
+                <span class="switch-track"><span class="switch-knob"></span></span>Auto next
+              </button>
+              <button
+                type="button"
+                class="switch"
+                role="switch"
+                [attr.aria-checked]="lightsOut()"
+                (click)="lightsOut.set(!lightsOut())"
+              >
+                <span class="switch-track"><span class="switch-knob"></span></span>Lights out
+              </button>
+            </div>
+
+            <div class="vote-group">
+              <button
+                class="vote-btn vote-like"
+                type="button"
+                aria-label="Like"
+                [attr.aria-pressed]="vote() === 'like'"
+                (click)="choose('like')"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                  <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z" />
+                  <path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3" />
+                </svg>
+                <span class="vote-count">3.2rb</span>
+              </button>
+              <span class="vote-divider"></span>
+              <button
+                class="vote-btn vote-dislike"
+                type="button"
+                aria-label="Dislike"
+                [attr.aria-pressed]="vote() === 'dislike'"
+                (click)="choose('dislike')"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                  <path d="M10 15V19a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3H10z" />
+                  <path d="M17 2h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17" />
+                </svg>
+                <span class="vote-count">478</span>
+              </button>
+            </div>
           </div>
         </div>
 
         <article class="watch-detail">
           <div class="watch-detail-inner">
             <div class="watch-poster" [style.--card-tone]="d.tone">
-              <span class="drama-art"
-                ><span class="drama-monogram">{{ monogram(d.title) }}</span></span
-              >
+              @if (d.posterUrl) {
+                <img [src]="d.posterUrl" [alt]="d.title + ' poster'" loading="lazy" />
+              } @else {
+                <span class="drama-art"
+                  ><span class="drama-monogram">{{ monogram(d.title) }}</span></span
+                >
+              }
             </div>
             <div class="watch-detail-body">
               <p class="eyebrow">{{ d.platformId }}</p>
-              <h1 class="watch-detail-title">{{ d.title }}</h1>
+              <h2 class="watch-detail-title">{{ d.title }}</h2>
+              @if (d.originalTitle) {
+                <p class="alternative-title">{{ d.originalTitle }}</p>
+              }
+
               <div class="metadata-grid">
-                <span class="metadata-item"
-                  ><strong>{{ d.releaseYear }}</strong> release</span
-                >
-                <span class="metadata-item"
-                  ><strong>{{ d.totalEpisodes }}</strong> episodes</span
-                >
-                <span class="metadata-item"
-                  ><strong>{{ d.durationMinutes ?? 1 }}m</strong> duration</span
-                >
-                <span class="metadata-item"
-                  ><strong>{{ d.platformId }}</strong> source</span
-                >
-                <span class="metadata-item"
-                  ><strong>SUB {{ subtitle() }}</strong></span
-                >
-                <span class="metadata-item"
-                  ><strong>{{ d.genres.join(' &middot; ') }}</strong></span
-                >
+                @if (d.releaseYear) {
+                  <span class="metadata-item"><strong>{{ d.releaseYear }}</strong> release</span>
+                }
+                @if (d.totalEpisodes) {
+                  <span class="metadata-item"><strong>{{ d.totalEpisodes }}</strong> episodes</span>
+                }
+                @if (d.latestEpisode) {
+                  <span class="metadata-item"><strong>EP {{ d.latestEpisode }}</strong> latest</span>
+                }
+                @if (statusLabel()) {
+                  <span class="metadata-item"><strong>{{ statusLabel() }}</strong> status</span>
+                }
+                @if (d.subtitleLanguages.length) {
+                  <span class="metadata-item"
+                    ><strong>SUB {{ d.subtitleLanguages.join(' / ') }}</strong></span
+                  >
+                }
+                @if (d.rating) {
+                  <span class="metadata-item metadata-rating">
+                    <strong>{{ d.rating.toFixed(1) }}</strong>
+                    <span class="stars" aria-hidden="true">
+                      @for (s of stars; track $index) {
+                        <svg class="star{{ $index < ratingFilled() ? ' star-on' : '' }}" viewBox="0 0 24 24" width="10" height="10">
+                          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                        </svg>
+                      }
+                    </span>
+                    @if (d.ratingIsDemo) {
+                      demo rating
+                    }
+                  </span>
+                }
               </div>
+
+              @if (d.genres.length) {
+                <div class="genre-tags">
+                  @for (g of d.genres; track g) {
+                    <span>{{ g }}</span>
+                  }
+                </div>
+              }
+
               <p class="synopsis">{{ d.synopsis }}</p>
+              @if (aired()) {
+                <p class="aired-line">Aired {{ aired() }}</p>
+              }
+
               <div class="detail-actions">
                 <button
                   class="btn"
                   type="button"
                   [class.btn-primary]="bookmarked()"
+                  [attr.aria-pressed]="bookmarked()"
                   (click)="toggleBookmark()"
                 >
-                  {{ bookmarked() ? '&#9733; Bookmarked' : '&#9734; Bookmark' }}
+                  <svg
+                    viewBox="0 0 24 24"
+                    width="15"
+                    height="15"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linejoin="round"
+                    [attr.fill]="bookmarked() ? 'currentColor' : 'none'"
+                    aria-hidden="true"
+                  >
+                    <path d="M6 4.5A2.5 2.5 0 0 1 8.5 2h7A2.5 2.5 0 0 1 18 4.5V21l-6-3.5L6 21z" />
+                  </svg>
+                  {{ bookmarked() ? 'Bookmarked' : 'Bookmark' }}
                 </button>
-                <button class="btn" type="button" (click)="share()">Share</button>
+                <button class="btn" type="button" (click)="share()">
+                  <svg
+                    viewBox="0 0 24 24"
+                    width="15"
+                    height="15"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    aria-hidden="true"
+                  >
+                    <circle cx="18" cy="5" r="3" /><circle cx="6" cy="12" r="3" /><circle cx="18" cy="19" r="3" />
+                    <path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4" />
+                  </svg>
+                  Share
+                </button>
               </div>
             </div>
           </div>
         </article>
-
-        <section class="watch-comments">
-          <div class="section-heading">
-            <h2 class="display">Comments</h2>
-            <span class="count">{{ comments().length }} comments</span>
-          </div>
-          <div class="comment-form">
-            <div class="comment-avatar"><span>U</span></div>
-            <div>
-              <textarea
-                class="comment-input"
-                rows="2"
-                placeholder="Write a comment..."
-                [value]="draft()"
-                (input)="onDraft($event)"
-              ></textarea>
-              <div class="flex justify-end mt-2">
-                <button class="btn btn-compact btn-primary" type="button" (click)="submitComment()">
-                  Send
-                </button>
-              </div>
-            </div>
-          </div>
-          <div class="comment-list">
-            @for (c of comments(); track $index) {
-              <article class="comment-item">
-                <div class="comment-avatar">
-                  <span>{{ c.author.charAt(0) }}</span>
-                </div>
-                <div class="comment-body">
-                  <div class="comment-head">
-                    <strong>{{ c.author }}</strong
-                    ><time>{{ c.time }}</time>
-                  </div>
-                  <p>{{ c.body }}</p>
-                  <div class="comment-actions">
-                    <button class="comment-action" type="button">Like</button
-                    ><button class="comment-action" type="button">Reply</button>
-                  </div>
-                </div>
-              </article>
-            }
-          </div>
-        </section>
       </div>
 
-      <aside class="episode-panel">
+      <aside class="episode-panel" aria-label="Episodes">
         <div class="panel-head">
           <h2>Episodes</h2>
-          <p>{{ d.title }} &middot; {{ d.totalEpisodes }} episodes</p>
+          <p>
+            Now playing EP {{ episodeNumber() }} &middot; {{ totalEpisodes() }}
+            {{ totalEpisodes() === 1 ? 'episode' : 'episodes' }}
+          </p>
         </div>
         <div class="episode-scroll">
           <div class="episode-list">
@@ -221,6 +378,8 @@
               <a
                 class="episode-button"
                 [class.active]="ep === episodeNumber()"
+                [attr.aria-current]="ep === episodeNumber() ? 'true' : null"
+                [attr.aria-label]="'Episode ' + ep"
                 [routerLink]="['/watch', d.slug, ep]"
                 >{{ ep }}</a
               >
@@ -243,6 +402,51 @@
         </div>
       </section>
     }
+
+    <section class="watch-comments">
+      <div class="section-heading">
+        <h2 class="display">Comments</h2>
+        <span class="count">{{ comments().length }} comments</span>
+      </div>
+      <div class="comment-form">
+        <div class="comment-avatar"><span>U</span></div>
+        <div>
+          <textarea
+            class="comment-input"
+            rows="2"
+            placeholder="Write a comment..."
+            aria-label="Write a comment"
+            [value]="draft()"
+            (input)="onDraft($event)"
+          ></textarea>
+          <div class="flex justify-end mt-2">
+            <button class="btn btn-compact btn-primary" type="button" (click)="submitComment()">
+              Send
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="comment-list">
+        @for (c of comments(); track $index) {
+          <article class="comment-item">
+            <div class="comment-avatar">
+              <span>{{ c.author.charAt(0) }}</span>
+            </div>
+            <div class="comment-body">
+              <div class="comment-head">
+                <strong>{{ c.author }}</strong
+                ><time>{{ c.time }}</time>
+              </div>
+              <p>{{ c.body }}</p>
+              <div class="comment-actions">
+                <button class="comment-action" type="button">Like</button
+                ><button class="comment-action" type="button">Reply</button>
+              </div>
+            </div>
+          </article>
+        }
+      </div>
+    </section>
   </main>
 } @else {
   <main class="container page">

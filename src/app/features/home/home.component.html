@@ -32,7 +32,6 @@
             <a class="btn btn-primary" [routerLink]="['/watch', d.slug, d.latestEpisode]"
               >&#9654; Watch now</a
             >
-            <a class="btn" [routerLink]="['/drama', d.slug]">Details</a>
           </div>
         </div>
         <div class="hero-art" [attr.data-monogram]="monogram(d.title)"></div>
@@ -100,7 +99,7 @@
       <div class="section-heading"><h2 class="display">Most Viewed</h2></div>
       <div class="rank-list">
         @for (d of mostViewed(); track d.id; let i = $index) {
-          <a class="rank-row" [routerLink]="['/drama', d.slug]" [style.--card-tone]="d.tone">
+          <a class="rank-row" [routerLink]="['/watch', d.slug, 1]" [style.--card-tone]="d.tone">
             <span class="rank-num">{{ i + 1 }}</span>
             <span class="rank-thumb"></span>
             <span class="rank-info">
@@ -115,7 +114,7 @@
       <div class="section-heading"><h2 class="display">Most Liked</h2></div>
       <div class="rank-list">
         @for (d of mostLiked(); track d.id; let i = $index) {
-          <a class="rank-row" [routerLink]="['/drama', d.slug]" [style.--card-tone]="d.tone">
+          <a class="rank-row" [routerLink]="['/watch', d.slug, 1]" [style.--card-tone]="d.tone">
             <span class="rank-num">{{ i + 1 }}</span>
             <span class="rank-thumb"></span>
             <span class="rank-info">

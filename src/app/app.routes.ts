@@ -11,9 +11,16 @@ export const routes: Routes = [
       import('./features/browse/browse.component').then((m) => m.BrowseComponent),
   },
   {
+    // Legacy detail URL: the watch page is now the canonical drama page.
     path: 'drama/:slug',
-    loadComponent: () =>
-      import('./features/drama-detail/drama-detail.component').then((m) => m.DramaDetailComponent),
+    pathMatch: 'full',
+    redirectTo: (route) => `/watch/${route.params['slug']}/1`,
+  },
+  {
+    // Bare /watch/:slug has no episode, default to the first one.
+    path: 'watch/:slug',
+    pathMatch: 'full',
+    redirectTo: (route) => `/watch/${route.params['slug']}/1`,
   },
   {
     path: 'watch/:slug/:episode',

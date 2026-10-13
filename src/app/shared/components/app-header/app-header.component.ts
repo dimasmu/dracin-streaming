@@ -80,7 +80,7 @@ export class AppHeaderComponent {
   protected random(): void {
     const all = this.catalog.dramas;
     const pick = all[Math.floor(Math.random() * all.length)];
-    this.router.navigate(['/drama', pick.slug]);
+    this.router.navigate(['/watch', pick.slug, 1]);
   }
 
   protected onSearchInput(event: Event): void {

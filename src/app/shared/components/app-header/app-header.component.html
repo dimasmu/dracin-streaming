@@ -128,7 +128,7 @@
             }
           } @else if (searchResults().length) {
             @for (d of searchResults(); track d.id) {
-              <a class="search-result" [routerLink]="['/drama', d.slug]" (click)="closeSearch()">
+              <a class="search-result" [routerLink]="['/watch', d.slug, 1]" (click)="closeSearch()">
                 <span class="search-result-thumb" [style.--card-tone]="d.tone"
                   ><span class="drama-art"></span
                 ></span>
