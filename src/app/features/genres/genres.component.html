@@ -1,8 +1,8 @@
 <main class="container page">
   <div class="page-head">
     <div>
-      <h1 class="display">Genres</h1>
-      <p>Discover Chinese short dramas by genre. Counts are derived from the current catalogue.</p>
+      <h1 class="display">{{ 'genres.title' | transloco }}</h1>
+      <p>{{ 'genres.intro' | transloco }}</p>
     </div>
   </div>
 
@@ -16,9 +16,9 @@
       >
         <div class="genre-card-art" [attr.data-monogram]="monogram(g.name)"></div>
         <div class="p-4">
-          <h2 class="display" style="font-size: 22px; margin: 0">{{ g.name }}</h2>
-          <p class="text-muted" style="font-size: 11px; margin: 4px 0 8px">{{ g.description }}</p>
-          <span class="count">{{ count(g.name) }} dramas</span>
+          <h2 class="display" style="font-size: 22px; margin: 0">{{ 'genre.' + g.name | transloco }}</h2>
+          <p class="text-muted" style="font-size: 11px; margin: 4px 0 8px">{{ 'genreDesc.' + g.id | transloco }}</p>
+          <span class="count">{{ 'common.dramasCount' | transloco: { count: count(g.name) } }}</span>
         </div>
       </a>
     }
@@ -26,13 +26,13 @@
 
   <section class="section">
     <div class="section-heading">
-      <h2 class="display">Browse by Genre</h2>
-      <span class="count">{{ filtered().length }} dramas</span>
+      <h2 class="display">{{ 'genres.browseBy' | transloco }}</h2>
+      <span class="count">{{ 'common.dramasCount' | transloco: { count: filtered().length } }}</span>
     </div>
-    <div class="genre-tabs" role="tablist" aria-label="Filter by genre">
+    <div class="genre-tabs" role="tablist" [attr.aria-label]="'genres.filterBy' | transloco">
       @for (g of genreOptions(); track g) {
         <button type="button" [class.active]="activeGenre() === g" (click)="selectGenre(g)">
-          {{ g }}
+          {{ g === 'All' ? ('common.all' | transloco) : ('genre.' + g | transloco) }}
         </button>
       }
     </div>
@@ -54,7 +54,7 @@
         </div>
       }
     } @else {
-      <app-empty-state title="No dramas in this genre" message="Try a different genre." />
+      <app-empty-state [title]="'genres.emptyTitle' | transloco" [message]="'genres.emptyMessage' | transloco" />
     }
   </section>
 </main>

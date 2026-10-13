@@ -4,7 +4,6 @@ export interface ReleaseScheduleItem {
   dramaTitle: string;
   platformId: string;
   episodeNumber: number;
-  subtitleStatus: string;
   releaseDate: string;
   releaseTime?: string;
   isDemo: boolean;

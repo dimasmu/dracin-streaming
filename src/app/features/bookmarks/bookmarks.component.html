@@ -1,10 +1,10 @@
 <main class="container page">
   <div class="page-head">
     <div>
-      <h1 class="display">Bookmarks</h1>
-      <p>Your saved dramas, stored locally in this browser.</p>
+      <h1 class="display">{{ 'bookmarks.title' | transloco }}</h1>
+      <p>{{ 'bookmarks.intro' | transloco }}</p>
     </div>
-    <span class="count">{{ dramas().length }} saved</span>
+    <span class="count">{{ 'bookmarks.saved' | transloco: { count: dramas().length } }}</span>
   </div>
 
   @if (dramas().length) {
@@ -15,10 +15,10 @@
     </div>
   } @else {
     <app-empty-state
-      title="No bookmarks yet"
-      message="Tap the bookmark icon on any drama to save it here."
+      [title]="'bookmarks.emptyTitle' | transloco"
+      [message]="'bookmarks.emptyMessage' | transloco"
     >
-      <a class="btn btn-primary" routerLink="/browse">Browse dramas</a>
+      <a class="btn btn-primary" routerLink="/browse">{{ 'bookmarks.browse' | transloco }}</a>
     </app-empty-state>
   }
 </main>

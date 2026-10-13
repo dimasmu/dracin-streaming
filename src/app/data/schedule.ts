@@ -8,18 +8,17 @@ export interface ScheduleSlot {
   time: string;
   dramaSlug: string;
   episodeNumber: number;
-  subtitleStatus: string;
 }
 
 export const SCHEDULE_SLOTS: ScheduleSlot[] = [
-  { day: 1, time: '19.00 WIB', dramaSlug: 'singgasana-bayangan-sulih-suara', episodeNumber: 143, subtitleStatus: 'EN' },
-  { day: 1, time: '20.30 WIB', dramaSlug: 'dulu-diremehkan-kini-berjaya', episodeNumber: 101, subtitleStatus: 'EN' },
-  { day: 2, time: '21.00 WIB', dramaSlug: 'suami-nikah-kilatku-memanjakanku', episodeNumber: 101, subtitleStatus: 'ID' },
-  { day: 3, time: '21.45 WIB', dramaSlug: 'wah-suamiku-ternyata-bos-besar', episodeNumber: 101, subtitleStatus: 'EN' },
-  { day: 4, time: '22.15 WIB', dramaSlug: 'legenda-tak-terkalahkan-sulih-suara', episodeNumber: 95, subtitleStatus: 'ID' },
-  { day: 5, time: '19.30 WIB', dramaSlug: 'cinta-di-balik-luka-lama', episodeNumber: 100, subtitleStatus: 'ID' },
-  { day: 6, time: '20.00 WIB', dramaSlug: 'istriku-aku-memang-dewa-sulih-suara', episodeNumber: 89, subtitleStatus: 'ID' },
-  { day: 6, time: '21.30 WIB', dramaSlug: 'putri-yang-tak-akan-tunduk', episodeNumber: 81, subtitleStatus: 'EN' },
+  { day: 1, time: '19.00 WIB', dramaSlug: 'singgasana-bayangan-sulih-suara', episodeNumber: 143 },
+  { day: 1, time: '20.30 WIB', dramaSlug: 'dulu-diremehkan-kini-berjaya', episodeNumber: 101 },
+  { day: 2, time: '21.00 WIB', dramaSlug: 'suami-nikah-kilatku-memanjakanku', episodeNumber: 101 },
+  { day: 3, time: '21.45 WIB', dramaSlug: 'wah-suamiku-ternyata-bos-besar', episodeNumber: 101 },
+  { day: 4, time: '22.15 WIB', dramaSlug: 'legenda-tak-terkalahkan-sulih-suara', episodeNumber: 95 },
+  { day: 5, time: '19.30 WIB', dramaSlug: 'cinta-di-balik-luka-lama', episodeNumber: 100 },
+  { day: 6, time: '20.00 WIB', dramaSlug: 'istriku-aku-memang-dewa-sulih-suara', episodeNumber: 89 },
+  { day: 6, time: '21.30 WIB', dramaSlug: 'putri-yang-tak-akan-tunduk', episodeNumber: 81 },
 ];
 
 export function buildScheduleItems(slots: ScheduleSlot[], now: Date): ReleaseScheduleItem[] {
@@ -36,7 +35,6 @@ export function buildScheduleItems(slots: ScheduleSlot[], now: Date): ReleaseSch
         dramaTitle: '',
         platformId: '',
         episodeNumber: slot.episodeNumber,
-        subtitleStatus: slot.subtitleStatus,
         releaseDate: iso,
         releaseTime: slot.time,
         isDemo: true,

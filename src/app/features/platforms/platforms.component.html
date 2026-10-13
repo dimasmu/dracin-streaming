@@ -1,11 +1,8 @@
 <main class="container page">
   <div class="page-head">
     <div>
-      <h1 class="display">Platforms</h1>
-      <p>
-        Explore dramas by their source platform. DRA.CIN is a directory only &mdash; no affiliation
-        or partnership with these platforms is implied.
-      </p>
+      <h1 class="display">{{ 'platforms.title' | transloco }}</h1>
+      <p>{{ 'platforms.intro' | transloco }}</p>
     </div>
   </div>
 
@@ -20,8 +17,8 @@
         <div class="genre-card-art" [attr.data-monogram]="monogram(p.name)"></div>
         <div class="p-4">
           <h2 class="display" style="font-size: 22px; margin: 0">{{ p.name }}</h2>
-          <p class="text-muted" style="font-size: 11px; margin: 4px 0 8px">{{ p.description }}</p>
-          <span class="count">{{ count(p.name) }} dramas</span>
+          <p class="text-muted" style="font-size: 11px; margin: 4px 0 8px">{{ 'platformDesc.' + p.id | transloco }}</p>
+          <span class="count">{{ 'common.dramasCount' | transloco: { count: count(p.name) } }}</span>
         </div>
       </a>
     }
@@ -29,11 +26,11 @@
 
   <section class="section">
     <div class="section-heading">
-      <h2 class="display">Browse by Platform</h2>
-      <span class="count">{{ filtered().length }} dramas</span>
+      <h2 class="display">{{ 'platforms.browseBy' | transloco }}</h2>
+      <span class="count">{{ 'common.dramasCount' | transloco: { count: filtered().length } }}</span>
     </div>
-    <div class="facet-bar facet-bar--split" aria-label="Filter by platform">
-      <span class="facet-chips-label">Platform</span>
+    <div class="facet-bar facet-bar--split" [attr.aria-label]="'platforms.filterBy' | transloco">
+      <span class="facet-chips-label">{{ 'platforms.platform' | transloco }}</span>
       <div class="facet-scroller">
         <div class="facet-chips">
           <button
@@ -42,7 +39,7 @@
             [class.active]="activePlatform() === 'All'"
             (click)="selectPlatform('All')"
           >
-            All
+            {{ 'common.all' | transloco }}
           </button>
           @for (p of catalog.platforms; track p.id) {
             <button
@@ -57,8 +54,8 @@
         </div>
       </div>
       <div class="facet-status">
-        <span class="count">{{ filtered().length }} dramas</span>
-        <button class="facet-clear" type="button" (click)="selectPlatform('All')">Reset</button>
+        <span class="count">{{ 'common.dramasCount' | transloco: { count: filtered().length } }}</span>
+        <button class="facet-clear" type="button" (click)="selectPlatform('All')">{{ 'common.reset' | transloco }}</button>
       </div>
     </div>
 
@@ -79,7 +76,7 @@
         </div>
       }
     } @else {
-      <app-empty-state title="No dramas on this platform" message="Try a different platform." />
+      <app-empty-state [title]="'platforms.emptyTitle' | transloco" [message]="'platforms.emptyMessage' | transloco" />
     }
   </section>
 </main>

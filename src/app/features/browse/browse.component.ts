@@ -9,10 +9,12 @@ import {
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { SelectModule } from 'primeng/select';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { PaginatorModule } from 'primeng/paginator';
 import { CatalogService, SortKey } from '../../core/services/catalog.service';
 import { DramaCardComponent } from '../../shared/components/drama-card/drama-card.component';
 import { EmptyStateComponent } from '../../shared/components/empty-state/empty-state.component';
+import { I18nService } from '../../core/services/i18n.service';
 
 interface Option {
   label: string;
@@ -20,7 +22,14 @@ interface Option {
 }
 
 @Component({
-  imports: [FormsModule, SelectModule, PaginatorModule, DramaCardComponent, EmptyStateComponent],
+  imports: [
+    FormsModule,
+    SelectModule,
+    PaginatorModule,
+    TranslocoPipe,
+    DramaCardComponent,
+    EmptyStateComponent,
+  ],
   templateUrl: './browse.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -28,6 +37,7 @@ export class BrowseComponent implements OnInit {
   protected readonly catalog = inject(CatalogService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly i18n = inject(I18nService);
 
   protected readonly selectedGenres = signal<string[]>([]);
   protected readonly selectedPlatforms = signal<string[]>([]);
@@ -41,10 +51,10 @@ export class BrowseComponent implements OnInit {
   protected readonly rows = signal(24);
   protected readonly first = signal(0);
 
-  protected readonly genreOptions: Option[] = this.catalog.genres.map((g) => ({
-    label: g.name,
-    value: g.name,
-  }));
+  /** Values stay the data names (used as filters); only the labels follow the website language. */
+  protected readonly genreOptions = computed<Option[]>(() =>
+    this.catalog.genres.map((g) => ({ label: this.i18n.t('genre.' + g.name), value: g.name })),
+  );
   protected readonly platformOptions: Option[] = this.catalog.platforms.map((p) => ({
     label: p.name,
     value: p.name,
@@ -52,20 +62,24 @@ export class BrowseComponent implements OnInit {
   protected readonly yearOptions: Option[] = this.catalog
     .availableYears()
     .map((y) => ({ label: String(y), value: y }));
-  protected readonly subtitleOptions: Option[] = this.catalog
-    .availableSubtitleLanguages()
-    .map((s) => ({
-      label: `Subtitle ${s}`,
+  protected readonly subtitleOptions = computed<Option[]>(() =>
+    this.catalog.availableSubtitleLanguages().map((s) => ({
+      label: this.i18n.t('browse.subtitleOption', { lang: s }),
       value: s,
-    }));
+    })),
+  );
 
-  protected readonly sortOptions: Option[] = [
-    { label: 'Most popular', value: 'popular' },
-    { label: 'Newest', value: 'new' },
-    { label: 'Highest rated', value: 'rating' },
-    { label: 'Title A\u2013Z', value: 'az' },
-    { label: 'Most episodes', value: 'full' },
-  ];
+  private readonly sortValues: SortKey[] = ['popular', 'new', 'rating', 'az', 'full'];
+  private readonly sortKeys: Record<SortKey, string> = {
+    popular: 'browse.sortPopular',
+    new: 'browse.sortNew',
+    rating: 'browse.sortRating',
+    az: 'browse.sortAz',
+    full: 'browse.sortEpisodes',
+  };
+  protected readonly sortOptions = computed<Option[]>(() =>
+    this.sortValues.map((v) => ({ label: this.i18n.t(this.sortKeys[v]), value: v })),
+  );
 
   protected readonly filtered = computed(() =>
     this.catalog.filter({
@@ -107,7 +121,7 @@ export class BrowseComponent implements OnInit {
     if (sub) this.selectedSubtitles.set(sub.split(',').filter(Boolean));
 
     const sortParam = params.get('sort');
-    if (sortParam && this.sortOptions.some((o) => o.value === sortParam))
+    if (sortParam && this.sortValues.includes(sortParam as SortKey))
       this.sort.set(sortParam as SortKey);
   }
 

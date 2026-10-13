@@ -11,7 +11,7 @@
     <circle cx="11" cy="11" r="8" />
     <path d="m21 21-4.35-4.35" />
   </svg>
-  <h3>{{ title() }}</h3>
+  <h3>{{ title() || ('empty.nothing' | transloco) }}</h3>
   <p>{{ message() }}</p>
   <ng-content />
 </div>

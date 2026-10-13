@@ -24,7 +24,10 @@ export interface Drama {
   totalEpisodes?: number;
   latestEpisode?: number;
   status: DramaStatus;
+  /** Subtitle languages of the drama's source, used by the Browse filter. */
   subtitleLanguages: string[];
+  /** Languages the video is available in. Every language has its own video per episode. */
+  videoLanguages: ('id' | 'en')[];
   rating?: number;
   ratingSource?: string;
   ratingIsDemo: boolean;

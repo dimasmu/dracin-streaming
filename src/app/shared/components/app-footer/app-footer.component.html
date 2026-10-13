@@ -2,33 +2,30 @@
   <div class="container footer-grid">
     <div class="footer-brand">
       <a class="logo" routerLink="/">DRA<b>.CIN</b></a>
-      <p>
-        A directory of Chinese short dramas across many platforms. Content metadata is shown to help
-        you discover series faster.
-      </p>
+      <p>{{ 'footer.about' | transloco }}</p>
     </div>
-    <nav class="footer-col" aria-label="Explore">
-      <h2>Explore</h2>
-      <a routerLink="/genre">Genre</a>
-      <a routerLink="/platform">Platform</a>
-      <a routerLink="/release-schedule">Schedule</a>
-      <a routerLink="/browse">Browse all</a>
+    <nav class="footer-col" [attr.aria-label]="'footer.explore' | transloco">
+      <h2>{{ 'footer.explore' | transloco }}</h2>
+      <a routerLink="/genre">{{ 'nav.genre' | transloco }}</a>
+      <a routerLink="/platform">{{ 'nav.platform' | transloco }}</a>
+      <a routerLink="/release-schedule">{{ 'nav.schedule' | transloco }}</a>
+      <a routerLink="/browse">{{ 'footer.browseAll' | transloco }}</a>
     </nav>
-    <nav class="footer-col" aria-label="Help">
-      <h2>Help</h2>
-      <a routerLink="/faq">FAQ</a>
-      <a routerLink="/contact">Contact</a>
-      <a routerLink="/bookmarks">Bookmarks</a>
+    <nav class="footer-col" [attr.aria-label]="'footer.help' | transloco">
+      <h2>{{ 'footer.help' | transloco }}</h2>
+      <a routerLink="/faq">{{ 'footer.faq' | transloco }}</a>
+      <a routerLink="/contact">{{ 'footer.contact' | transloco }}</a>
+      <a routerLink="/bookmarks">{{ 'nav.bookmarks' | transloco }}</a>
     </nav>
-    <nav class="footer-col" aria-label="Legal">
-      <h2>Legal</h2>
-      <a routerLink="/terms">Terms of Service</a>
-      <a routerLink="/privacy">Privacy</a>
-      <a routerLink="/dmca">DMCA</a>
+    <nav class="footer-col" [attr.aria-label]="'footer.legal' | transloco">
+      <h2>{{ 'footer.legal' | transloco }}</h2>
+      <a routerLink="/terms">{{ 'footer.terms' | transloco }}</a>
+      <a routerLink="/privacy">{{ 'footer.privacy' | transloco }}</a>
+      <a routerLink="/dmca">{{ 'footer.dmca' | transloco }}</a>
     </nav>
   </div>
   <div class="container footer-bottom">
-    <span>&copy; 2026 DRA.CIN &middot; Visual prototype</span>
-    <span>Metadata &middot; Source platforms &middot; Subtitles</span>
+    <span>{{ 'footer.copyright' | transloco }}</span>
+    <span>{{ 'footer.tagline' | transloco }}</span>
   </div>
 </footer>

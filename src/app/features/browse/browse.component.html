@@ -1,33 +1,30 @@
 <main class="container page">
   <div class="page-head">
     <div>
-      <h1 class="display">Browse Dramas</h1>
-      <p>
-        Search and filter the full Chinese short-drama catalogue by genre, platform, year and
-        subtitle language.
-      </p>
+      <h1 class="display">{{ 'browse.title' | transloco }}</h1>
+      <p>{{ 'browse.intro' | transloco }}</p>
     </div>
-    <span class="count">{{ filtered().length }} dramas found</span>
+    <span class="count">{{ 'common.dramasFound' | transloco: { count: filtered().length } }}</span>
   </div>
 
   <div class="browse-layout">
-    <aside class="browse-sidebar" aria-label="Filters">
+    <aside class="browse-sidebar" [attr.aria-label]="'browse.filters' | transloco">
       <div class="filter-group">
-        <span class="filter-label">Genre</span>
+        <span class="filter-label">{{ 'browse.genre' | transloco }}</span>
         <p-select
-          [options]="genreOptions"
+          [options]="genreOptions()"
           optionLabel="label"
           optionValue="value"
           [multiple]="true"
           [ngModel]="selectedGenres()"
           (ngModelChange)="setGenres($event)"
-          placeholder="All genres"
+          [placeholder]="'browse.allGenres' | transloco"
           [showClear]="true"
           [style]="{ width: '100%' }"
         />
       </div>
       <div class="filter-group">
-        <span class="filter-label">Platform</span>
+        <span class="filter-label">{{ 'browse.platform' | transloco }}</span>
         <p-select
           [options]="platformOptions"
           optionLabel="label"
@@ -35,13 +32,13 @@
           [multiple]="true"
           [ngModel]="selectedPlatforms()"
           (ngModelChange)="setPlatforms($event)"
-          placeholder="All platforms"
+          [placeholder]="'browse.allPlatforms' | transloco"
           [showClear]="true"
           [style]="{ width: '100%' }"
         />
       </div>
       <div class="filter-group">
-        <span class="filter-label">Release Year</span>
+        <span class="filter-label">{{ 'browse.year' | transloco }}</span>
         <p-select
           [options]="yearOptions"
           optionLabel="label"
@@ -49,49 +46,49 @@
           [multiple]="true"
           [ngModel]="selectedYears()"
           (ngModelChange)="setYears($event)"
-          placeholder="All years"
+          [placeholder]="'browse.allYears' | transloco"
           [showClear]="true"
           [style]="{ width: '100%' }"
         />
       </div>
       <div class="filter-group">
-        <span class="filter-label">Subtitle</span>
+        <span class="filter-label">{{ 'browse.subtitle' | transloco }}</span>
         <p-select
-          [options]="subtitleOptions"
+          [options]="subtitleOptions()"
           optionLabel="label"
           optionValue="value"
           [multiple]="true"
           [ngModel]="selectedSubtitles()"
           (ngModelChange)="setSubtitles($event)"
-          placeholder="All subtitles"
+          [placeholder]="'browse.allSubtitles' | transloco"
           [showClear]="true"
           [style]="{ width: '100%' }"
         />
       </div>
       <div class="filter-group">
-        <span class="filter-label">Release Date</span>
+        <span class="filter-label">{{ 'browse.releaseDate' | transloco }}</span>
         <div class="grid grid-cols-2 gap-2">
-          <input type="date" class="date-input" [(ngModel)]="dateFrom" aria-label="From date" />
-          <input type="date" class="date-input" [(ngModel)]="dateTo" aria-label="To date" />
+          <input type="date" class="date-input" [(ngModel)]="dateFrom" [attr.aria-label]="'browse.fromDate' | transloco" />
+          <input type="date" class="date-input" [(ngModel)]="dateTo" [attr.aria-label]="'browse.toDate' | transloco" />
         </div>
       </div>
-      <button class="facet-clear" type="button" (click)="reset()">Reset all filters</button>
+      <button class="facet-clear" type="button" (click)="reset()">{{ 'browse.resetAll' | transloco }}</button>
     </aside>
 
     <div class="browse-content">
       <div class="browse-toolbar">
         <input
           class="search"
-          placeholder="Search title, genre, platform"
+          [placeholder]="'browse.searchPlaceholder' | transloco"
           [value]="query()"
           (input)="onQuery($event)"
-          aria-label="Search the catalogue"
+          [attr.aria-label]="'browse.searchLabel' | transloco"
         />
         <div class="toolbar-sort">
-          <label class="toolbar-sort-label" for="sort">Sort</label>
+          <label class="toolbar-sort-label" for="sort">{{ 'browse.sort' | transloco }}</label>
           <p-select
             inputId="sort"
-            [options]="sortOptions"
+            [options]="sortOptions()"
             optionLabel="label"
             optionValue="value"
             [(ngModel)]="sort"
@@ -119,10 +116,10 @@
         }
       } @else {
         <app-empty-state
-          title="No matching dramas"
-          message="Try adjusting or clearing your filters."
+          [title]="'browse.noMatchTitle' | transloco"
+          [message]="'browse.noMatchMessage' | transloco"
         >
-          <button class="btn btn-primary" type="button" (click)="reset()">Reset filters</button>
+          <button class="btn btn-primary" type="button" (click)="reset()">{{ 'browse.resetFilters' | transloco }}</button>
         </app-empty-state>
       }
     </div>

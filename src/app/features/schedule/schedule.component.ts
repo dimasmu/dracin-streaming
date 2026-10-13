@@ -1,30 +1,33 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { CatalogService } from '../../core/services/catalog.service';
+import { I18nService } from '../../core/services/i18n.service';
 import { EmptyStateComponent } from '../../shared/components/empty-state/empty-state.component';
 import { buildScheduleItems, SCHEDULE_SLOTS } from '../../data/schedule';
 import type { ReleaseScheduleItem } from '../../core/models/schedule';
 
-const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-
 @Component({
-  imports: [RouterLink, EmptyStateComponent],
+  imports: [RouterLink, TranslocoPipe, EmptyStateComponent],
   templateUrl: './schedule.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ScheduleComponent {
   protected readonly catalog = inject(CatalogService);
+  private readonly i18n = inject(I18nService);
 
   protected readonly selectedIso = signal(this.todayIso());
 
   protected readonly days = computed(() => {
     const now = new Date();
+    const fmt = new Intl.DateTimeFormat(this.i18n.lang(), { weekday: 'short' });
+    const today = this.i18n.t('schedule.today');
     const result: { iso: string; label: string }[] = [];
     for (let i = 0; i < 8; i++) {
       const d = new Date(now);
       d.setDate(now.getDate() + i);
       const iso = d.toISOString().slice(0, 10);
-      const label = i === 0 ? 'Today' : `${WEEKDAYS[d.getDay()]} ${d.getDate()}`;
+      const label = i === 0 ? today : `${fmt.format(d)} ${d.getDate()}`;
       result.push({ iso, label });
     }
     return result;

@@ -1,5 +1,3 @@
-const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-
 export function monogram(title: string): string {
   const initials = title
     .split(/\s+/)
@@ -11,16 +9,24 @@ export function monogram(title: string): string {
   return letters.slice(0, 2) || 'D';
 }
 
-export function formatAired(dateStr?: string, year?: number): string {
-  if (!dateStr && !year) return 'TBA';
+/**
+ * "7 Jun 2024" in the website language. `tba` is what to show when neither a
+ * date nor a year is known, so the caller can translate it.
+ */
+export function formatAired(dateStr?: string, year?: number, lang = 'en', tba = 'TBA'): string {
+  if (!dateStr && !year) return tba;
   if (!dateStr) return String(year);
   const parts = String(dateStr).split('-');
   if (parts.length !== 3) return String(dateStr);
-  const m = MONTHS[Number(parts[1]) - 1];
-  if (!m) return String(dateStr);
-  return `${Number(parts[2])} ${m} ${parts[0]}`;
+  const date = new Date(Date.UTC(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2])));
+  if (isNaN(date.getTime())) return String(dateStr);
+  return new Intl.DateTimeFormat(lang, {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+    timeZone: 'UTC',
+  }).format(date);
 }
-
 export function formatDuration(totalEpisodes?: number, durationMinutes = 1): string {
   const mins = (totalEpisodes ?? 0) * durationMinutes;
   if (mins >= 60) {
@@ -38,4 +44,9 @@ export function ratingStars(rating?: number): number {
 
 export function clamp(value: string | number, max: number): string {
   return String(value).length > max ? String(value).slice(0, max) : String(value);
+}
+
+/** "ID / EN" - the video versions a drama is available in. */
+export function videoLangLabel(langs: readonly string[], sep = ' / '): string {
+  return langs.map((l) => l.toUpperCase()).join(sep);
 }

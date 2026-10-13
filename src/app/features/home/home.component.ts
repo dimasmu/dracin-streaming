@@ -10,22 +10,26 @@ import {
   signal,
 } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { CatalogService } from '../../core/services/catalog.service';
 import { DragScrollDirective } from '../../shared/directives/drag-scroll.directive';
 import { DramaCardComponent } from '../../shared/components/drama-card/drama-card.component';
 import type { Drama } from '../../core/models/drama';
-import { monogram } from '../../core/utils/format';
+import { monogram, videoLangLabel } from '../../core/utils/format';
+import { I18nService } from '../../core/services/i18n.service';
 
 const AUTO_ROTATE_MS = 7000;
 
 @Component({
-  imports: [RouterLink, DramaCardComponent, DragScrollDirective],
+  imports: [RouterLink, TranslocoPipe, DramaCardComponent, DragScrollDirective],
   templateUrl: './home.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HomeComponent implements OnInit, OnDestroy {
   protected readonly catalog = inject(CatalogService);
   protected readonly monogram = monogram;
+  protected readonly videoLangs = (langs: readonly string[]) => videoLangLabel(langs, ' · ');
+  private readonly i18n = inject(I18nService);
   private readonly heroTrack = inject<ElementRef<HTMLElement>>(ElementRef);
 
   protected readonly featured = signal<Drama[]>([]);
@@ -68,7 +72,7 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   protected readonly schedulePreview = computed(() => {
     const now = new Date();
-    const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const dayFmt = new Intl.DateTimeFormat(this.i18n.lang(), { weekday: 'short' });
     return this.catalog.trending(6).map((d, i) => {
       const date = new Date(now);
       date.setDate(now.getDate() + ((i % 6) + 1));
@@ -80,8 +84,7 @@ export class HomeComponent implements OnInit, OnDestroy {
         dramaTitle: d.title,
         episodeNumber: (d.latestEpisode ?? 0) + 1,
         platformId: d.platformId,
-        subtitleStatus: d.subtitleLanguages[0],
-        dayLabel: weekdays[date.getDay()],
+        dayLabel: dayFmt.format(date),
         releaseTime: `${String(hours).padStart(2, '0')}.${String(minutes).padStart(2, '0')} WIB`,
       };
     });

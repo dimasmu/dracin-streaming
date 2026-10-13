@@ -1,11 +1,11 @@
-<section class="hero" aria-label="Featured dramas">
+<section class="hero" [attr.aria-label]="'home.featured' | transloco">
   <div
     class="hero-track"
     appDragScroll
     tabindex="0"
     role="region"
     aria-roledescription="carousel"
-    aria-label="Featured dramas"
+    [attr.aria-label]="'home.featured' | transloco"
     (keydown.arrow-left)="step(-1); $event.preventDefault()"
     (keydown.arrow-right)="step(1); $event.preventDefault()"
     (pointerenter)="pauseAuto()"
@@ -16,21 +16,21 @@
     @for (d of featured(); track d.id) {
       <article class="hero-slide" [style.--slide-tone]="d.tone">
         <div class="hero-copy">
-          <p class="eyebrow">Editor&rsquo;s pick &middot; {{ d.platformId }}</p>
+          <p class="eyebrow">{{ 'home.editorsPick' | transloco: { platform: d.platformId } }}</p>
           <h1>{{ d.title }}</h1>
           <div class="hero-meta">
             <span class="meta-pill">{{ d.releaseYear }}</span>
-            <span class="meta-pill">EP {{ d.latestEpisode }}</span>
+            <span class="meta-pill">{{ 'common.episodeShort' | transloco: { n: d.latestEpisode } }}</span>
             @for (g of d.genres; track g) {
-              <span>{{ g }}</span>
+              <span>{{ 'genre.' + g | transloco }}</span>
             }
             <span>{{ d.platformId }}</span>
-            <span>SUB {{ d.subtitleLanguages[0] }}</span>
+            <span>{{ videoLangs(d.videoLanguages) }}</span>
           </div>
           <p class="hero-description">{{ d.synopsis }}</p>
           <div class="hero-actions">
             <a class="btn btn-primary" [routerLink]="['/watch', d.slug, d.latestEpisode]"
-              >&#9654; Watch now</a
+              >&#9654; {{ 'home.watchNow' | transloco }}</a
             >
           </div>
         </div>
@@ -42,7 +42,7 @@
   <button
     class="slider-arrow slider-arrow-prev"
     type="button"
-    aria-label="Previous slide"
+    [attr.aria-label]="'home.prevSlide' | transloco"
     (click)="step(-1)"
   >
     &#8592;
@@ -53,7 +53,7 @@
         class="slider-dot"
         [class.active]="i === current()"
         type="button"
-        [attr.aria-label]="'Slide ' + (i + 1)"
+        [attr.aria-label]="'home.slide' | transloco: { n: i + 1 }"
         [attr.aria-current]="i === current() ? 'true' : null"
         (click)="go(i)"
       ></button>
@@ -62,7 +62,7 @@
   <button
     class="slider-arrow slider-arrow-next"
     type="button"
-    aria-label="Next slide"
+    [attr.aria-label]="'home.nextSlide' | transloco"
     (click)="step(1)"
   >
     &#8594;
@@ -72,8 +72,8 @@
 <div class="container page">
   <section class="section">
     <div class="section-heading">
-      <h2 class="display">Trending Now</h2>
-      <a routerLink="/browse">View all &rarr;</a>
+      <h2 class="display">{{ 'home.trending' | transloco }}</h2>
+      <a routerLink="/browse">{{ 'common.viewAllArrow' | transloco }}</a>
     </div>
     <div class="carousel" appDragScroll>
       @for (d of trending(); track d.id) {
@@ -84,8 +84,8 @@
 
   <section class="section">
     <div class="section-heading">
-      <h2 class="display">Recently Updated</h2>
-      <a routerLink="/browse">View all &rarr;</a>
+      <h2 class="display">{{ 'home.recent' | transloco }}</h2>
+      <a routerLink="/browse">{{ 'common.viewAllArrow' | transloco }}</a>
     </div>
     <div class="carousel" appDragScroll>
       @for (d of recent(); track d.id) {
@@ -96,7 +96,7 @@
 
   <section class="section ranking-band">
     <div>
-      <div class="section-heading"><h2 class="display">Most Viewed</h2></div>
+      <div class="section-heading"><h2 class="display">{{ 'home.mostViewed' | transloco }}</h2></div>
       <div class="rank-list">
         @for (d of mostViewed(); track d.id; let i = $index) {
           <a class="rank-row" [routerLink]="['/watch', d.slug, 1]" [style.--card-tone]="d.tone">
@@ -104,14 +104,14 @@
             <span class="rank-thumb"></span>
             <span class="rank-info">
               <h3>{{ d.title }}</h3>
-              <p>{{ d.genres[0] }} &middot; {{ d.platformId }} &middot; {{ d.latestEpisode }} EP</p>
+              <p>{{ 'home.epLine' | transloco: { genre: ('genre.' + d.genres[0] | transloco), platform: d.platformId, n: d.latestEpisode } }}</p>
             </span>
           </a>
         }
       </div>
     </div>
     <div>
-      <div class="section-heading"><h2 class="display">Most Liked</h2></div>
+      <div class="section-heading"><h2 class="display">{{ 'home.mostLiked' | transloco }}</h2></div>
       <div class="rank-list">
         @for (d of mostLiked(); track d.id; let i = $index) {
           <a class="rank-row" [routerLink]="['/watch', d.slug, 1]" [style.--card-tone]="d.tone">
@@ -119,7 +119,7 @@
             <span class="rank-thumb"></span>
             <span class="rank-info">
               <h3>{{ d.title }}</h3>
-              <p>{{ d.genres[0] }} &middot; {{ d.platformId }} &middot; {{ d.latestEpisode }} EP</p>
+              <p>{{ 'home.epLine' | transloco: { genre: ('genre.' + d.genres[0] | transloco), platform: d.platformId, n: d.latestEpisode } }}</p>
             </span>
           </a>
         }
@@ -129,13 +129,13 @@
 
   <section class="section">
     <div class="section-heading">
-      <h2 class="display">Browse by Genre</h2>
-      <a routerLink="/genre">View all &rarr;</a>
+      <h2 class="display">{{ 'home.browseByGenre' | transloco }}</h2>
+      <a routerLink="/genre">{{ 'common.viewAllArrow' | transloco }}</a>
     </div>
-    <div class="genre-tabs" role="tablist" aria-label="Browse by genre">
+    <div class="genre-tabs" role="tablist" [attr.aria-label]="'home.browseByGenre' | transloco">
       @for (g of genreOptions(); track g) {
         <button type="button" [class.active]="activeGenre() === g" (click)="activeGenre.set(g)">
-          {{ g }}
+          {{ g === 'All' ? ('common.all' | transloco) : ('genre.' + g | transloco) }}
         </button>
       }
     </div>
@@ -148,23 +148,23 @@
 
   <section class="section">
     <div class="section-heading">
-      <h2 class="display">Browse by Platform</h2>
-      <a routerLink="/platform">View all &rarr;</a>
+      <h2 class="display">{{ 'home.browseByPlatform' | transloco }}</h2>
+      <a routerLink="/platform">{{ 'common.viewAllArrow' | transloco }}</a>
     </div>
 
     <div class="platform-strip">
       <div class="platform-strip-head">
-        <span class="platform-strip-label">Platform</span>
+        <span class="platform-strip-label">{{ 'nav.platform' | transloco }}</span>
         <button
           class="platform-strip-clear"
           type="button"
           [disabled]="selectedPlatforms().size === 0"
           (click)="clearPlatforms()"
         >
-          Clear all
+          {{ 'home.clearAll' | transloco }}
         </button>
       </div>
-      <div class="platform-scroller" appDragScroll role="group" aria-label="Filter by platform">
+      <div class="platform-scroller" appDragScroll role="group" [attr.aria-label]="'home.filterByPlatform' | transloco">
         @for (p of catalog.platforms; track p.id) {
           <button
             class="platform-tab"
@@ -188,14 +188,14 @@
         }
       </div>
     } @else {
-      <p class="count" style="margin-top: 16px">No dramas for the selected platforms.</p>
+      <p class="count" style="margin-top: 16px">{{ 'home.noPlatform' | transloco }}</p>
     }
   </section>
 
   <section class="section">
     <div class="section-heading">
-      <h2 class="display">Coming Up This Week</h2>
-      <a routerLink="/release-schedule">Full schedule &rarr;</a>
+      <h2 class="display">{{ 'home.comingUp' | transloco }}</h2>
+      <a routerLink="/release-schedule">{{ 'home.fullSchedule' | transloco }}</a>
     </div>
     <div class="schedule-list">
       @for (item of schedulePreview(); track item.id) {
@@ -203,10 +203,7 @@
           <span class="schedule-mark">{{ item.dayLabel }}</span>
           <span>
             <h3>{{ item.dramaTitle }}</h3>
-            <p>
-              Episode {{ item.episodeNumber }} &middot; {{ item.platformId }} &middot; Sub
-              {{ item.subtitleStatus }}
-            </p>
+            <p>{{ 'home.scheduleLine' | transloco: { n: item.episodeNumber, platform: item.platformId } }}</p>
           </span>
           <span class="schedule-time">{{ item.releaseTime }}</span>
         </a>

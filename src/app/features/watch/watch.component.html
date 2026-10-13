@@ -1,14 +1,14 @@
 @if (drama(); as d) {
   <main class="container watch-page" [class.lights-out]="lightsOut()">
     <header class="watch-head">
-      <nav class="breadcrumbs" aria-label="Breadcrumb">
-        <a routerLink="/">Home</a><span aria-hidden="true">/</span>
-        <a routerLink="/browse">Dramas</a><span aria-hidden="true">/</span>
+      <nav class="breadcrumbs" [attr.aria-label]="'watch.breadcrumb' | transloco">
+        <a routerLink="/">{{ 'common.home' | transloco }}</a><span aria-hidden="true">/</span>
+        <a routerLink="/browse">{{ 'common.dramas' | transloco }}</a><span aria-hidden="true">/</span>
         <span class="crumb-current">{{ d.title }}</span>
       </nav>
       <div class="watch-title-row">
         <h1 class="watch-title">{{ d.title }}</h1>
-        <span class="chip chip-accent">Episode {{ episodeNumber() }}</span>
+        <span class="chip chip-accent">{{ 'watch.episode' | transloco: { n: episodeNumber() } }}</span>
         @if (statusLabel()) {
           <span class="chip">{{ statusLabel() }}</span>
         }
@@ -21,14 +21,14 @@
           <div #player class="video-player" [style.--card-tone]="d.tone">
             <div class="player-top">
               <span class="player-title">{{ d.title }}</span>
-              <span class="player-ep">Episode {{ episodeNumber() }} of {{ totalEpisodes() }}</span>
+              <span class="player-ep">{{ 'watch.episodeOf' | transloco: { n: episodeNumber(), total: totalEpisodes() } }}</span>
             </div>
-            <span class="player-demo-badge">Demo player &middot; no video source</span>
+            <span class="player-demo-badge">{{ 'watch.demoBadge' | transloco }}</span>
 
             <button
               class="play-button"
               type="button"
-              [attr.aria-label]="playing() ? 'Pause demo' : 'Play demo'"
+              [attr.aria-label]="(playing() ? 'watch.pauseDemo' : 'watch.playDemo') | transloco"
               (click)="togglePlay()"
             >
               @if (playing()) {
@@ -46,7 +46,7 @@
               <div
                 class="timeline"
                 role="slider"
-                aria-label="Seek"
+                [attr.aria-label]="'watch.seek' | transloco"
                 aria-valuemin="0"
                 aria-valuemax="100"
                 [attr.aria-valuenow]="progress().toFixed(0)"
@@ -60,7 +60,7 @@
                   <button
                     type="button"
                     class="ctl-btn"
-                    [attr.aria-label]="playing() ? 'Pause' : 'Play'"
+                    [attr.aria-label]="(playing() ? 'watch.pause' : 'watch.play') | transloco"
                     (click)="togglePlay()"
                   >
                     @if (playing()) {
@@ -76,7 +76,7 @@
                   <button
                     type="button"
                     class="ctl-btn"
-                    [attr.aria-label]="muted() ? 'Unmute' : 'Mute'"
+                    [attr.aria-label]="(muted() ? 'watch.unmute' : 'watch.mute') | transloco"
                     [attr.aria-pressed]="muted()"
                     (click)="muted.set(!muted())"
                   >
@@ -101,13 +101,13 @@
                   <span class="time-label">{{ elapsed() }} / {{ duration() }}</span>
                 </div>
                 <div class="controls-group">
-                  @if (subtitle()) {
-                    <span class="ctl-tag" title="Subtitle language">SUB {{ subtitle() }}</span>
+                  @if (videoLang()) {
+                    <span class="ctl-tag" [attr.title]="'videoLang.label' | transloco">{{ videoLang().toUpperCase() }}</span>
                   }
                   <button
                     type="button"
                     class="ctl-btn ctl-text"
-                    title="Toggle quality (demo)"
+                    [attr.title]="'watch.quality' | transloco"
                     (click)="toggleQuality()"
                   >
                     {{ quality() }}
@@ -115,8 +115,8 @@
                   <button
                     type="button"
                     class="ctl-btn"
-                    aria-label="Toggle fullscreen"
-                    title="Fullscreen"
+                    [attr.aria-label]="'watch.toggleFullscreen' | transloco"
+                    [attr.title]="'watch.fullscreen' | transloco"
                     (click)="toggleFullscreen()"
                   >
                     <svg
@@ -141,24 +141,26 @@
             <div class="episode-nav">
               <a
                 class="btn btn-icon"
-                aria-label="Previous episode"
-                title="Previous episode"
+                [attr.aria-label]="'watch.prevEpisode' | transloco"
+                [attr.title]="'watch.prevEpisode' | transloco"
                 [attr.aria-disabled]="!hasPrev()"
                 [attr.tabindex]="hasPrev() ? null : -1"
                 [routerLink]="['/watch', d.slug, hasPrev() ? episodeNumber() - 1 : episodeNumber()]"
+                [queryParams]="versionParams()"
               >
                 <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
                   <path d="m15 18-6-6 6-6" />
                 </svg>
               </a>
-              <span class="ep-indicator">EP {{ episodeNumber() }} / {{ totalEpisodes() }}</span>
+              <span class="ep-indicator">{{ 'watch.epIndicator' | transloco: { n: episodeNumber(), total: totalEpisodes() } }}</span>
               <a
                 class="btn btn-icon"
-                aria-label="Next episode"
-                title="Next episode"
+                [attr.aria-label]="'watch.nextEpisode' | transloco"
+                [attr.title]="'watch.nextEpisode' | transloco"
                 [attr.aria-disabled]="!hasNext()"
                 [attr.tabindex]="hasNext() ? null : -1"
                 [routerLink]="['/watch', d.slug, hasNext() ? episodeNumber() + 1 : episodeNumber()]"
+                [queryParams]="versionParams()"
               >
                 <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
                   <path d="m9 18 6-6-6-6" />
@@ -167,7 +169,19 @@
             </div>
 
             <div class="toolbar-group">
-              <div class="segmented" role="group" aria-label="Server">
+              @if (videoLangs().length > 1) {
+                <p-select
+                  class="video-lang-select"
+                  [options]="videoLangOptions()"
+                  optionLabel="label"
+                  optionValue="value"
+                  [ngModel]="videoLang()"
+                  (ngModelChange)="setVideoLang($event)"
+                  [ariaLabel]="'watch.videoVersion' | transloco"
+                  [appendTo]="'body'"
+                />
+              }
+              <div class="segmented" role="group" [attr.aria-label]="'watch.server' | transloco">
                 <button
                   class="seg-btn"
                   type="button"
@@ -175,7 +189,7 @@
                   [attr.aria-pressed]="server() === 1"
                   (click)="server.set(1)"
                 >
-                  Server 1
+                  {{ 'watch.server1' | transloco }}
                 </button>
                 <button
                   class="seg-btn"
@@ -184,7 +198,7 @@
                   [attr.aria-pressed]="server() === 2"
                   (click)="server.set(2)"
                 >
-                  Server 2
+                  {{ 'watch.server2' | transloco }}
                 </button>
               </div>
             </div>
@@ -199,7 +213,7 @@
                 [attr.aria-checked]="autoPlay()"
                 (click)="autoPlay.set(!autoPlay())"
               >
-                <span class="switch-track"><span class="switch-knob"></span></span>Auto play
+                <span class="switch-track"><span class="switch-knob"></span></span>{{ 'watch.autoPlay' | transloco }}
               </button>
               <button
                 type="button"
@@ -208,7 +222,7 @@
                 [attr.aria-checked]="autoNext()"
                 (click)="autoNext.set(!autoNext())"
               >
-                <span class="switch-track"><span class="switch-knob"></span></span>Auto next
+                <span class="switch-track"><span class="switch-knob"></span></span>{{ 'watch.autoNext' | transloco }}
               </button>
               <button
                 type="button"
@@ -217,7 +231,7 @@
                 [attr.aria-checked]="lightsOut()"
                 (click)="lightsOut.set(!lightsOut())"
               >
-                <span class="switch-track"><span class="switch-knob"></span></span>Lights out
+                <span class="switch-track"><span class="switch-knob"></span></span>{{ 'watch.lightsOut' | transloco }}
               </button>
             </div>
 
@@ -225,7 +239,7 @@
               <button
                 class="vote-btn vote-like"
                 type="button"
-                aria-label="Like"
+                [attr.aria-label]="'watch.like' | transloco"
                 [attr.aria-pressed]="vote() === 'like'"
                 (click)="choose('like')"
               >
@@ -239,7 +253,7 @@
               <button
                 class="vote-btn vote-dislike"
                 type="button"
-                aria-label="Dislike"
+                [attr.aria-label]="'watch.dislike' | transloco"
                 [attr.aria-pressed]="vote() === 'dislike'"
                 (click)="choose('dislike')"
               >
@@ -257,7 +271,7 @@
           <div class="watch-detail-inner">
             <div class="watch-poster" [style.--card-tone]="d.tone">
               @if (d.posterUrl) {
-                <img [src]="d.posterUrl" [alt]="d.title + ' poster'" loading="lazy" />
+                <img [src]="d.posterUrl" [alt]="'watch.posterAlt' | transloco: { title: d.title }" loading="lazy" />
               } @else {
                 <span class="drama-art"
                   ><span class="drama-monogram">{{ monogram(d.title) }}</span></span
@@ -273,20 +287,20 @@
 
               <div class="metadata-grid">
                 @if (d.releaseYear) {
-                  <span class="metadata-item"><strong>{{ d.releaseYear }}</strong> release</span>
+                  <span class="metadata-item"><strong>{{ d.releaseYear }}</strong> {{ 'common.release' | transloco }}</span>
                 }
                 @if (d.totalEpisodes) {
-                  <span class="metadata-item"><strong>{{ d.totalEpisodes }}</strong> episodes</span>
+                  <span class="metadata-item"><strong>{{ d.totalEpisodes }}</strong> {{ episodesUnit() }}</span>
                 }
                 @if (d.latestEpisode) {
-                  <span class="metadata-item"><strong>EP {{ d.latestEpisode }}</strong> latest</span>
+                  <span class="metadata-item"><strong>{{ 'common.episodeShort' | transloco: { n: d.latestEpisode } }}</strong> {{ 'common.latest' | transloco }}</span>
                 }
                 @if (statusLabel()) {
-                  <span class="metadata-item"><strong>{{ statusLabel() }}</strong> status</span>
+                  <span class="metadata-item"><strong>{{ statusLabel() }}</strong> {{ 'common.status' | transloco }}</span>
                 }
-                @if (d.subtitleLanguages.length) {
+                @if (d.videoLanguages.length) {
                   <span class="metadata-item"
-                    ><strong>SUB {{ d.subtitleLanguages.join(' / ') }}</strong></span
+                    ><strong>{{ videoLangText() }}</strong> {{ 'watch.detailVideo' | transloco }}</span
                   >
                 }
                 @if (d.rating) {
@@ -300,7 +314,7 @@
                       }
                     </span>
                     @if (d.ratingIsDemo) {
-                      demo rating
+                      {{ 'watch.ratingDemo' | transloco }}
                     }
                   </span>
                 }
@@ -309,14 +323,14 @@
               @if (d.genres.length) {
                 <div class="genre-tags">
                   @for (g of d.genres; track g) {
-                    <span>{{ g }}</span>
+                    <span>{{ 'genre.' + g | transloco }}</span>
                   }
                 </div>
               }
 
               <p class="synopsis">{{ d.synopsis }}</p>
               @if (aired()) {
-                <p class="aired-line">Aired {{ aired() }}</p>
+                <p class="aired-line">{{ 'watch.aired' | transloco: { date: aired() } }}</p>
               }
 
               <div class="detail-actions">
@@ -339,7 +353,7 @@
                   >
                     <path d="M6 4.5A2.5 2.5 0 0 1 8.5 2h7A2.5 2.5 0 0 1 18 4.5V21l-6-3.5L6 21z" />
                   </svg>
-                  {{ bookmarked() ? 'Bookmarked' : 'Bookmark' }}
+                  {{ (bookmarked() ? 'watch.bookmarked' : 'watch.bookmark') | transloco }}
                 </button>
                 <button class="btn" type="button" (click)="share()">
                   <svg
@@ -356,7 +370,7 @@
                     <circle cx="18" cy="5" r="3" /><circle cx="6" cy="12" r="3" /><circle cx="18" cy="19" r="3" />
                     <path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4" />
                   </svg>
-                  Share
+                  {{ 'watch.share' | transloco }}
                 </button>
               </div>
             </div>
@@ -364,13 +378,10 @@
         </article>
       </div>
 
-      <aside class="episode-panel" aria-label="Episodes">
+      <aside class="episode-panel" [attr.aria-label]="'watch.episodesPanel' | transloco">
         <div class="panel-head">
-          <h2>Episodes</h2>
-          <p>
-            Now playing EP {{ episodeNumber() }} &middot; {{ totalEpisodes() }}
-            {{ totalEpisodes() === 1 ? 'episode' : 'episodes' }}
-          </p>
+          <h2>{{ 'watch.episodesPanel' | transloco }}</h2>
+          <p>{{ 'watch.nowPlaying' | transloco: { n: episodeNumber(), total: totalEpisodes(), unit: episodesUnit() } }}</p>
         </div>
         <div class="episode-scroll">
           <div class="episode-list">
@@ -379,8 +390,9 @@
                 class="episode-button"
                 [class.active]="ep === episodeNumber()"
                 [attr.aria-current]="ep === episodeNumber() ? 'true' : null"
-                [attr.aria-label]="'Episode ' + ep"
+                [attr.aria-label]="'watch.episode' | transloco: { n: ep }"
                 [routerLink]="['/watch', d.slug, ep]"
+                [queryParams]="versionParams()"
                 >{{ ep }}</a
               >
             }
@@ -392,8 +404,8 @@
     @if (related().length) {
       <section class="section">
         <div class="section-heading">
-          <h2 class="display">Related Dramas</h2>
-          <a routerLink="/browse">View all</a>
+          <h2 class="display">{{ 'watch.related' | transloco }}</h2>
+          <a routerLink="/browse">{{ 'common.viewAll' | transloco }}</a>
         </div>
         <div class="rail" appDragScroll>
           @for (r of related(); track r.id) {
@@ -405,8 +417,8 @@
 
     <section class="watch-comments">
       <div class="section-heading">
-        <h2 class="display">Comments</h2>
-        <span class="count">{{ comments().length }} comments</span>
+        <h2 class="display">{{ 'watch.comments' | transloco }}</h2>
+        <span class="count">{{ 'watch.commentsCount' | transloco: { count: comments().length } }}</span>
       </div>
       <div class="comment-form">
         <div class="comment-avatar"><span>U</span></div>
@@ -414,14 +426,14 @@
           <textarea
             class="comment-input"
             rows="2"
-            placeholder="Write a comment..."
-            aria-label="Write a comment"
+            [placeholder]="'watch.writeComment' | transloco"
+            [attr.aria-label]="'watch.writeComment' | transloco"
             [value]="draft()"
             (input)="onDraft($event)"
           ></textarea>
           <div class="flex justify-end mt-2">
             <button class="btn btn-compact btn-primary" type="button" (click)="submitComment()">
-              Send
+              {{ 'watch.send' | transloco }}
             </button>
           </div>
         </div>
@@ -439,8 +451,8 @@
               </div>
               <p>{{ c.body }}</p>
               <div class="comment-actions">
-                <button class="comment-action" type="button">Like</button
-                ><button class="comment-action" type="button">Reply</button>
+                <button class="comment-action" type="button">{{ 'watch.commentLike' | transloco }}</button
+                ><button class="comment-action" type="button">{{ 'watch.commentReply' | transloco }}</button>
               </div>
             </div>
           </article>
@@ -451,10 +463,10 @@
 } @else {
   <main class="container page">
     <app-empty-state
-      title="Drama not found"
-      message="This drama does not exist or may have been removed."
+      [title]="'watch.notFoundTitle' | transloco"
+      [message]="'watch.notFoundMessage' | transloco"
     >
-      <a class="btn btn-primary" routerLink="/browse">Browse all dramas</a>
+      <a class="btn btn-primary" routerLink="/browse">{{ 'watch.browseAll' | transloco }}</a>
     </app-empty-state>
   </main>
 }

@@ -1,20 +1,24 @@
 <main>
   <div class="legal-hero">
     <div class="container">
-      <nav class="legal-breadcrumb" aria-label="Breadcrumb">
-        <a routerLink="/">DRA.CIN</a> <span aria-hidden="true">/</span> <span>Privacy Policy</span>
+      <nav class="legal-breadcrumb" [attr.aria-label]="'watch.breadcrumb' | transloco">
+        <a routerLink="/">DRA.CIN</a> <span aria-hidden="true">/</span>
+        <span>{{ 'privacy.crumb' | transloco }}</span>
       </nav>
       <div class="legal-hero-inner">
-        <p class="eyebrow">Legal</p>
-        <h1 class="display">Privacy Policy</h1>
-        <p>
-          This document explains what data DRA.CIN collects, how it is used, and the steps taken to
-          protect your privacy as a user of this prototype.
-        </p>
+        <p class="eyebrow">{{ 'common.legal' | transloco }}</p>
+        <h1 class="display">{{ 'privacy.title' | transloco }}</h1>
+        <p>{{ 'privacy.intro' | transloco }}</p>
         <div class="legal-meta">
-          <span class="legal-meta-item"><strong>Version:</strong> 1.0</span>
-          <span class="legal-meta-item"><strong>Effective:</strong> 1 January 2026</span>
-          <span class="legal-meta-item"><strong>Last updated:</strong> 1 January 2026</span>
+          <span class="legal-meta-item"><strong>{{ 'legalCommon.version' | transloco }}</strong> 1.0</span>
+          <span class="legal-meta-item"
+            ><strong>{{ 'legalCommon.effective' | transloco }}</strong>
+            {{ 'legalCommon.jan2026' | transloco }}</span
+          >
+          <span class="legal-meta-item"
+            ><strong>{{ 'legalCommon.lastUpdated' | transloco }}</strong>
+            {{ 'legalCommon.jan2026' | transloco }}</span
+          >
         </div>
       </div>
     </div>
@@ -22,136 +26,129 @@
 
   <div class="container">
     <div class="legal-layout">
-      <aside class="legal-sidebar" aria-label="Document navigation">
+      <aside class="legal-sidebar" [attr.aria-label]="'legalCommon.docNav' | transloco">
         <nav class="legal-toc">
-          <h2>Contents</h2>
+          <h2>{{ 'legalCommon.contents' | transloco }}</h2>
           <ol>
-            <li><a href="#p1">1. Information We Collect</a></li>
-            <li><a href="#p2">2. How We Use Data</a></li>
-            <li><a href="#p3">3. Data Storage</a></li>
-            <li><a href="#p4">4. Third-Party Sharing</a></li>
-            <li><a href="#p5">5. Your Rights</a></li>
-            <li><a href="#p6">6. DMCA Policy</a></li>
-            <li><a href="#p7">7. Policy Changes</a></li>
-            <li><a href="#p8">8. Contact</a></li>
+            <li><a href="#p1">{{ 'privacy.toc1' | transloco }}</a></li>
+            <li><a href="#p2">{{ 'privacy.toc2' | transloco }}</a></li>
+            <li><a href="#p3">{{ 'privacy.toc3' | transloco }}</a></li>
+            <li><a href="#p4">{{ 'privacy.toc4' | transloco }}</a></li>
+            <li><a href="#p5">{{ 'privacy.toc5' | transloco }}</a></li>
+            <li><a href="#p6">{{ 'privacy.toc6' | transloco }}</a></li>
+            <li><a href="#p7">{{ 'privacy.toc7' | transloco }}</a></li>
+            <li><a href="#p8">{{ 'privacy.toc8' | transloco }}</a></li>
           </ol>
         </nav>
       </aside>
 
       <div class="legal-content">
         <section class="legal-section" id="p1">
-          <h2>1. Information We Collect</h2>
+          <h2>{{ 'privacy.toc1' | transloco }}</h2>
+          <p>{{ 'privacy.s1p1' | transloco }}</p>
           <p>
-            DRA.CIN is a visual prototype that functions as a metadata directory. In its current
-            phase it does not actively collect personal data from its users.
+            <strong>{{ 'privacy.s1local' | transloco }}</strong>
           </p>
-          <p><strong>Stored locally (in your browser only):</strong></p>
           <ul>
             <li>
-              Subtitle preference (EN or ID) and theme preference, stored via
-              <code>localStorage</code>. This data is never sent to a server.
+              {{ 'privacy.s1localItemBefore' | transloco }} <code>localStorage</code>.
+              {{ 'privacy.s1localItemAfter' | transloco }}
             </li>
           </ul>
-          <p><strong>Potentially received indirectly:</strong></p>
+          <p>
+            <strong>{{ 'privacy.s1indirect' | transloco }}</strong>
+          </p>
           <ul>
-            <li>
-              Details submitted through the contact form (name, email, subject and message) &mdash;
-              used only to respond to you.
-            </li>
+            <li>{{ 'privacy.s1indirectItem' | transloco }}</li>
           </ul>
           <div class="legal-callout info">
             <p>
-              <strong>Development note:</strong> sections that depend on actual business practices
-              are placeholders and require legal review before production use.
+              <strong>{{ 'privacy.s1note' | transloco }}</strong>
+              {{ 'privacy.s1noteText' | transloco }}
             </p>
           </div>
         </section>
 
         <section class="legal-section" id="p2">
-          <h2>2. How We Use Data</h2>
-          <p>Data we receive is used for:</p>
+          <h2>{{ 'privacy.toc2' | transloco }}</h2>
+          <p>{{ 'privacy.s2intro' | transloco }}</p>
           <ul>
             <li>
-              <strong>Subtitle preference</strong> &mdash; stored locally and used to tailor
-              metadata display.
+              <strong>{{ 'privacy.s2a' | transloco }}</strong> {{ 'privacy.s2aText' | transloco }}
             </li>
             <li>
-              <strong>Contact messages</strong> &mdash; used exclusively to respond to questions,
-              bug reports or content requests.
+              <strong>{{ 'privacy.s2b' | transloco }}</strong> {{ 'privacy.s2bText' | transloco }}
             </li>
           </ul>
-          <p>DRA.CIN does not sell, trade or share your personal data for marketing purposes.</p>
+          <p>{{ 'privacy.s2p' | transloco }}</p>
         </section>
 
         <section class="legal-section" id="p3">
-          <h2>3. Data Storage</h2>
+          <h2>{{ 'privacy.toc3' | transloco }}</h2>
           <p>
-            Subtitle and theme preferences are stored in <code>localStorage</code> on your own
-            browser. DRA.CIN has no access to your <code>localStorage</code> &mdash; the data stays
-            on your device and can be cleared at any time through your browser settings.
+            {{ 'privacy.s3p1Before' | transloco }} <code>localStorage</code>
+            {{ 'privacy.s3p1Mid' | transloco }} <code>localStorage</code>
+            {{ 'privacy.s3p1After' | transloco }}
           </p>
-          <p>
-            Metadata submitted through the contact form would, in production, be stored only as long
-            as needed.
-          </p>
+          <p>{{ 'privacy.s3p2' | transloco }}</p>
         </section>
 
         <section class="legal-section" id="p4">
-          <h2>4. Third-Party Sharing</h2>
-          <p>DRA.CIN does not share your personal data with third parties, except:</p>
+          <h2>{{ 'privacy.toc4' | transloco }}</h2>
+          <p>{{ 'privacy.s4intro' | transloco }}</p>
           <ul>
             <li>
-              <strong>Legal compliance</strong> &mdash; if required by applicable law or legal
-              process.
+              <strong>{{ 'privacy.s4a' | transloco }}</strong> {{ 'privacy.s4aText' | transloco }}
             </li>
             <li>
-              <strong>Analytics placeholders</strong> &mdash; this prototype has not integrated
-              third-party analytics that actively send data.
+              <strong>{{ 'privacy.s4b' | transloco }}</strong> {{ 'privacy.s4bText' | transloco }}
             </li>
           </ul>
           <div class="legal-callout info">
             <p>
-              <strong>Note:</strong> when you click a link to a third-party streaming platform (for
-              example DramaBox or ReelShort), that platform&rsquo;s own privacy policy applies
-              separately.
+              <strong>{{ 'legalCommon.note' | transloco }}</strong>
+              {{ 'privacy.s4noteText' | transloco }}
             </p>
           </div>
         </section>
 
         <section class="legal-section" id="p5">
-          <h2>5. Your Rights</h2>
-          <p>As a user you may:</p>
+          <h2>{{ 'privacy.toc5' | transloco }}</h2>
+          <p>{{ 'privacy.s5intro' | transloco }}</p>
           <ul>
-            <li>Know what data we collect about you (if any).</li>
-            <li>Request deletion of personal data you have submitted.</li>
-            <li>Manage or delete the preferences stored in your browser.</li>
+            <li>{{ 'privacy.s5a' | transloco }}</li>
+            <li>{{ 'privacy.s5b' | transloco }}</li>
+            <li>{{ 'privacy.s5c' | transloco }}</li>
           </ul>
-          <p>To exercise these rights, use the <a routerLink="/contact">Contact page</a>.</p>
+          <p>
+            {{ 'privacy.s5p' | transloco }}
+            <a routerLink="/contact">{{ 'legalCommon.contactPage' | transloco }}</a>.
+          </p>
         </section>
 
         <section class="legal-section" id="p6">
-          <h2>6. DMCA Policy</h2>
+          <h2>{{ 'privacy.toc6' | transloco }}</h2>
           <p>
-            DRA.CIN respects intellectual property rights. See the
-            <a routerLink="/dmca">DMCA policy</a> for removal requests.
+            {{ 'privacy.s6p' | transloco }}
+            <a routerLink="/dmca">{{ 'legalCommon.dmcaPolicy' | transloco }}</a>
+            {{ 'privacy.s6pAfter' | transloco }}
           </p>
         </section>
 
         <section class="legal-section" id="p7">
-          <h2>7. Policy Changes</h2>
-          <p>
-            This policy may be updated as the platform develops. Changes are reflected in the
-            &ldquo;Last updated&rdquo; date at the top of this document. Continued use after changes
-            means you accept the revised policy.
-          </p>
+          <h2>{{ 'privacy.toc7' | transloco }}</h2>
+          <p>{{ 'privacy.s7p' | transloco }}</p>
         </section>
 
         <section class="legal-section" id="p8">
-          <h2>8. Contact</h2>
-          <p>For questions about this policy, use the <a routerLink="/contact">Contact page</a>.</p>
+          <h2>{{ 'privacy.toc8' | transloco }}</h2>
+          <p>
+            {{ 'privacy.s8p' | transloco }}
+            <a routerLink="/contact">{{ 'legalCommon.contactPage' | transloco }}</a>.
+          </p>
           <div class="contact-info-card" style="margin-top: 18px">
-            <h3>Data Protection</h3>
-            <p>For privacy and data protection matters:</p>
+            <h3>{{ 'privacy.s8card' | transloco }}</h3>
+            <p>{{ 'privacy.s8cardText' | transloco }}</p>
             <p class="contact-value">hello&#64;dracin.example</p>
           </div>
         </section>

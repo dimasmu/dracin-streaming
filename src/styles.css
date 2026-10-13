@@ -2055,6 +2055,16 @@ img {
   height: 40px;
   min-height: 40px;
 }
+.video-lang-select {
+  min-width: 132px;
+}
+.playback-toolbar .p-select {
+  height: 40px;
+  min-height: 40px;
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 700;
+}
 .ep-indicator {
   min-width: 72px;
   text-align: center;

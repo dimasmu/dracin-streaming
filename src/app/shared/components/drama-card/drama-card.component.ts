@@ -7,13 +7,14 @@ import {
   input,
 } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { TranslocoPipe } from '@jsverse/transloco';
 import type { Drama } from '../../../core/models/drama';
 import { DramaPreviewService } from '../../../core/services/drama-preview.service';
-import { monogram } from '../../../core/utils/format';
+import { monogram, videoLangLabel } from '../../../core/utils/format';
 
 @Component({
   selector: 'app-drama-card',
-  imports: [RouterLink],
+  imports: [RouterLink, TranslocoPipe],
   templateUrl: './drama-card.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -24,7 +25,7 @@ export class DramaCardComponent {
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
 
   protected readonly monogram = computed(() => monogram(this.drama().title));
-  protected readonly subtitle = computed(() => this.drama().subtitleLanguages[0] ?? 'EN');
+  protected readonly videoLangs = computed(() => videoLangLabel(this.drama().videoLanguages, ' · '));
   protected readonly genre = computed(() => this.drama().genres[0] ?? '');
   protected readonly episode = computed(
     () => this.drama().latestEpisode ?? this.drama().totalEpisodes ?? 0,

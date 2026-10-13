@@ -2,10 +2,12 @@ import { ChangeDetectionStrategy, Component, ElementRef, computed, inject } from
 import { RouterLink } from '@angular/router';
 import { OverlayModule, ScrollStrategyOptions } from '@angular/cdk/overlay';
 import { MessageService } from 'primeng/api';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { SkeletonModule } from 'primeng/skeleton';
 import { BookmarkService } from '../../../core/services/bookmark.service';
 import { DramaPreviewService } from '../../../core/services/drama-preview.service';
-import { formatAired, monogram, ratingStars } from '../../../core/utils/format';
+import { I18nService } from '../../../core/services/i18n.service';
+import { formatAired, monogram, ratingStars, videoLangLabel } from '../../../core/utils/format';
 
 /**
  * The single, app-root-mounted drama preview.
@@ -26,7 +28,7 @@ import { formatAired, monogram, ratingStars } from '../../../core/utils/format';
  */
 @Component({
   selector: 'app-drama-preview',
-  imports: [RouterLink, OverlayModule, SkeletonModule],
+  imports: [RouterLink, OverlayModule, SkeletonModule, TranslocoPipe],
   templateUrl: './drama-preview.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -35,6 +37,7 @@ export class DramaPreviewComponent {
   private readonly scrollStrategies = inject(ScrollStrategyOptions);
   private readonly bookmarks = inject(BookmarkService);
   private readonly messages = inject(MessageService);
+  private readonly i18n = inject(I18nService);
 
   protected readonly monogram = monogram;
   protected readonly stars = [0, 1, 2, 3, 4];
@@ -75,8 +78,14 @@ export class DramaPreviewComponent {
 
   protected readonly ratingFilled = computed(() => ratingStars(this.preview.state()?.drama.rating));
   protected readonly aired = computed(() =>
-    formatAired(this.preview.state()?.drama.releaseDate, this.preview.state()?.drama.releaseYear),
+    formatAired(
+      this.preview.state()?.drama.releaseDate,
+      this.preview.state()?.drama.releaseYear,
+      this.i18n.lang(),
+      this.i18n.t('common.tba'),
+    ),
   );
+  protected readonly videoLangs = (langs: readonly string[]) => videoLangLabel(langs);
 
   protected readonly watchEpisode = computed(() => {
     const d = this.preview.state()?.drama;
@@ -96,7 +105,7 @@ export class DramaPreviewComponent {
     const added = this.bookmarks.toggle(d.id);
     this.messages.add({
       severity: 'success',
-      summary: added ? 'Added to bookmarks' : 'Removed from bookmarks',
+      summary: this.i18n.t(added ? 'card.addedBookmark' : 'card.removedBookmark'),
       detail: d.title,
       life: 2500,
     });

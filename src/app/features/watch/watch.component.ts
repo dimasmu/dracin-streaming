@@ -11,35 +11,50 @@ import {
   untracked,
   viewChild,
 } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
 import { MessageService } from 'primeng/api';
+import { TranslocoPipe } from '@jsverse/transloco';
+import { SelectModule } from 'primeng/select';
 import { CatalogService } from '../../core/services/catalog.service';
 import { BookmarkService } from '../../core/services/bookmark.service';
-import { PreferencesService } from '../../core/services/preferences.service';
+import { I18nService } from '../../core/services/i18n.service';
+import { PreferencesService, VideoLang } from '../../core/services/preferences.service';
 import { DramaCardComponent } from '../../shared/components/drama-card/drama-card.component';
 import { EmptyStateComponent } from '../../shared/components/empty-state/empty-state.component';
 import { DragScrollDirective } from '../../shared/directives/drag-scroll.directive';
-import { formatAired, monogram, ratingStars } from '../../core/utils/format';
+import { formatAired, monogram, ratingStars, videoLangLabel } from '../../core/utils/format';
 
-interface Comment {
-  author: string;
-  time: string;
+/** A comment you posted. Its author and time are translated when shown, so they follow the website language. */
+interface OwnComment {
   body: string;
 }
 
 @Component({
-  imports: [RouterLink, DramaCardComponent, EmptyStateComponent, DragScrollDirective],
+  imports: [
+    FormsModule,
+    RouterLink,
+    SelectModule,
+    TranslocoPipe,
+    DramaCardComponent,
+    EmptyStateComponent,
+    DragScrollDirective,
+  ],
   templateUrl: './watch.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class WatchComponent {
   readonly slug = input<string>();
   readonly episode = input<string>();
+  /** Video version from the ?v=id|en query param. */
+  readonly v = input<string>();
 
   private readonly catalog = inject(CatalogService);
   private readonly bookmarks = inject(BookmarkService);
   private readonly prefs = inject(PreferencesService);
   private readonly messages = inject(MessageService);
+  private readonly router = inject(Router);
+  private readonly i18n = inject(I18nService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly playerEl = viewChild<ElementRef<HTMLElement>>('player');
 
@@ -73,12 +88,14 @@ export class WatchComponent {
 
   protected readonly statusLabel = computed(() => {
     const s = this.drama()?.status;
-    return s && s !== 'unknown' ? s.charAt(0).toUpperCase() + s.slice(1) : '';
+    return s && s !== 'unknown' ? this.i18n.t('status.' + s) : '';
   });
   protected readonly ratingFilled = computed(() => ratingStars(this.drama()?.rating));
   protected readonly aired = computed(() => {
     const d = this.drama();
-    return d && (d.releaseDate || d.releaseYear) ? formatAired(d.releaseDate, d.releaseYear) : '';
+    return d && (d.releaseDate || d.releaseYear)
+      ? formatAired(d.releaseDate, d.releaseYear, this.i18n.lang(), this.i18n.t('common.tba'))
+      : '';
   });
 
   // Demo-player state. There is no real media source behind any of this.
@@ -92,37 +109,55 @@ export class WatchComponent {
   protected readonly lightsOut = signal(false);
   protected readonly vote = signal<'' | 'like' | 'dislike'>('');
 
-  /** Follows the language chosen in the navbar, falling back to what this drama offers. */
-  protected readonly subtitle = computed(() => {
-    const langs = this.drama()?.subtitleLanguages ?? [];
-    const wanted = this.prefs.subtitle();
-    return langs.includes(wanted) ? wanted : (langs[0] ?? '');
+  /** Video versions this drama has, in display order. */
+  protected readonly videoLangs = computed<VideoLang[]>(() => this.drama()?.videoLanguages ?? []);
+
+  /**
+   * Which video version is playing: the URL's `?v=` first, then what the
+   * viewer last chose, then the website language, then the first version.
+   * The website language is only a starting point; the two are independent.
+   */
+  protected readonly videoLang = computed<VideoLang | ''>(() => {
+    const langs = this.videoLangs();
+    for (const wanted of [this.v(), this.prefs.videoLang(), this.i18n.lang()]) {
+      const match = langs.find((l) => l === wanted);
+      if (match) return match;
+    }
+    return langs[0] ?? '';
   });
 
+  /** Query params that keep the chosen version while moving between episodes. */
+  protected readonly versionParams = computed(() => (this.v() ? { v: this.videoLang() } : {}));
+
+  /** Dropdown options. Names follow the website language; values are the video versions. */
+  protected readonly videoLangOptions = computed(() =>
+    this.videoLangs().map((value) => ({ value, label: this.i18n.t('videoLang.' + value + 'Name') })),
+  );
+
+  protected readonly videoLangText = computed(() => videoLangLabel(this.videoLangs()));
+
+  protected readonly episodesUnit = computed(() =>
+    this.i18n.t(this.totalEpisodes() === 1 ? 'watch.unitOne' : 'watch.unitMany'),
+  );
   protected readonly durationSeconds = computed(() => (this.drama()?.durationMinutes ?? 1) * 60);
   protected readonly duration = computed(() => this.formatTime(this.durationSeconds()));
   protected readonly elapsed = computed(() =>
     this.formatTime(Math.floor((this.progress() / 100) * this.durationSeconds())),
   );
 
-  protected readonly comments = signal<Comment[]>([
-    {
-      author: 'Aisyah R.',
-      time: '2 hours ago',
-      body: 'This episode keeps you on edge! The acting feels so natural.',
-    },
-    {
-      author: 'Rizky P.',
-      time: '5 hours ago',
-      body: 'Started from episode 1 and binged all the way here. The twist in episode 38 was completely unexpected.',
-    },
-    {
-      author: 'Fajar M.',
-      time: '1 day ago',
-      body: 'The chemistry between the leads gets stronger every episode.',
-    },
-  ]);
-  protected readonly draft = signal('');
+  private readonly ownComments = signal<OwnComment[]>([]);
+  protected readonly comments = computed(() => [
+    ...this.ownComments().map((c) => ({
+      author: this.i18n.t('watch.you'),
+      time: this.i18n.t('watch.justNow'),
+      body: c.body,
+    })),
+    ...[1, 2, 3].map((n) => ({
+      author: this.i18n.t(`watch.c${n}Author`),
+      time: this.i18n.t(`watch.c${n}Time`),
+      body: this.i18n.t(`watch.c${n}Body`),
+    })),
+  ]);  protected readonly draft = signal('');
 
   private timer: ReturnType<typeof setInterval> | null = null;
 
@@ -165,6 +200,17 @@ export class WatchComponent {
     else void el.requestFullscreen?.();
   }
 
+  /** Switch to the other video. Playback position is kept, like changing audio track in a real player. */
+  protected setVideoLang(lang: VideoLang | null): void {
+    if (!lang || lang === this.videoLang()) return;
+    this.prefs.setVideoLang(lang);
+    void this.router.navigate([], {
+      queryParams: { v: lang },
+      queryParamsHandling: 'merge',
+      replaceUrl: true,
+    });
+  }
+
   protected choose(value: 'like' | 'dislike'): void {
     this.vote.set(this.vote() === value ? '' : value);
   }
@@ -175,7 +221,7 @@ export class WatchComponent {
     const added = this.bookmarks.toggle(d.id);
     this.messages.add({
       severity: 'success',
-      summary: added ? 'Added to bookmarks' : 'Removed from bookmarks',
+      summary: this.i18n.t(added ? 'card.addedBookmark' : 'card.removedBookmark'),
       detail: d.title,
       life: 2500,
     });
@@ -184,14 +230,20 @@ export class WatchComponent {
   protected async share(): Promise<void> {
     const d = this.drama();
     if (!d) return;
-    const url = `${window.location.origin}/watch/${d.slug}/${this.episodeNumber()}`;
+    const version = this.videoLang();
+    const url = `${window.location.origin}/watch/${d.slug}/${this.episodeNumber()}${version ? `?v=${version}` : ''}`;
     try {
       await navigator.clipboard.writeText(url);
-      this.messages.add({ severity: 'success', summary: 'Link copied', detail: url, life: 2500 });
+      this.messages.add({
+        severity: 'success',
+        summary: this.i18n.t('watch.linkCopied'),
+        detail: url,
+        life: 2500,
+      });
     } catch {
       this.messages.add({
         severity: 'warn',
-        summary: 'Could not copy link',
+        summary: this.i18n.t('watch.linkFailed'),
         detail: url,
         life: 4000,
       });
@@ -205,9 +257,14 @@ export class WatchComponent {
   protected submitComment(): void {
     const body = this.draft().trim();
     if (!body) return;
-    this.comments.update((c) => [{ author: 'You', time: 'Just now', body }, ...c]);
+    this.ownComments.update((c) => [{ body }, ...c]);
     this.draft.set('');
-    this.messages.add({ severity: 'success', summary: 'Comment posted', detail: body, life: 2500 });
+    this.messages.add({
+      severity: 'success',
+      summary: this.i18n.t('watch.commentPosted'),
+      detail: body,
+      life: 2500,
+    });
   }
 
   private stop(reset: boolean): void {

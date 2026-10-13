@@ -16,12 +16,15 @@ import { DrawerModule } from 'primeng/drawer';
 import { SkeletonModule } from 'primeng/skeleton';
 import { MessageService } from 'primeng/api';
 import { CatalogService } from '../../../core/services/catalog.service';
-import { PreferencesService, SubtitlePreference } from '../../../core/services/preferences.service';
+import { TranslocoPipe } from '@jsverse/transloco';
+import { PreferencesService } from '../../../core/services/preferences.service';
+import { I18nService, SiteLang } from '../../../core/services/i18n.service';
 import type { Drama } from '../../../core/models/drama';
+import { videoLangLabel } from '../../../core/utils/format';
 
 @Component({
   selector: 'app-header',
-  imports: [RouterLink, DrawerModule, SkeletonModule],
+  imports: [RouterLink, DrawerModule, SkeletonModule, TranslocoPipe],
   templateUrl: './app-header.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -29,6 +32,7 @@ export class AppHeaderComponent {
   protected readonly router = inject(Router);
   private readonly catalog = inject(CatalogService);
   protected readonly prefs = inject(PreferencesService);
+  protected readonly i18n = inject(I18nService);
   private readonly messages = inject(MessageService);
 
   protected readonly drawerVisible = signal(false);
@@ -40,10 +44,11 @@ export class AppHeaderComponent {
   protected readonly searchResults = signal<Drama[]>([]);
 
   protected readonly navItems = computed(() => [
-    { path: '/', label: 'Home' },
-    { path: '/genre', label: 'Genre' },
-    { path: '/platform', label: 'Platform' },
-    { path: '/release-schedule', label: 'Schedule' },
+    { path: '/', labelKey: 'nav.home' },
+    { path: '/genre', labelKey: 'nav.genre' },
+    { path: '/platform', labelKey: 'nav.platform' },
+    { path: '/release-schedule', labelKey: 'nav.schedule' },
+    { path: '/browse', labelKey: 'nav.browse' },
   ]);
 
   private debounceTimer: ReturnType<typeof setTimeout> | null = null;
@@ -67,14 +72,18 @@ export class AppHeaderComponent {
     { initialValue: this.router.url },
   );
 
+  protected videoLangs(d: Drama): string {
+    return videoLangLabel(d.videoLanguages);
+  }
+
   protected isActive(path: string): boolean {
     const url = this.currentUrl();
     if (path === '/') return url === '/';
     return url === path || url.startsWith(`${path}/`);
   }
 
-  protected setSubtitle(value: SubtitlePreference): void {
-    this.prefs.setSubtitle(value);
+  protected setLang(value: SiteLang): void {
+    void this.i18n.setLang(value);
   }
 
   protected random(): void {
@@ -114,8 +123,13 @@ export class AppHeaderComponent {
     this.searchLoading.set(false);
   }
 
-  protected prototypeNotice(detail: string): void {
+  protected prototypeNotice(detailKey: string): void {
     this.accountOpen.set(false);
-    this.messages.add({ severity: 'info', summary: 'Prototype', detail, life: 3000 });
+    this.messages.add({
+      severity: 'info',
+      summary: this.i18n.t('common.prototype'),
+      detail: this.i18n.t(detailKey),
+      life: 3000,
+    });
   }
 }

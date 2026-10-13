@@ -1,21 +1,24 @@
 <main>
   <div class="legal-hero">
     <div class="container">
-      <nav class="legal-breadcrumb" aria-label="Breadcrumb">
+      <nav class="legal-breadcrumb" [attr.aria-label]="'watch.breadcrumb' | transloco">
         <a routerLink="/">DRA.CIN</a> <span aria-hidden="true">/</span>
-        <span>Terms of Service</span>
+        <span>{{ 'terms.crumb' | transloco }}</span>
       </nav>
       <div class="legal-hero-inner">
-        <p class="eyebrow">Legal</p>
-        <h1 class="display">Terms of Service</h1>
-        <p>
-          This document sets out the rules, limits and responsibilities that apply to your use of
-          DRA.CIN as a metadata directory for Chinese short dramas.
-        </p>
+        <p class="eyebrow">{{ 'common.legal' | transloco }}</p>
+        <h1 class="display">{{ 'terms.title' | transloco }}</h1>
+        <p>{{ 'terms.intro' | transloco }}</p>
         <div class="legal-meta">
-          <span class="legal-meta-item"><strong>Version:</strong> 1.0</span>
-          <span class="legal-meta-item"><strong>Effective:</strong> 1 January 2026</span>
-          <span class="legal-meta-item"><strong>Last updated:</strong> 1 January 2026</span>
+          <span class="legal-meta-item"><strong>{{ 'legalCommon.version' | transloco }}</strong> 1.0</span>
+          <span class="legal-meta-item"
+            ><strong>{{ 'legalCommon.effective' | transloco }}</strong>
+            {{ 'legalCommon.jan2026' | transloco }}</span
+          >
+          <span class="legal-meta-item"
+            ><strong>{{ 'legalCommon.lastUpdated' | transloco }}</strong>
+            {{ 'legalCommon.jan2026' | transloco }}</span
+          >
         </div>
       </div>
     </div>
@@ -23,135 +26,108 @@
 
   <div class="container">
     <div class="legal-layout">
-      <aside class="legal-sidebar" aria-label="Document navigation">
+      <aside class="legal-sidebar" [attr.aria-label]="'legalCommon.docNav' | transloco">
         <nav class="legal-toc">
-          <h2>Contents</h2>
+          <h2>{{ 'legalCommon.contents' | transloco }}</h2>
           <ol>
-            <li><a href="#p1">1. Introduction</a></li>
-            <li><a href="#p2">2. Our Service</a></li>
-            <li><a href="#p3">3. User Accounts</a></li>
-            <li><a href="#p4">4. Intellectual Property</a></li>
-            <li><a href="#p5">5. Liability</a></li>
-            <li><a href="#p6">6. Privacy</a></li>
-            <li><a href="#p7">7. Policy Changes</a></li>
-            <li><a href="#p8">8. Governing Law</a></li>
-            <li><a href="#p9">9. Contact</a></li>
+            <li><a href="#p1">{{ 'terms.toc1' | transloco }}</a></li>
+            <li><a href="#p2">{{ 'terms.toc2' | transloco }}</a></li>
+            <li><a href="#p3">{{ 'terms.toc3' | transloco }}</a></li>
+            <li><a href="#p4">{{ 'terms.toc4' | transloco }}</a></li>
+            <li><a href="#p5">{{ 'terms.toc5' | transloco }}</a></li>
+            <li><a href="#p6">{{ 'terms.toc6' | transloco }}</a></li>
+            <li><a href="#p7">{{ 'terms.toc7' | transloco }}</a></li>
+            <li><a href="#p8">{{ 'terms.toc8' | transloco }}</a></li>
+            <li><a href="#p9">{{ 'terms.toc9' | transloco }}</a></li>
           </ol>
         </nav>
       </aside>
 
       <div class="legal-content">
         <section class="legal-section" id="p1">
-          <h2>1. Introduction</h2>
-          <p>
-            By accessing or using DRA.CIN you agree to be bound by these Terms of Service in full.
-            If you do not agree with any provision, you may not use the platform.
-          </p>
-          <p>
-            These terms may be updated at any time. Continued use after changes means you accept the
-            revised terms.
-          </p>
+          <h2>{{ 'terms.toc1' | transloco }}</h2>
+          <p>{{ 'terms.s1p1' | transloco }}</p>
+          <p>{{ 'terms.s1p2' | transloco }}</p>
           <div class="legal-callout info">
             <p>
-              <strong>Note:</strong> DRA.CIN is a visual prototype and a metadata directory. It does
-              not operate a streaming service or provide any video content.
+              <strong>{{ 'legalCommon.note' | transloco }}</strong> {{ 'terms.s1note' | transloco }}
             </p>
           </div>
         </section>
 
         <section class="legal-section" id="p2">
-          <h2>2. Our Service</h2>
-          <p>DRA.CIN provides access to:</p>
+          <h2>{{ 'terms.toc2' | transloco }}</h2>
+          <p>{{ 'terms.s2intro' | transloco }}</p>
           <ul>
-            <li>
-              Drama metadata including titles, synopses, episode counts, genres and source
-              platforms.
-            </li>
-            <li>Browsing and search by genre, platform, schedule and other criteria.</li>
-            <li>Reference links to third-party platforms where content is available.</li>
-            <li>Subtitle preferences (EN or ID) stored locally in the browser.</li>
+            <li>{{ 'terms.s2a' | transloco }}</li>
+            <li>{{ 'terms.s2b' | transloco }}</li>
+            <li>{{ 'terms.s2c' | transloco }}</li>
+            <li>{{ 'terms.s2d' | transloco }}</li>
           </ul>
-          <p>DRA.CIN does <strong>not</strong>:</p>
+          <p>{{ 'terms.s2not' | transloco }}</p>
           <ul>
-            <li>Host, store or play video files.</li>
-            <li>Provide streaming or downloading.</li>
-            <li>Guarantee the availability or completeness of the metadata shown.</li>
-            <li>Take responsibility for third-party platforms&rsquo; content or policies.</li>
+            <li>{{ 'terms.s2e' | transloco }}</li>
+            <li>{{ 'terms.s2f' | transloco }}</li>
+            <li>{{ 'terms.s2g' | transloco }}</li>
+            <li>{{ 'terms.s2h' | transloco }}</li>
           </ul>
         </section>
 
         <section class="legal-section" id="p3">
-          <h2>3. User Accounts</h2>
-          <p>
-            Access to certain features may require an account. This prototype does not implement a
-            real account system; bookmarks and preferences are stored locally in your browser.
-          </p>
-          <p>DRA.CIN may suspend access for activity that violates these terms.</p>
+          <h2>{{ 'terms.toc3' | transloco }}</h2>
+          <p>{{ 'terms.s3p1' | transloco }}</p>
+          <p>{{ 'terms.s3p2' | transloco }}</p>
         </section>
 
         <section class="legal-section" id="p4">
-          <h2>4. Intellectual Property</h2>
-          <p>
-            All video content, artwork and copyrighted material referenced on DRA.CIN belongs to
-            their respective owners. DRA.CIN does not claim ownership of any third-party content.
-            Linking to platforms is for navigation only.
-          </p>
+          <h2>{{ 'terms.toc4' | transloco }}</h2>
+          <p>{{ 'terms.s4p1' | transloco }}</p>
           <div class="legal-callout warning">
             <p>
-              <strong>Attention:</strong> if you are a rights owner and believe your material is
-              displayed without permission, see the <a routerLink="/dmca">DMCA policy</a> to request
-              removal.
+              <strong>{{ 'legalCommon.attention' | transloco }}</strong>
+              {{ 'terms.s4warnBefore' | transloco }}
+              <a routerLink="/dmca">{{ 'legalCommon.dmcaPolicy' | transloco }}</a>
+              {{ 'terms.s4warnAfter' | transloco }}
             </p>
           </div>
-          <p>
-            &ldquo;DRA.CIN&rdquo;, the logo and related visual elements are property of DRA.CIN. Use
-            of these marks without written permission is prohibited.
-          </p>
+          <p>{{ 'terms.s4p2' | transloco }}</p>
         </section>
 
         <section class="legal-section" id="p5">
-          <h2>5. Liability</h2>
-          <p>
-            DRA.CIN is provided &ldquo;as is&rdquo; and &ldquo;as available&rdquo;, without
-            warranties of any kind, express or implied. DRA.CIN is not liable for indirect,
-            incidental, consequential or punitive damages arising from use of the platform.
-          </p>
-          <p>
-            By using DRA.CIN you agree to indemnify it from claims, losses, liabilities and expenses
-            arising from your use of the platform or your breach of these terms.
-          </p>
+          <h2>{{ 'terms.toc5' | transloco }}</h2>
+          <p>{{ 'terms.s5p1' | transloco }}</p>
+          <p>{{ 'terms.s5p2' | transloco }}</p>
         </section>
 
         <section class="legal-section" id="p6">
-          <h2>6. Privacy</h2>
+          <h2>{{ 'terms.toc6' | transloco }}</h2>
           <p>
-            DRA.CIN respects your privacy. The only data stored locally in your browser is your
-            subtitle and theme preference, via <code>localStorage</code>. No personal data is sent
-            to a DRA.CIN server.
+            {{ 'terms.s6p1Before' | transloco }} <code>localStorage</code>.
+            {{ 'terms.s6p1After' | transloco }}
           </p>
-          <p>See the <a routerLink="/privacy">Privacy policy</a> for more information.</p>
+          <p>
+            {{ 'terms.s6p2' | transloco }}
+            <a routerLink="/privacy">{{ 'legalCommon.privacyPolicy' | transloco }}</a>
+            {{ 'terms.s6p2After' | transloco }}
+          </p>
         </section>
 
         <section class="legal-section" id="p7">
-          <h2>7. Policy Changes</h2>
-          <p>
-            DRA.CIN may modify these terms at any time. Changes are reflected in the &ldquo;Last
-            updated&rdquo; date. Continued use after changes means you accept the revised terms;
-            your remedy if you disagree is to stop using the platform.
-          </p>
+          <h2>{{ 'terms.toc7' | transloco }}</h2>
+          <p>{{ 'terms.s7p1' | transloco }}</p>
         </section>
 
         <section class="legal-section" id="p8">
-          <h2>8. Governing Law</h2>
-          <p>
-            These terms are governed by and construed in accordance with the laws of the applicable
-            jurisdiction. Disputes will be resolved through the appropriate channels.
-          </p>
+          <h2>{{ 'terms.toc8' | transloco }}</h2>
+          <p>{{ 'terms.s8p1' | transloco }}</p>
         </section>
 
         <section class="legal-section" id="p9">
-          <h2>9. Contact</h2>
-          <p>For questions about these terms, use the <a routerLink="/contact">Contact page</a>.</p>
+          <h2>{{ 'terms.toc9' | transloco }}</h2>
+          <p>
+            {{ 'terms.s9p1' | transloco }}
+            <a routerLink="/contact">{{ 'legalCommon.contactPage' | transloco }}</a>.
+          </p>
         </section>
       </div>
     </div>

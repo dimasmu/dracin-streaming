@@ -62,29 +62,29 @@
                   <span class="drama-preview-pill">{{ state.drama.releaseYear }}</span>
                 }
                 @if (state.drama.status) {
-                  <span class="drama-preview-pill">{{ state.drama.status }}</span>
+                  <span class="drama-preview-pill">{{ 'status.' + state.drama.status | transloco }}</span>
                 }
               </div>
 
               <dl class="drama-preview-facts">
                 @if (state.drama.totalEpisodes) {
-                  <div><dt>Episodes</dt><dd>{{ state.drama.totalEpisodes }}</dd></div>
+                  <div><dt>{{ 'preview.episodes' | transloco }}</dt><dd>{{ state.drama.totalEpisodes }}</dd></div>
                 }
                 @if (state.drama.latestEpisode) {
-                  <div><dt>Latest</dt><dd>EP {{ state.drama.latestEpisode }}</dd></div>
+                  <div><dt>{{ 'preview.latest' | transloco }}</dt><dd>{{ 'common.episodeShort' | transloco: { n: state.drama.latestEpisode } }}</dd></div>
                 }
                 @if (state.drama.platformId) {
-                  <div><dt>Platform</dt><dd>{{ state.drama.platformId }}</dd></div>
+                  <div><dt>{{ 'preview.platform' | transloco }}</dt><dd>{{ state.drama.platformId }}</dd></div>
                 }
-                @if (state.drama.subtitleLanguages.length) {
-                  <div><dt>Subtitles</dt><dd>{{ state.drama.subtitleLanguages.join(' / ') }}</dd></div>
+                @if (state.drama.videoLanguages.length) {
+                  <div><dt>{{ 'preview.video' | transloco }}</dt><dd>{{ videoLangs(state.drama.videoLanguages) }}</dd></div>
                 }
               </dl>
 
               @if (state.drama.genres.length) {
                 <div class="drama-preview-genres">
                   @for (g of state.drama.genres; track g) {
-                    <span>{{ g }}</span>
+                    <span>{{ 'genre.' + g | transloco }}</span>
                   }
                 </div>
               }
@@ -94,15 +94,15 @@
               }
 
               <div class="drama-preview-foot">
-                <span class="drama-preview-aired">Aired {{ aired() }}</span>
+                <span class="drama-preview-aired">{{ 'preview.aired' | transloco: { date: aired() } }}</span>
                 <div class="drama-preview-actions">
                   <button
                     type="button"
                     class="btn btn-icon"
                     [class.active]="bookmarked()"
                     [attr.aria-pressed]="bookmarked()"
-                    [attr.aria-label]="bookmarked() ? 'Remove from bookmarks' : 'Add to bookmarks'"
-                    [attr.title]="bookmarked() ? 'Remove from bookmarks' : 'Add to bookmarks'"
+                    [attr.aria-label]="(bookmarked() ? 'card.removeBookmark' : 'card.addBookmark') | transloco"
+                    [attr.title]="(bookmarked() ? 'card.removeBookmark' : 'card.addBookmark') | transloco"
                     (click)="toggleBookmark()"
                   >
                     <svg
@@ -121,8 +121,8 @@
                   <a
                     class="btn btn-icon btn-primary"
                     [routerLink]="['/watch', state.drama.slug, watchEpisode()]"
-                    [attr.aria-label]="'Watch ' + state.drama.title"
-                    title="Watch now"
+                    [attr.aria-label]="('card.watch' | transloco) + ' ' + state.drama.title"
+                    [attr.title]="'card.watchNow' | transloco"
                     (click)="preview.close()"
                   >
                     <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true">

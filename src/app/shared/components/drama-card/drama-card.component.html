@@ -13,7 +13,7 @@
     </div>
     <span class="card-shade"></span>
     <span class="card-platform">{{ drama().platformId }}</span>
-    <span class="card-locale">{{ subtitle() }}</span>
+    <span class="card-locale">{{ videoLangs() }}</span>
 
     <span class="card-play-overlay" aria-hidden="true">
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
@@ -28,6 +28,6 @@
 
   <div class="card-copy">
     <h3>{{ drama().title }}</h3>
-    <p><i class="episode-dot"></i> EP {{ episode() }} &middot; {{ genre() }}</p>
+    <p><i class="episode-dot"></i> {{ 'common.episodeShort' | transloco: { n: episode() } }} &middot; {{ genre() ? ('genre.' + genre() | transloco) : '' }}</p>
   </div>
 </article>

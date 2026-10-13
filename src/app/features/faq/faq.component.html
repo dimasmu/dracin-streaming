@@ -1,9 +1,9 @@
 <main>
   <div class="faq-hero">
     <div class="container">
-      <p class="eyebrow">Help Center</p>
-      <h1 class="display">How can we help?</h1>
-      <p>Search for answers or browse the categories below.</p>
+      <p class="eyebrow">{{ 'faq.helpCenter' | transloco }}</p>
+      <h1 class="display">{{ 'faq.title' | transloco }}</h1>
+      <p>{{ 'faq.intro' | transloco }}</p>
       <div class="faq-search-wrap">
         <svg
           viewBox="0 0 24 24"
@@ -20,8 +20,8 @@
         <input
           class="faq-search"
           type="search"
-          placeholder="Type a question or keyword&hellip;"
-          aria-label="Search the help center"
+          [placeholder]="'faq.searchPlaceholder' | transloco"
+          [attr.aria-label]="'faq.searchLabel' | transloco"
           [value]="query()"
           (input)="onQuery($event)"
         />
@@ -31,7 +31,7 @@
 
   <div class="container">
     <div class="faq-categories">
-      <h2 class="faq-categories-heading display">Browse Categories</h2>
+      <h2 class="faq-categories-heading display">{{ 'faq.categories' | transloco }}</h2>
       <div class="faq-category-grid">
         @for (c of categories(); track c.id) {
           <button
@@ -43,7 +43,7 @@
             <div class="faq-cat-icon"><i [class]="c.icon" aria-hidden="true"></i></div>
             <div class="text-left">
               <p class="faq-cat-title">{{ c.name }}</p>
-              <p class="faq-cat-count">{{ c.count }} questions</p>
+              <p class="faq-cat-count">{{ 'faq.questionsCount' | transloco: { count: c.count } }}</p>
             </div>
           </button>
         }
@@ -51,7 +51,7 @@
     </div>
 
     <div class="faq-accordion">
-      <h2 class="faq-accordion-heading display">Common Questions</h2>
+      <h2 class="faq-accordion-heading display">{{ 'faq.common' | transloco }}</h2>
       @if (visible().length) {
         <p-accordion [(value)]="openPanels" [multiple]="true">
           @for (item of visible(); track $index; let i = $index) {
@@ -63,16 +63,16 @@
         </p-accordion>
       } @else {
         <p class="faq-no-results">
-          No results for &ldquo;{{ query() }}&rdquo;. Try another keyword or contact support.
+          {{ 'faq.noResults' | transloco: { query: query() } }}
         </p>
       }
     </div>
 
     <div style="text-align: center; padding: 0 0 80px">
       <p style="color: var(--muted); font-size: 13px; margin: 0 0 14px">
-        Didn&rsquo;t find what you were looking for?
+        {{ 'faq.notFound' | transloco }}
       </p>
-      <a class="btn btn-primary" routerLink="/contact">Contact Support</a>
+      <a class="btn btn-primary" routerLink="/contact">{{ 'faq.contactSupport' | transloco }}</a>
     </div>
   </div>
 </main>

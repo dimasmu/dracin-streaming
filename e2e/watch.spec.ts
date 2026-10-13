@@ -68,30 +68,19 @@ test.describe('watch page (merged drama details)', () => {
     await expect(page).toHaveURL(new RegExp(`/watch/${SLUG}/2$`));
   });
 
-  test('episode panel updates the route; no episode or subtitle dropdowns remain', async ({
+  test('episode panel updates the route; only the video-language dropdown remains', async ({
     page,
   }) => {
     await page.goto(`/watch/${SLUG}/1`);
-    await expect(page.locator('main p-select')).toHaveCount(0);
+    // The episode list is the panel, not a dropdown; the only select is the video language.
+    await expect(page.locator('main p-select')).toHaveCount(1);
+    await expect(page.locator('main p-select.video-lang-select')).toHaveCount(1);
     await page.locator('.episode-button', { hasText: /^5$/ }).click();
     await expect(page).toHaveURL(new RegExp(`/watch/${SLUG}/5$`));
     await expect(page.locator('.episode-button.active')).toHaveText('5');
     await expect(page.locator('.ep-indicator')).toContainText('EP 5 /');
   });
 
-  // Each drama in the mock data offers exactly one subtitle language, so the
-  // player tag shows the navbar language when offered, else what the drama has.
-  test('player subtitle tag reflects the navbar language and drama availability', async ({
-    page,
-  }) => {
-    await page.goto(`/watch/${SLUG}/1`); // EN-only drama
-    const tag = page.locator('.ctl-tag');
-    await expect(tag).toHaveText('SUB EN');
-    await page.locator('.language-toggle button', { hasText: 'ID' }).click();
-    await expect(tag).toHaveText('SUB EN'); // ID not offered, falls back to EN
-    await page.goto('/watch/sulih-suara-paman-sopir-taksi-online-jagoan/1'); // ID-only drama
-    await expect(tag).toHaveText('SUB ID');
-  });
 
   test('bookmark toggles on the watch page', async ({ page }) => {
     await page.goto(`/watch/${SLUG}/1`);
@@ -162,4 +151,19 @@ test.describe('responsive layout', () => {
       expect(errors).toEqual([]);
     });
   }
+});
+
+test.describe('navbar Browse link', () => {
+  test('sits directly before Random, has an icon, and opens /browse', async ({ page }) => {
+    await page.goto('/');
+    const items = page.locator('.nav-links > *');
+    const labels = (await items.allInnerTexts()).map((s) => s.trim());
+    expect(labels.slice(-2)).toEqual(['Browse', 'Random']);
+    const browse = page.locator('.nav-links a[href="/browse"]');
+    await expect(browse.locator('svg.nav-icon')).toHaveCount(1);
+    await browse.click();
+    await expect(page).toHaveURL(/\/browse$/);
+    await expect(browse).toHaveAttribute('aria-current', 'page');
+    await expect(page.locator('.nav-links a[aria-current="page"]')).toHaveCount(1);
+  });
 });

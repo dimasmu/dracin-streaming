@@ -1,37 +1,56 @@
-import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { AccordionModule } from 'primeng/accordion';
-import { FAQ_CATEGORIES, FAQ_ITEMS, type FaqItem } from '../../data/faq';
+import { FAQ_CATEGORIES } from '../../data/faq';
+import { I18nService } from '../../core/services/i18n.service';
+
+interface FaqEntry {
+  category: string;
+  q: string;
+  a: string;
+}
 
 @Component({
-  imports: [RouterLink, AccordionModule],
+  imports: [RouterLink, AccordionModule, TranslocoPipe],
   templateUrl: './faq.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FaqComponent {
-  protected readonly items = FAQ_ITEMS;
+  private readonly i18n = inject(I18nService);
+  private readonly transloco = inject(TranslocoService);
+
   protected readonly query = signal('');
   protected readonly activeCategory = signal<string | null>(null);
   protected readonly openPanels = signal<string[]>([]);
 
+  /** All questions in the website language. Re-evaluates when the language changes. */
+  private readonly items = computed<FaqEntry[]>(() => {
+    this.i18n.lang();
+    return FAQ_CATEGORIES.flatMap((c) => {
+      const list = this.transloco.translate<{ q: string; a: string }[]>(`faq.items.${c.id}`);
+      return (Array.isArray(list) ? list : []).map((item) => ({ category: c.id, ...item }));
+    });
+  });
+
   protected readonly categories = computed(() =>
-    FAQ_CATEGORIES.map((c) => ({ ...c, count: this.count(c.id) })),
+    FAQ_CATEGORIES.map((c) => ({
+      ...c,
+      name: this.i18n.t(`faq.cat.${c.id}`),
+      count: this.items().filter((i) => i.category === c.id).length,
+    })),
   );
 
   protected readonly visible = computed(() => {
     const q = this.query().trim().toLowerCase();
     const cat = this.activeCategory();
-    return FAQ_ITEMS.filter((item) => {
+    return this.items().filter((item) => {
       if (cat && item.category !== cat) return false;
       if (q && !(item.q.toLowerCase().includes(q) || item.a.toLowerCase().includes(q)))
         return false;
       return true;
     });
   });
-
-  protected count(id: string): number {
-    return FAQ_ITEMS.filter((i) => i.category === id).length;
-  }
 
   protected setCategory(id: string): void {
     this.activeCategory.set(this.activeCategory() === id ? null : id);
@@ -42,7 +61,8 @@ export class FaqComponent {
     this.query.set((event.target as HTMLInputElement).value);
   }
 
-  protected itemKey(item: FaqItem): string {
-    return `${item.category}-${item.q}`;
+  /** Stable across languages: category + position, not the (translated) question text. */
+  protected itemKey(item: FaqEntry): string {
+    return `${item.category}-${this.items().indexOf(item)}`;
   }
 }

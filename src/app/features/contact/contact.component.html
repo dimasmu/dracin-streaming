@@ -1,11 +1,9 @@
 <main>
   <div class="contact-hero">
     <div class="container">
-      <p class="eyebrow">Contact Us</p>
-      <h1 class="display">DRA.CIN Support</h1>
-      <p>
-        Questions, bug reports or content requests? Fill in the form below or reach out directly.
-      </p>
+      <p class="eyebrow">{{ 'contact.eyebrow' | transloco }}</p>
+      <h1 class="display">{{ 'contact.title' | transloco }}</h1>
+      <p>{{ 'contact.intro' | transloco }}</p>
     </div>
   </div>
 
@@ -13,58 +11,53 @@
     <div class="contact-grid">
       <div class="contact-info">
         <div class="contact-info-card">
-          <h3>Email</h3>
-          <p>Send general questions and issue reports by email.</p>
+          <h3>{{ 'contact.emailTitle' | transloco }}</h3>
+          <p>{{ 'contact.emailText' | transloco }}</p>
           <p class="contact-value">hello&#64;dracin.example</p>
         </div>
         <div class="contact-info-card">
-          <h3>Copyright (DMCA)</h3>
-          <p>For copyright removal requests, see our <a routerLink="/dmca">DMCA policy</a>.</p>
+          <h3>{{ 'contact.dmcaTitle' | transloco }}</h3>
+          <p>{{ 'contact.dmcaTextBefore' | transloco }} <a routerLink="/dmca">{{ 'contact.dmcaLink' | transloco }}</a>.</p>
           <p class="contact-value">dmca&#64;dracin.example</p>
         </div>
         <div class="contact-info-card">
-          <h3>Response Time</h3>
-          <p>
-            We aim to respond to every message within 2&ndash;5 business days. Copyright requests
-            may take longer to verify.
-          </p>
+          <h3>{{ 'contact.responseTitle' | transloco }}</h3>
+          <p>{{ 'contact.responseText' | transloco }}</p>
         </div>
         <div class="contact-info-card">
-          <h3>Prototype Site</h3>
-          <p>
-            DRA.CIN currently operates as a visual prototype. There is no live streaming service or
-            active user account system.
-          </p>
+          <h3>{{ 'contact.protoTitle' | transloco }}</h3>
+          <p>{{ 'contact.protoText' | transloco }}</p>
         </div>
         <div class="contact-info-card">
-          <h3>Legal Links</h3>
+          <h3>{{ 'contact.legalLinks' | transloco }}</h3>
           <p>
-            <a routerLink="/terms">Terms of Service</a> &middot;
-            <a routerLink="/dmca">DMCA Policy</a> &middot; <a routerLink="/faq">FAQ</a>
+            <a routerLink="/terms">{{ 'contact.terms' | transloco }}</a> &middot;
+            <a routerLink="/dmca">{{ 'contact.dmcaPolicy' | transloco }}</a> &middot;
+            <a routerLink="/faq">{{ 'contact.faq' | transloco }}</a>
           </p>
         </div>
       </div>
 
       <div class="contact-form-wrap">
-        <h2 class="display">Send a Message</h2>
-        <p>Fields marked with * are required.</p>
+        <h2 class="display">{{ 'contact.send' | transloco }}</h2>
+        <p>{{ 'contact.required' | transloco }}</p>
 
         @if (!submitted()) {
           <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
             <div class="contact-field">
-              <label for="cf-name">Full Name *</label>
+              <label for="cf-name">{{ 'contact.name' | transloco }}</label>
               <input
                 pInputText
                 id="cf-name"
                 type="text"
                 formControlName="name"
-                placeholder="Your name"
+                [placeholder]="'contact.namePlaceholder' | transloco"
                 autocomplete="name"
                 [class.invalid]="isInvalid('name')"
               />
             </div>
             <div class="contact-field">
-              <label for="cf-email">Email Address *</label>
+              <label for="cf-email">{{ 'contact.email' | transloco }}</label>
               <input
                 pInputText
                 id="cf-email"
@@ -76,44 +69,41 @@
               />
             </div>
             <div class="contact-field">
-              <label for="cf-subject">Subject *</label>
+              <label for="cf-subject">{{ 'contact.subject' | transloco }}</label>
               <input
                 pInputText
                 id="cf-subject"
                 type="text"
                 formControlName="subject"
-                placeholder="Topic of your message"
+                [placeholder]="'contact.subjectPlaceholder' | transloco"
                 [class.invalid]="isInvalid('subject')"
               />
             </div>
             <div class="contact-field">
-              <label for="cf-category">Category *</label>
+              <label for="cf-category">{{ 'contact.category' | transloco }}</label>
               <p-select
                 inputId="cf-category"
-                [options]="categoryOptions"
+                [options]="categoryOptions()"
                 optionLabel="label"
                 optionValue="value"
-                placeholder="Choose a category&hellip;"
+                [placeholder]="'contact.categoryPlaceholder' | transloco"
                 [formControl]="form.controls.category"
                 [style]="{ width: '100%' }"
                 [class.invalid]="isInvalid('category')"
               />
             </div>
             <div class="contact-field">
-              <label for="cf-message">Message</label>
+              <label for="cf-message">{{ 'contact.message' | transloco }}</label>
               <textarea
                 id="cf-message"
                 formControlName="message"
-                placeholder="Describe your question or issue in detail&hellip;"
+                [placeholder]="'contact.messagePlaceholder' | transloco"
               ></textarea>
             </div>
             <div class="contact-form-footer">
-              <p class="contact-note">
-                Your data is not shared with third parties. Only the subtitle language preference
-                (EN/ID) is stored locally in this browser.
-              </p>
+              <p class="contact-note">{{ 'contact.note' | transloco }}</p>
               <button class="btn btn-primary" type="submit" [disabled]="sending()">
-                {{ sending() ? 'Sending&hellip;' : 'Send Message' }}
+                {{ (sending() ? 'contact.sending' : 'contact.sendButton') | transloco }}
               </button>
             </div>
           </form>
@@ -130,12 +120,11 @@
             "
           >
             <strong class="display" style="display: block; margin-bottom: 6px"
-              >Message recorded</strong
+              >{{ 'contact.recorded' | transloco }}</strong
             >
-            Thanks for reaching out. This is a prototype &mdash; no message has actually been sent
-            to a server.
+            {{ 'contact.recordedText' | transloco }}
             <div style="margin-top: 14px">
-              <button class="btn btn-compact" type="button" (click)="reset()">Send another</button>
+              <button class="btn btn-compact" type="button" (click)="reset()">{{ 'contact.sendAnother' | transloco }}</button>
             </div>
           </div>
         }

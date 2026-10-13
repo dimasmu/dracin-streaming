@@ -1,19 +1,18 @@
 <main class="container page">
   <div class="page-head">
     <div>
-      <h1 class="display">Release Schedule</h1>
-      <p>Upcoming episode releases grouped by day. Times are shown in WIB.</p>
+      <h1 class="display">{{ 'schedule.title' | transloco }}</h1>
+      <p>{{ 'schedule.intro' | transloco }}</p>
     </div>
   </div>
 
   <div class="legal-callout info" style="margin: 0 0 20px">
     <p>
-      <strong>Demo schedule:</strong> these air-times and episode numbers are illustrative and are
-      not sourced release information. Titles link to their catalogue pages.
+      <strong>{{ 'schedule.demoLabel' | transloco }}</strong> {{ 'schedule.demoText' | transloco }}
     </p>
   </div>
 
-  <div class="day-tabs" role="tablist" aria-label="Select a day">
+  <div class="day-tabs" role="tablist" [attr.aria-label]="'schedule.selectDay' | transloco">
     @for (d of days(); track d.iso) {
       <button
         type="button"
@@ -33,10 +32,7 @@
             <span class="schedule-mark">{{ dayMark(item) }}</span>
             <span>
               <h3>{{ item.dramaTitle }}</h3>
-              <p>
-                Episode {{ item.episodeNumber }} &middot; {{ item.platformId }} &middot; Sub
-                {{ item.subtitleStatus }}
-              </p>
+              <p>{{ 'schedule.itemLine' | transloco: { n: item.episodeNumber, platform: item.platformId } }}</p>
             </span>
             <span class="schedule-time">{{ item.releaseTime }}</span>
           </a>
@@ -44,8 +40,8 @@
       </div>
     } @else {
       <app-empty-state
-        title="No releases this day"
-        message="Pick another day to see the schedule."
+        [title]="'schedule.emptyTitle' | transloco"
+        [message]="'schedule.emptyMessage' | transloco"
       />
     }
   </section>

@@ -23,6 +23,8 @@ export default defineConfig({
     trace: 'retain-on-failure',
     // The preview only opens for devices that report hover capability.
     hasTouch: false,
+    // The site follows the browser language on first visit; pin it so tests are deterministic.
+    locale: 'en-US',
   },
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
   webServer: {

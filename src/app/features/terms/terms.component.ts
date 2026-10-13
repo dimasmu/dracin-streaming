@@ -1,8 +1,9 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 @Component({
-  imports: [RouterLink],
+  imports: [RouterLink, TranslocoPipe],
   templateUrl: './terms.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

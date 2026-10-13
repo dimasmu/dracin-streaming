@@ -1,31 +1,30 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { MessageService } from 'primeng/api';
+import { TranslocoPipe } from '@jsverse/transloco';
+import { I18nService } from '../../core/services/i18n.service';
 
 @Component({
-  imports: [RouterLink, ReactiveFormsModule, InputTextModule, SelectModule],
+  imports: [RouterLink, ReactiveFormsModule, InputTextModule, SelectModule, TranslocoPipe],
   templateUrl: './contact.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ContactComponent {
   private readonly fb = inject(FormBuilder);
   private readonly messages = inject(MessageService);
+  private readonly i18n = inject(I18nService);
 
   protected readonly submitting = signal(false);
   protected readonly submitted = signal(false);
   protected readonly sending = signal(false);
 
-  protected readonly categoryOptions = [
-    { label: 'Metadata Report', value: 'metadata' },
-    { label: 'Bug / Technical Report', value: 'bug' },
-    { label: 'Content Request', value: 'request' },
-    { label: 'Copyright (DMCA)', value: 'copyright' },
-    { label: 'Feedback / Suggestion', value: 'feedback' },
-    { label: 'Other', value: 'other' },
-  ];
+  private readonly categoryValues = ['metadata', 'bug', 'request', 'copyright', 'feedback', 'other'];
+  protected readonly categoryOptions = computed(() =>
+    this.categoryValues.map((value) => ({ label: this.i18n.t('contact.cat.' + value), value })),
+  );
 
   protected readonly form = this.fb.group({
     name: ['', [Validators.required]],
@@ -45,8 +44,8 @@ export class ContactComponent {
       this.form.markAllAsTouched();
       this.messages.add({
         severity: 'error',
-        summary: 'Check the form',
-        detail: 'Please fix the highlighted fields.',
+        summary: this.i18n.t('contact.checkForm'),
+        detail: this.i18n.t('contact.fixFields'),
         life: 3000,
       });
       return;
@@ -57,8 +56,8 @@ export class ContactComponent {
       this.submitted.set(true);
       this.messages.add({
         severity: 'success',
-        summary: 'Message recorded',
-        detail: 'This is a local simulation; nothing was sent to a server.',
+        summary: this.i18n.t('contact.recorded'),
+        detail: this.i18n.t('contact.localSim'),
         life: 4000,
       });
     }, 900);

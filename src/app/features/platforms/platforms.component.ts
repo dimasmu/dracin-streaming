@@ -1,13 +1,14 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { PaginatorModule } from 'primeng/paginator';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { CatalogService } from '../../core/services/catalog.service';
 import { DramaCardComponent } from '../../shared/components/drama-card/drama-card.component';
 import { EmptyStateComponent } from '../../shared/components/empty-state/empty-state.component';
 import { monogram } from '../../core/utils/format';
 
 @Component({
-  imports: [RouterLink, PaginatorModule, DramaCardComponent, EmptyStateComponent],
+  imports: [RouterLink, PaginatorModule, TranslocoPipe, DramaCardComponent, EmptyStateComponent],
   templateUrl: './platforms.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
