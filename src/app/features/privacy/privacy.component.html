@@ -1,158 +1,114 @@
-<main>
-  <div class="legal-hero">
-    <div class="container">
-      <nav class="legal-breadcrumb" [attr.aria-label]="'watch.breadcrumb' | transloco">
-        <a routerLink="/">DRA.CIN</a> <span aria-hidden="true">/</span>
-        <span>{{ 'privacy.crumb' | transloco }}</span>
-      </nav>
-      <div class="legal-hero-inner">
-        <p class="eyebrow">{{ 'common.legal' | transloco }}</p>
-        <h1 class="display">{{ 'privacy.title' | transloco }}</h1>
-        <p>{{ 'privacy.intro' | transloco }}</p>
-        <div class="legal-meta">
-          <span class="legal-meta-item"><strong>{{ 'legalCommon.version' | transloco }}</strong> 1.0</span>
-          <span class="legal-meta-item"
-            ><strong>{{ 'legalCommon.effective' | transloco }}</strong>
-            {{ 'legalCommon.jan2026' | transloco }}</span
-          >
-          <span class="legal-meta-item"
-            ><strong>{{ 'legalCommon.lastUpdated' | transloco }}</strong>
-            {{ 'legalCommon.jan2026' | transloco }}</span
-          >
-        </div>
-      </div>
+<app-legal-page doc="privacy" [sections]="sections">
+  <ng-container legalTitle>{{ 'privacy.title' | transloco }}</ng-container>
+  <ng-container legalIntro>{{ 'privacy.intro' | transloco }}</ng-container>
+
+  <section class="legal-section" id="p1">
+    <h2><span class="sec-num" aria-hidden="true">01</span>{{ 'privacy.toc1' | transloco }}</h2>
+    <p>{{ 'privacy.s1p1' | transloco }}</p>
+    <p>
+      <strong>{{ 'privacy.s1local' | transloco }}</strong>
+    </p>
+    <ul>
+      <li>
+        {{ 'privacy.s1localItemBefore' | transloco }} <code>localStorage</code>.
+        {{ 'privacy.s1localItemAfter' | transloco }}
+      </li>
+    </ul>
+    <p>
+      <strong>{{ 'privacy.s1indirect' | transloco }}</strong>
+    </p>
+    <ul>
+      <li>{{ 'privacy.s1indirectItem' | transloco }}</li>
+    </ul>
+    <div class="legal-callout info">
+      <p>
+        <strong>{{ 'privacy.s1note' | transloco }}</strong>
+        {{ 'privacy.s1noteText' | transloco }}
+      </p>
     </div>
-  </div>
+  </section>
 
-  <div class="container">
-    <div class="legal-layout">
-      <aside class="legal-sidebar" [attr.aria-label]="'legalCommon.docNav' | transloco">
-        <nav class="legal-toc">
-          <h2>{{ 'legalCommon.contents' | transloco }}</h2>
-          <ol>
-            <li><a href="#p1">{{ 'privacy.toc1' | transloco }}</a></li>
-            <li><a href="#p2">{{ 'privacy.toc2' | transloco }}</a></li>
-            <li><a href="#p3">{{ 'privacy.toc3' | transloco }}</a></li>
-            <li><a href="#p4">{{ 'privacy.toc4' | transloco }}</a></li>
-            <li><a href="#p5">{{ 'privacy.toc5' | transloco }}</a></li>
-            <li><a href="#p6">{{ 'privacy.toc6' | transloco }}</a></li>
-            <li><a href="#p7">{{ 'privacy.toc7' | transloco }}</a></li>
-            <li><a href="#p8">{{ 'privacy.toc8' | transloco }}</a></li>
-          </ol>
-        </nav>
-      </aside>
+  <section class="legal-section" id="p2">
+    <h2><span class="sec-num" aria-hidden="true">02</span>{{ 'privacy.toc2' | transloco }}</h2>
+    <p>{{ 'privacy.s2intro' | transloco }}</p>
+    <ul>
+      <li>
+        <strong>{{ 'privacy.s2a' | transloco }}</strong> {{ 'privacy.s2aText' | transloco }}
+      </li>
+      <li>
+        <strong>{{ 'privacy.s2b' | transloco }}</strong> {{ 'privacy.s2bText' | transloco }}
+      </li>
+    </ul>
+    <p>{{ 'privacy.s2p' | transloco }}</p>
+  </section>
 
-      <div class="legal-content">
-        <section class="legal-section" id="p1">
-          <h2>{{ 'privacy.toc1' | transloco }}</h2>
-          <p>{{ 'privacy.s1p1' | transloco }}</p>
-          <p>
-            <strong>{{ 'privacy.s1local' | transloco }}</strong>
-          </p>
-          <ul>
-            <li>
-              {{ 'privacy.s1localItemBefore' | transloco }} <code>localStorage</code>.
-              {{ 'privacy.s1localItemAfter' | transloco }}
-            </li>
-          </ul>
-          <p>
-            <strong>{{ 'privacy.s1indirect' | transloco }}</strong>
-          </p>
-          <ul>
-            <li>{{ 'privacy.s1indirectItem' | transloco }}</li>
-          </ul>
-          <div class="legal-callout info">
-            <p>
-              <strong>{{ 'privacy.s1note' | transloco }}</strong>
-              {{ 'privacy.s1noteText' | transloco }}
-            </p>
-          </div>
-        </section>
+  <section class="legal-section" id="p3">
+    <h2><span class="sec-num" aria-hidden="true">03</span>{{ 'privacy.toc3' | transloco }}</h2>
+    <p>
+      {{ 'privacy.s3p1Before' | transloco }} <code>localStorage</code>
+      {{ 'privacy.s3p1Mid' | transloco }} <code>localStorage</code>
+      {{ 'privacy.s3p1After' | transloco }}
+    </p>
+    <p>{{ 'privacy.s3p2' | transloco }}</p>
+  </section>
 
-        <section class="legal-section" id="p2">
-          <h2>{{ 'privacy.toc2' | transloco }}</h2>
-          <p>{{ 'privacy.s2intro' | transloco }}</p>
-          <ul>
-            <li>
-              <strong>{{ 'privacy.s2a' | transloco }}</strong> {{ 'privacy.s2aText' | transloco }}
-            </li>
-            <li>
-              <strong>{{ 'privacy.s2b' | transloco }}</strong> {{ 'privacy.s2bText' | transloco }}
-            </li>
-          </ul>
-          <p>{{ 'privacy.s2p' | transloco }}</p>
-        </section>
-
-        <section class="legal-section" id="p3">
-          <h2>{{ 'privacy.toc3' | transloco }}</h2>
-          <p>
-            {{ 'privacy.s3p1Before' | transloco }} <code>localStorage</code>
-            {{ 'privacy.s3p1Mid' | transloco }} <code>localStorage</code>
-            {{ 'privacy.s3p1After' | transloco }}
-          </p>
-          <p>{{ 'privacy.s3p2' | transloco }}</p>
-        </section>
-
-        <section class="legal-section" id="p4">
-          <h2>{{ 'privacy.toc4' | transloco }}</h2>
-          <p>{{ 'privacy.s4intro' | transloco }}</p>
-          <ul>
-            <li>
-              <strong>{{ 'privacy.s4a' | transloco }}</strong> {{ 'privacy.s4aText' | transloco }}
-            </li>
-            <li>
-              <strong>{{ 'privacy.s4b' | transloco }}</strong> {{ 'privacy.s4bText' | transloco }}
-            </li>
-          </ul>
-          <div class="legal-callout info">
-            <p>
-              <strong>{{ 'legalCommon.note' | transloco }}</strong>
-              {{ 'privacy.s4noteText' | transloco }}
-            </p>
-          </div>
-        </section>
-
-        <section class="legal-section" id="p5">
-          <h2>{{ 'privacy.toc5' | transloco }}</h2>
-          <p>{{ 'privacy.s5intro' | transloco }}</p>
-          <ul>
-            <li>{{ 'privacy.s5a' | transloco }}</li>
-            <li>{{ 'privacy.s5b' | transloco }}</li>
-            <li>{{ 'privacy.s5c' | transloco }}</li>
-          </ul>
-          <p>
-            {{ 'privacy.s5p' | transloco }}
-            <a routerLink="/contact">{{ 'legalCommon.contactPage' | transloco }}</a>.
-          </p>
-        </section>
-
-        <section class="legal-section" id="p6">
-          <h2>{{ 'privacy.toc6' | transloco }}</h2>
-          <p>
-            {{ 'privacy.s6p' | transloco }}
-            <a routerLink="/dmca">{{ 'legalCommon.dmcaPolicy' | transloco }}</a>
-            {{ 'privacy.s6pAfter' | transloco }}
-          </p>
-        </section>
-
-        <section class="legal-section" id="p7">
-          <h2>{{ 'privacy.toc7' | transloco }}</h2>
-          <p>{{ 'privacy.s7p' | transloco }}</p>
-        </section>
-
-        <section class="legal-section" id="p8">
-          <h2>{{ 'privacy.toc8' | transloco }}</h2>
-          <p>
-            {{ 'privacy.s8p' | transloco }}
-            <a routerLink="/contact">{{ 'legalCommon.contactPage' | transloco }}</a>.
-          </p>
-          <div class="contact-info-card" style="margin-top: 18px">
-            <h3>{{ 'privacy.s8card' | transloco }}</h3>
-            <p>{{ 'privacy.s8cardText' | transloco }}</p>
-            <p class="contact-value">hello&#64;dracin.example</p>
-          </div>
-        </section>
-      </div>
+  <section class="legal-section" id="p4">
+    <h2><span class="sec-num" aria-hidden="true">04</span>{{ 'privacy.toc4' | transloco }}</h2>
+    <p>{{ 'privacy.s4intro' | transloco }}</p>
+    <ul>
+      <li>
+        <strong>{{ 'privacy.s4a' | transloco }}</strong> {{ 'privacy.s4aText' | transloco }}
+      </li>
+      <li>
+        <strong>{{ 'privacy.s4b' | transloco }}</strong> {{ 'privacy.s4bText' | transloco }}
+      </li>
+    </ul>
+    <div class="legal-callout info">
+      <p>
+        <strong>{{ 'legalCommon.note' | transloco }}</strong>
+        {{ 'privacy.s4noteText' | transloco }}
+      </p>
     </div>
-  </div>
-</main>
+  </section>
+
+  <section class="legal-section" id="p5">
+    <h2><span class="sec-num" aria-hidden="true">05</span>{{ 'privacy.toc5' | transloco }}</h2>
+    <p>{{ 'privacy.s5intro' | transloco }}</p>
+    <ul>
+      <li>{{ 'privacy.s5a' | transloco }}</li>
+      <li>{{ 'privacy.s5b' | transloco }}</li>
+      <li>{{ 'privacy.s5c' | transloco }}</li>
+    </ul>
+    <p>
+      {{ 'privacy.s5p' | transloco }}
+      <a routerLink="/contact">{{ 'legalCommon.contactPage' | transloco }}</a>.
+    </p>
+  </section>
+
+  <section class="legal-section" id="p6">
+    <h2><span class="sec-num" aria-hidden="true">06</span>{{ 'privacy.toc6' | transloco }}</h2>
+    <p>
+      {{ 'privacy.s6p' | transloco }}
+      <a routerLink="/dmca">{{ 'legalCommon.dmcaPolicy' | transloco }}</a>
+      {{ 'privacy.s6pAfter' | transloco }}
+    </p>
+  </section>
+
+  <section class="legal-section" id="p7">
+    <h2><span class="sec-num" aria-hidden="true">07</span>{{ 'privacy.toc7' | transloco }}</h2>
+    <p>{{ 'privacy.s7p' | transloco }}</p>
+  </section>
+
+  <section class="legal-section" id="p8">
+    <h2><span class="sec-num" aria-hidden="true">08</span>{{ 'privacy.toc8' | transloco }}</h2>
+    <p>
+      {{ 'privacy.s8p' | transloco }}
+      <a routerLink="/contact">{{ 'legalCommon.contactPage' | transloco }}</a>.
+    </p>
+    <div class="contact-info-card" style="margin-top: 18px">
+      <h3>{{ 'privacy.s8card' | transloco }}</h3>
+      <p>{{ 'privacy.s8cardText' | transloco }}</p>
+      <p class="contact-value"><app-email-link [address]="email" /></p>
+    </div>
+  </section>
+</app-legal-page>

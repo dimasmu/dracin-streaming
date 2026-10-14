@@ -13,12 +13,12 @@
         <div class="contact-info-card">
           <h3>{{ 'contact.emailTitle' | transloco }}</h3>
           <p>{{ 'contact.emailText' | transloco }}</p>
-          <p class="contact-value">hello&#64;dracin.example</p>
+          <p class="contact-value"><app-email-link [address]="generalEmail" /></p>
         </div>
         <div class="contact-info-card">
           <h3>{{ 'contact.dmcaTitle' | transloco }}</h3>
           <p>{{ 'contact.dmcaTextBefore' | transloco }} <a routerLink="/dmca">{{ 'contact.dmcaLink' | transloco }}</a>.</p>
-          <p class="contact-value">dmca&#64;dracin.example</p>
+          <p class="contact-value"><app-email-link [address]="dmcaEmail" /></p>
         </div>
         <div class="contact-info-card">
           <h3>{{ 'contact.responseTitle' | transloco }}</h3>

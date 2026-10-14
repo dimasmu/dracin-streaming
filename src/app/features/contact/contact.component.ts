@@ -1,21 +1,33 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { MessageService } from 'primeng/api';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { I18nService } from '../../core/services/i18n.service';
+import { LEGAL_CONTACT } from '../../core/legal';
+import { EmailLinkComponent } from '../../shared/components/email-link/email-link.component';
 
 @Component({
-  imports: [RouterLink, ReactiveFormsModule, InputTextModule, SelectModule, TranslocoPipe],
+  imports: [
+    RouterLink,
+    ReactiveFormsModule,
+    InputTextModule,
+    SelectModule,
+    TranslocoPipe,
+    EmailLinkComponent,
+  ],
   templateUrl: './contact.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ContactComponent {
+export class ContactComponent implements OnInit {
+  protected readonly generalEmail = LEGAL_CONTACT.general;
+  protected readonly dmcaEmail = LEGAL_CONTACT.dmca;
   private readonly fb = inject(FormBuilder);
   private readonly messages = inject(MessageService);
   private readonly i18n = inject(I18nService);
+  private readonly route = inject(ActivatedRoute);
 
   protected readonly submitting = signal(false);
   protected readonly submitted = signal(false);
@@ -33,6 +45,14 @@ export class ContactComponent {
     category: ['', [Validators.required]],
     message: [''],
   });
+
+  /** ?category=copyright (used by the DMCA page) preselects a category. Unknown values are ignored. */
+  ngOnInit(): void {
+    const wanted = this.route.snapshot.queryParamMap.get('category');
+    if (wanted && this.categoryValues.includes(wanted)) {
+      this.form.controls.category.setValue(wanted);
+    }
+  }
 
   protected isInvalid(field: 'name' | 'email' | 'subject' | 'category'): boolean {
     const control = this.form.controls[field];

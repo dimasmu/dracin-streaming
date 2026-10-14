@@ -1,123 +1,93 @@
-<main>
-  <div class="legal-hero">
-    <div class="container">
-      <nav class="legal-breadcrumb" [attr.aria-label]="'watch.breadcrumb' | transloco">
-        <a routerLink="/">DRA.CIN</a> <span aria-hidden="true">/</span>
-        <span>{{ 'dmca.crumb' | transloco }}</span>
-      </nav>
-      <div class="legal-hero-inner">
-        <p class="eyebrow">{{ 'common.legal' | transloco }}</p>
-        <h1 class="display">{{ 'dmca.title1' | transloco }}<br />{{ 'dmca.title2' | transloco }}</h1>
-        <p>{{ 'dmca.intro' | transloco }}</p>
-        <div class="legal-meta">
-          <span class="legal-meta-item"
-            ><strong>{{ 'legalCommon.effective' | transloco }}</strong>
-            {{ 'legalCommon.jan2026' | transloco }}</span
+<app-legal-page doc="dmca" [sections]="sections">
+  <ng-container legalTitle>{{ 'dmca.title1' | transloco }}<br />{{ 'dmca.title2' | transloco }}</ng-container>
+  <ng-container legalIntro>{{ 'dmca.intro' | transloco }}</ng-container>
+
+  <section class="legal-section" id="scope">
+    <h2><span class="sec-num" aria-hidden="true">01</span>{{ 'dmca.toc1' | transloco }}</h2>
+    <p>{{ 'dmca.s1p1' | transloco }}</p>
+    <p>{{ 'dmca.s1p2' | transloco }}</p>
+    <div class="legal-callout info">
+      <p>
+        <strong>{{ 'legalCommon.note' | transloco }}</strong> {{ 'dmca.s1note' | transloco }}
+      </p>
+    </div>
+  </section>
+
+  <section class="legal-section" id="notice">
+    <h2><span class="sec-num" aria-hidden="true">02</span>{{ 'dmca.toc2' | transloco }}</h2>
+    <p>{{ 'dmca.s2p' | transloco }}</p>
+    <div class="legal-callout warning">
+      <p>
+        <strong>{{ 'legalCommon.warning' | transloco }}</strong> {{ 'dmca.s2warn' | transloco }}
+      </p>
+    </div>
+
+    <h3 id="checklist"><span class="sec-num sec-num-sub" aria-hidden="true">02.1</span>{{ 'dmca.s21' | transloco }}</h3>
+    <ul class="dmca-checklist">
+      @for (n of checklist; track n) {
+        <li>
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
           >
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+          <span
+            ><strong>{{ 'dmca.c' + n + 'b' | transloco }}</strong> {{ 'dmca.c' + n | transloco }}</span
+          >
+        </li>
+      }
+    </ul>
+
+    <h3 id="steps"><span class="sec-num sec-num-sub" aria-hidden="true">02.2</span>{{ 'dmca.s22' | transloco }}</h3>
+    <div class="dmca-steps">
+      @for (n of steps; track n) {
+        <div class="dmca-step">
+          <div class="dmca-step-num" aria-hidden="true">{{ n }}</div>
+          <div class="dmca-step-body">
+            <h3>{{ 'dmca.st' + n | transloco }}</h3>
+            <p>{{ 'dmca.st' + n + 'p' | transloco }}</p>
+          </div>
         </div>
-      </div>
+      }
     </div>
-  </div>
+  </section>
 
-  <div class="container">
-    <div class="legal-layout">
-      <aside class="legal-sidebar" [attr.aria-label]="'legalCommon.docNav' | transloco">
-        <nav class="legal-toc">
-          <h2>{{ 'legalCommon.contents' | transloco }}</h2>
-          <ol>
-            <li><a href="#scope">{{ 'dmca.toc1' | transloco }}</a></li>
-            <li><a href="#notice">{{ 'dmca.toc2' | transloco }}</a></li>
-            <li class="level-2"><a href="#checklist">{{ 'dmca.toc21' | transloco }}</a></li>
-            <li class="level-2"><a href="#steps">{{ 'dmca.toc22' | transloco }}</a></li>
-            <li><a href="#counter">{{ 'dmca.toc3' | transloco }}</a></li>
-            <li><a href="#repeat">{{ 'dmca.toc4' | transloco }}</a></li>
-            <li><a href="#contact">{{ 'dmca.toc5' | transloco }}</a></li>
-          </ol>
-        </nav>
-      </aside>
+  <section class="legal-section" id="counter">
+    <h2><span class="sec-num" aria-hidden="true">03</span>{{ 'dmca.toc3' | transloco }}</h2>
+    <p>{{ 'dmca.s3p' | transloco }}</p>
+  </section>
 
-      <div class="legal-content">
-        <section class="legal-section" id="scope">
-          <h2>{{ 'dmca.toc1' | transloco }}</h2>
-          <p>{{ 'dmca.s1p1' | transloco }}</p>
-          <p>{{ 'dmca.s1p2' | transloco }}</p>
-          <div class="legal-callout info">
-            <p>
-              <strong>{{ 'legalCommon.note' | transloco }}</strong> {{ 'dmca.s1note' | transloco }}
-            </p>
-          </div>
-        </section>
+  <section class="legal-section" id="repeat">
+    <h2><span class="sec-num" aria-hidden="true">04</span>{{ 'dmca.toc4' | transloco }}</h2>
+    <p>{{ 'dmca.s4p' | transloco }}</p>
+  </section>
 
-        <section class="legal-section" id="notice">
-          <h2>{{ 'dmca.toc2' | transloco }}</h2>
-          <p>{{ 'dmca.s2p' | transloco }}</p>
-          <div class="legal-callout warning">
-            <p>
-              <strong>{{ 'legalCommon.warning' | transloco }}</strong> {{ 'dmca.s2warn' | transloco }}
-            </p>
-          </div>
-
-          <h3 id="checklist">{{ 'dmca.s21' | transloco }}</h3>
-          <ul class="dmca-checklist">
-            @for (n of checklist; track n) {
-              <li>
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
-                <span
-                  ><strong>{{ 'dmca.c' + n + 'b' | transloco }}</strong>
-                  {{ 'dmca.c' + n | transloco }}</span
-                >
-              </li>
-            }
-          </ul>
-
-          <h3 id="steps">{{ 'dmca.s22' | transloco }}</h3>
-          <div class="dmca-steps">
-            @for (n of steps; track n) {
-              <div class="dmca-step">
-                <div class="dmca-step-num">{{ n }}</div>
-                <div class="dmca-step-body">
-                  <h3>{{ 'dmca.st' + n | transloco }}</h3>
-                  <p>{{ 'dmca.st' + n + 'p' | transloco }}</p>
-                </div>
-              </div>
-            }
-          </div>
-        </section>
-
-        <section class="legal-section" id="counter">
-          <h2>{{ 'dmca.toc3' | transloco }}</h2>
-          <p>{{ 'dmca.s3p' | transloco }}</p>
-        </section>
-
-        <section class="legal-section" id="repeat">
-          <h2>{{ 'dmca.toc4' | transloco }}</h2>
-          <p>{{ 'dmca.s4p' | transloco }}</p>
-        </section>
-
-        <section class="legal-section" id="contact">
-          <h2>{{ 'dmca.toc5' | transloco }}</h2>
-          <p>
-            {{ 'dmca.s5p' | transloco }}
-            <a routerLink="/contact">{{ 'legalCommon.contactPage' | transloco }}</a>
-            {{ 'dmca.s5pAfter' | transloco }}
-          </p>
-          <div class="contact-info-card" style="margin-top: 18px">
-            <h3>{{ 'dmca.s5card' | transloco }}</h3>
-            <p>{{ 'dmca.s5cardText' | transloco }}</p>
-            <p class="contact-value">dmca&#64;dracin.example</p>
-            <p style="margin-top: 8px">{{ 'dmca.s5cardNote' | transloco }}</p>
-          </div>
-        </section>
-      </div>
+  <section class="legal-section" id="contact">
+    <h2><span class="sec-num" aria-hidden="true">05</span>{{ 'dmca.toc5' | transloco }}</h2>
+    <p>
+      {{ 'dmca.s5p' | transloco }}
+      <a routerLink="/contact" [queryParams]="{ category: 'copyright' }">{{
+        'legalCommon.contactPage' | transloco
+      }}</a>
+      {{ 'dmca.s5pAfter' | transloco }}
+    </p>
+    <div class="dmca-report">
+      <p>{{ 'dmca.reportNote' | transloco }}</p>
+      <a class="btn btn-primary" routerLink="/contact" [queryParams]="{ category: 'copyright' }">{{
+        'dmca.reportButton' | transloco
+      }}</a>
     </div>
-  </div>
-</main>
+    <div class="contact-info-card" style="margin-top: 18px">
+      <h3>{{ 'dmca.s5card' | transloco }}</h3>
+      <p>{{ 'dmca.s5cardText' | transloco }}</p>
+      <p class="contact-value"><app-email-link [address]="email" /></p>
+      <p style="margin-top: 8px">{{ 'dmca.s5cardNote' | transloco }}</p>
+    </div>
+  </section>
+</app-legal-page>

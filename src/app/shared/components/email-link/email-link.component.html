@@ -1,0 +1,28 @@
+<span class="email-link">
+  <a class="email-address" [href]="'mailto:' + address()">{{ address() }}</a>
+  <button
+    type="button"
+    class="email-copy"
+    [class.copied]="copied()"
+    [attr.aria-label]="'legalCommon.copyEmail' | transloco: { address: address() }"
+    (click)="copy()"
+  >
+    @if (copied()) {
+      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <polyline points="20 6 9 17 4 12" />
+      </svg>
+      {{ 'legalCommon.copied' | transloco }}
+    } @else {
+      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="9" y="9" width="12" height="12" rx="2" />
+        <path d="M5 15V5a2 2 0 0 1 2-2h10" />
+      </svg>
+      {{ 'legalCommon.copy' | transloco }}
+    }
+  </button>
+  <span class="visually-hidden" role="status" aria-live="polite">
+    @if (copied()) {
+      {{ 'legalCommon.emailCopied' | transloco }}
+    }
+  </span>
+</span>

@@ -1,3 +1,4 @@
+import { ViewportScroller } from '@angular/common';
 import {
   ApplicationConfig,
   inject,
@@ -30,6 +31,8 @@ export const appConfig: ApplicationConfig = {
       loader: I18nLoader,
     }),
     provideAppInitializer(() => inject(I18nService).init()),
+    // The header is sticky (68px). Without an offset, anchored headings end up underneath it.
+    provideAppInitializer(() => inject(ViewportScroller).setOffset([0, 84])),
     provideRouter(
       routes,
       withComponentInputBinding(),
