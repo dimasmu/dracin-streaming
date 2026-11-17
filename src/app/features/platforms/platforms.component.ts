@@ -16,14 +16,18 @@ export class PlatformsComponent {
   protected readonly catalog = inject(CatalogService);
   protected readonly monogram = monogram;
 
-  protected readonly activePlatform = signal('All');
+  /** Selected platform names; empty means "all platforms". */
+  protected readonly selectedPlatforms = signal<readonly string[]>([]);
   protected readonly rows = signal(12);
   protected readonly first = signal(0);
 
+  /** True when no platform is picked, i.e. the "All" chip is active. */
+  protected readonly isAll = computed(() => this.selectedPlatforms().length === 0);
+
   protected readonly filtered = computed(() => {
-    const p = this.activePlatform();
-    if (p === 'All') return this.catalog.filter({ sort: 'popular' });
-    return this.catalog.filter({ platforms: [p], sort: 'popular' });
+    const selected = this.selectedPlatforms();
+    if (selected.length === 0) return this.catalog.filter({ sort: 'popular' });
+    return this.catalog.filter({ platforms: [...selected], sort: 'popular' });
   });
 
   protected readonly pageCount = computed(() =>
@@ -35,8 +39,20 @@ export class PlatformsComponent {
     return this.filtered().slice(start, start + this.rows());
   });
 
-  protected selectPlatform(name: string): void {
-    this.activePlatform.set(name);
+  protected isSelected(name: string): boolean {
+    return this.selectedPlatforms().includes(name);
+  }
+
+  protected togglePlatform(name: string): void {
+    const current = this.selectedPlatforms();
+    this.selectedPlatforms.set(
+      current.includes(name) ? current.filter((n) => n !== name) : [...current, name],
+    );
+    this.first.set(0);
+  }
+
+  protected clearPlatforms(): void {
+    this.selectedPlatforms.set([]);
     this.first.set(0);
   }
 

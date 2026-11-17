@@ -209,6 +209,8 @@
     "browseBy": "Browse by Platform",
     "filterBy": "Filter by platform",
     "platform": "Platform",
+    "selected": "{{count}} selected",
+    "allSelected": "All platforms",
     "emptyTitle": "No dramas on this platform",
     "emptyMessage": "Try a different platform."
   },

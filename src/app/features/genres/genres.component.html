@@ -29,12 +29,42 @@
       <h2 class="display">{{ 'genres.browseBy' | transloco }}</h2>
       <span class="count">{{ 'common.dramasCount' | transloco: { count: filtered().length } }}</span>
     </div>
-    <div class="genre-tabs" role="tablist" [attr.aria-label]="'genres.filterBy' | transloco">
-      @for (g of genreOptions(); track g) {
-        <button type="button" [class.active]="activeGenre() === g" (click)="selectGenre(g)">
-          {{ g === 'All' ? ('common.all' | transloco) : ('genre.' + g | transloco) }}
+    <div class="facet-panel" role="group" [attr.aria-label]="'genres.filterBy' | transloco">
+      <div class="facet-head">
+        <span class="facet-head-label">
+          {{ 'genres.title' | transloco }}
+          <span class="facet-head-count">{{
+            isAll()
+              ? ('platforms.allSelected' | transloco)
+              : ('platforms.selected' | transloco: { count: selectedGenres().length })
+          }}</span>
+        </span>
+        <button class="facet-clear" type="button" [disabled]="isAll()" (click)="clearGenres()">
+          {{ 'common.reset' | transloco }}
         </button>
-      }
+      </div>
+      <div class="filter-chips">
+        <button
+          class="filter-chip filter-chip--all"
+          type="button"
+          [attr.aria-pressed]="isAll()"
+          (click)="clearGenres()"
+        >
+          {{ 'common.all' | transloco }}
+        </button>
+        @for (g of genreOptions(); track g) {
+          <button
+            class="filter-chip"
+            type="button"
+            [attr.aria-pressed]="isSelected(g)"
+            (click)="toggleGenre(g)"
+          >
+            <span class="chip-check" aria-hidden="true">&#10003;</span>
+            <span>{{ 'genre.' + g | transloco }}</span>
+            <span class="chip-count">{{ count(g) }}</span>
+          </button>
+        }
+      </div>
     </div>
 
     @if (filtered().length) {

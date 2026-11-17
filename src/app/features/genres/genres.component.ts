@@ -16,19 +16,20 @@ export class GenresComponent {
   protected readonly catalog = inject(CatalogService);
   protected readonly monogram = monogram;
 
-  protected readonly activeGenre = signal('All');
+  /** Selected genre names; empty means "all genres". */
+  protected readonly selectedGenres = signal<readonly string[]>([]);
   protected readonly rows = signal(12);
   protected readonly first = signal(0);
 
-  protected readonly genreOptions = computed(() => [
-    'All',
-    ...this.catalog.genres.map((g) => g.name),
-  ]);
+  /** True when no genre is picked, i.e. the "All" chip is active. */
+  protected readonly isAll = computed(() => this.selectedGenres().length === 0);
+
+  protected readonly genreOptions = computed(() => this.catalog.genres.map((g) => g.name));
 
   protected readonly filtered = computed(() => {
-    const g = this.activeGenre();
-    if (g === 'All') return this.catalog.filter({ sort: 'popular' });
-    return this.catalog.filter({ genres: [g], sort: 'popular' });
+    const selected = this.selectedGenres();
+    if (selected.length === 0) return this.catalog.filter({ sort: 'popular' });
+    return this.catalog.filter({ genres: [...selected], sort: 'popular' });
   });
 
   protected readonly pageCount = computed(() =>
@@ -40,8 +41,20 @@ export class GenresComponent {
     return this.filtered().slice(start, start + this.rows());
   });
 
-  protected selectGenre(genre: string): void {
-    this.activeGenre.set(genre);
+  protected isSelected(name: string): boolean {
+    return this.selectedGenres().includes(name);
+  }
+
+  protected toggleGenre(name: string): void {
+    const current = this.selectedGenres();
+    this.selectedGenres.set(
+      current.includes(name) ? current.filter((n) => n !== name) : [...current, name],
+    );
+    this.first.set(0);
+  }
+
+  protected clearGenres(): void {
+    this.selectedGenres.set([]);
     this.first.set(0);
   }
 

@@ -209,6 +209,8 @@
     "browseBy": "Jelajahi per Platform",
     "filterBy": "Filter berdasarkan platform",
     "platform": "Platform",
+    "selected": "{{count}} dipilih",
+    "allSelected": "Semua platform",
     "emptyTitle": "Belum ada drama di platform ini",
     "emptyMessage": "Coba platform lain."
   },

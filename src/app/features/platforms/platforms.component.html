@@ -29,33 +29,50 @@
       <h2 class="display">{{ 'platforms.browseBy' | transloco }}</h2>
       <span class="count">{{ 'common.dramasCount' | transloco: { count: filtered().length } }}</span>
     </div>
-    <div class="facet-bar facet-bar--split" [attr.aria-label]="'platforms.filterBy' | transloco">
-      <span class="facet-chips-label">{{ 'platforms.platform' | transloco }}</span>
-      <div class="facet-scroller">
-        <div class="facet-chips">
+
+    <div class="facet-panel" role="group" [attr.aria-label]="'platforms.filterBy' | transloco">
+      <div class="facet-head">
+        <span class="facet-head-label">
+          {{ 'platforms.platform' | transloco }}
+          <span class="facet-head-count">{{
+            isAll()
+              ? ('platforms.allSelected' | transloco)
+              : ('platforms.selected' | transloco: { count: selectedPlatforms().length })
+          }}</span>
+        </span>
+        <button
+          class="facet-clear"
+          type="button"
+          [disabled]="isAll()"
+          (click)="clearPlatforms()"
+        >
+          {{ 'common.reset' | transloco }}
+        </button>
+      </div>
+
+      <div class="filter-chips">
+        <button
+          class="filter-chip filter-chip--all"
+          type="button"
+          [attr.aria-pressed]="isAll()"
+          (click)="clearPlatforms()"
+        >
+          {{ 'common.all' | transloco }}
+        </button>
+        @for (p of catalog.platforms; track p.id) {
           <button
             class="filter-chip"
             type="button"
-            [class.active]="activePlatform() === 'All'"
-            (click)="selectPlatform('All')"
+            [style.--card-tone]="p.tone"
+            [attr.aria-pressed]="isSelected(p.name)"
+            (click)="togglePlatform(p.name)"
           >
-            {{ 'common.all' | transloco }}
+            <span class="chip-check" aria-hidden="true">&#10003;</span>
+            <span class="chip-dot" aria-hidden="true"></span>
+            <span>{{ p.name }}</span>
+            <span class="chip-count">{{ count(p.name) }}</span>
           </button>
-          @for (p of catalog.platforms; track p.id) {
-            <button
-              class="filter-chip"
-              type="button"
-              [class.active]="activePlatform() === p.name"
-              (click)="selectPlatform(p.name)"
-            >
-              {{ p.name }} <span class="chip-count">{{ count(p.name) }}</span>
-            </button>
-          }
-        </div>
-      </div>
-      <div class="facet-status">
-        <span class="count">{{ 'common.dramasCount' | transloco: { count: filtered().length } }}</span>
-        <button class="facet-clear" type="button" (click)="selectPlatform('All')">{{ 'common.reset' | transloco }}</button>
+        }
       </div>
     </div>
 
@@ -76,7 +93,11 @@
         </div>
       }
     } @else {
-      <app-empty-state [title]="'platforms.emptyTitle' | transloco" [message]="'platforms.emptyMessage' | transloco" />
+      <app-empty-state [title]="'platforms.emptyTitle' | transloco" [message]="'platforms.emptyMessage' | transloco">
+        <button class="btn btn-primary" type="button" (click)="clearPlatforms()">
+          {{ 'browse.resetFilters' | transloco }}
+        </button>
+      </app-empty-state>
     }
   </section>
 </main>

@@ -1379,7 +1379,6 @@ img {
 .filters {
   margin: 22px 0 18px;
 }
-.filter-chip,
 .genre-tabs button,
 .platform-tabs button,
 .day-tabs button {
@@ -1393,7 +1392,6 @@ img {
   font-weight: 800;
   transition: background 0.15s, color 0.15s, border-color 0.15s;
 }
-.filter-chip.active,
 .genre-tabs button.active,
 .platform-tabs button.active,
 .day-tabs button.active {
@@ -1518,74 +1516,125 @@ img {
   margin-top: 18px;
 }
 
-.facet-bar {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 10px;
+/* Facet panel: symmetric header + wrapping chip grid (no horizontal scroll) */
+.facet-panel {
   margin-top: 14px;
-  padding: 12px;
+  padding: 16px;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 9px;
+  border-radius: 12px;
 }
-.facet-chips {
+.facet-head {
   display: flex;
-  flex-wrap: wrap;
-  flex: 1;
-  min-width: 0;
-  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
 }
-.facet-chips-label {
-  margin: 0 6px 0 2px;
-  align-self: center;
+.facet-head-label {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
   color: var(--cyan);
   font: 700 9px var(--font-mono);
   letter-spacing: 0.14em;
   text-transform: uppercase;
 }
-.facet-chips .chip-count {
-  margin-left: 7px;
-  padding: 1px 5px;
-  background: color-mix(in oklch, var(--bg) 55%, transparent);
-  border-radius: 3px;
-  font: 700 9px var(--font-mono);
+.facet-head-count {
+  color: var(--muted);
+  font: 700 10px var(--font-mono);
+  letter-spacing: 0;
+  text-transform: none;
+  white-space: nowrap;
 }
 .facet-clear {
-  margin-left: auto;
+  flex: none;
   min-height: 30px;
   padding: 0 11px;
   color: var(--muted);
   background: transparent;
   border: 1px dashed var(--border);
-  border-radius: 5px;
+  border-radius: 6px;
   font-size: 10px;
   font-weight: 800;
+  transition: color var(--motion-fast), border-color var(--motion-fast);
 }
-.facet-clear:hover {
+.facet-clear:hover:not(:disabled) {
   color: var(--fg);
   border-color: var(--accent);
 }
-.facet-bar--split {
-  flex-wrap: nowrap;
-  gap: 14px;
+.facet-clear:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
 }
-.facet-scroller {
-  flex: 1;
-  min-width: 0;
-  overflow-x: auto;
-  scrollbar-width: thin;
-}
-.facet-bar--split .facet-chips {
-  flex-wrap: nowrap;
-  flex: none;
-  min-width: max-content;
-}
-.facet-bar--split .facet-status {
-  flex: none;
+.filter-chips {
   display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.filter-chip {
+  display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
+  min-height: 36px;
+  padding: 0 13px;
+  white-space: nowrap;
+  color: var(--muted);
+  background: color-mix(in oklch, var(--bg) 40%, var(--surface));
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+  transition:
+    color var(--motion-fast) ease,
+    border-color var(--motion-fast) ease,
+    background var(--motion-fast) ease;
+}
+.filter-chip:hover {
+  color: var(--fg);
+  border-color: var(--muted);
+}
+.filter-chip[aria-pressed='true'] {
+  color: var(--fg);
+  background: color-mix(in oklch, var(--accent) 22%, var(--surface));
+  border-color: var(--accent);
+}
+.filter-chip .chip-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--card-tone, var(--accent));
+  opacity: 0.55;
+  transition: opacity var(--motion-fast) ease;
+}
+.filter-chip[aria-pressed='true'] .chip-dot {
+  opacity: 1;
+}
+.filter-chip .chip-check {
+  display: none;
+  font-size: 10px;
+  line-height: 1;
+}
+.filter-chip[aria-pressed='true'] .chip-check {
+  display: inline;
+}
+.filter-chip .chip-count {
+  padding: 1px 6px;
+  background: color-mix(in oklch, var(--bg) 55%, transparent);
+  border-radius: 999px;
+  color: var(--muted);
+  font: 700 9px var(--font-mono);
+}
+.filter-chip[aria-pressed='true'] .chip-count {
+  color: var(--fg);
+}
+/* "All" acts as a reset pill: active only while nothing else is selected. */
+.filter-chip--all {
+  border-style: dashed;
+  font-family: var(--font-mono);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
 }
 
 /* Browse layout */
