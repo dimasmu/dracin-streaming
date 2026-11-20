@@ -61,29 +61,17 @@
                 @if (state.drama.releaseYear) {
                   <span class="drama-preview-pill">{{ state.drama.releaseYear }}</span>
                 }
-                @if (state.drama.status) {
-                  <span class="drama-preview-pill">{{ 'status.' + state.drama.status | transloco }}</span>
-                }
               </div>
 
               <dl class="drama-preview-facts">
                 @if (state.drama.totalEpisodes) {
                   <div><dt>{{ 'preview.episodes' | transloco }}</dt><dd>{{ state.drama.totalEpisodes }}</dd></div>
                 }
-                @if (state.drama.latestEpisode) {
-                  <div><dt>{{ 'preview.latest' | transloco }}</dt><dd>{{ 'common.episodeShort' | transloco: { n: state.drama.latestEpisode } }}</dd></div>
-                }
-                @if (state.drama.platformId) {
-                  <div><dt>{{ 'preview.platform' | transloco }}</dt><dd>{{ state.drama.platformId }}</dd></div>
-                }
-                @if (state.drama.videoLanguages.length) {
-                  <div><dt>{{ 'preview.video' | transloco }}</dt><dd>{{ videoLangs(state.drama.videoLanguages) }}</dd></div>
-                }
               </dl>
 
               @if (state.drama.genres.length) {
                 <div class="drama-preview-genres">
-                  @for (g of state.drama.genres; track g) {
+                  @for (g of state.drama.genres.slice(0, 3); track g) {
                     <span>{{ 'genre.' + g | transloco }}</span>
                   }
                 </div>
@@ -94,7 +82,7 @@
               }
 
               <div class="drama-preview-foot">
-                <span class="drama-preview-aired">{{ 'preview.aired' | transloco: { date: aired() } }}</span>
+                <span class="drama-preview-episode">{{ state.drama.latestEpisode ?? state.drama.totalEpisodes ?? 0 }} {{ 'preview.episodes' | transloco }}</span>
                 <div class="drama-preview-actions">
                   <button
                     type="button"

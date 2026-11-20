@@ -7,7 +7,7 @@ import { SkeletonModule } from 'primeng/skeleton';
 import { BookmarkService } from '../../../core/services/bookmark.service';
 import { DramaPreviewService } from '../../../core/services/drama-preview.service';
 import { I18nService } from '../../../core/services/i18n.service';
-import { formatAired, monogram, ratingStars, videoLangLabel } from '../../../core/utils/format';
+import { monogram, ratingStars } from '../../../core/utils/format';
 
 /**
  * The single, app-root-mounted drama preview.
@@ -76,16 +76,6 @@ export class DramaPreviewComponent {
   protected readonly viewportMargin = 12;
 
   protected readonly ratingFilled = computed(() => ratingStars(this.preview.state()?.drama.rating));
-  protected readonly aired = computed(() =>
-    formatAired(
-      this.preview.state()?.drama.releaseDate,
-      this.preview.state()?.drama.releaseYear,
-      this.i18n.lang(),
-      this.i18n.t('common.tba'),
-    ),
-  );
-  protected readonly videoLangs = (langs: readonly string[]) => videoLangLabel(langs);
-
   protected readonly watchEpisode = computed(() => {
     const d = this.preview.state()?.drama;
     return Math.max(1, d?.latestEpisode ?? d?.totalEpisodes ?? 1);

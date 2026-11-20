@@ -14,30 +14,6 @@
       <span class="truncate">{{ drama().platformId }}</span>
     </span>
 
-    <div class="poster-top-right">
-      @if (ratingLabel(); as rate) {
-        <span class="poster-rate-badge">&#9733; {{ rate }}</span>
-      }
-      <button
-        type="button"
-        class="poster-bm-btn"
-        [class.is-saved]="isBookmarked()"
-        [attr.aria-pressed]="isBookmarked()"
-        [attr.aria-label]="
-          isBookmarked()
-            ? i18n.lang() === 'id'
-              ? 'Hapus dari markah'
-              : 'Remove bookmark'
-            : i18n.lang() === 'id'
-              ? 'Simpan ke markah'
-              : 'Save bookmark'
-        "
-        (click)="toggleBookmark($event)"
-      >
-        {{ isBookmarked() ? '&#9733;' : '&#9734;' }}
-      </button>
-    </div>
-
     <span class="poster-play-circle" aria-hidden="true">
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
     </span>

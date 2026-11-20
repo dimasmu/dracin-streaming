@@ -23,14 +23,7 @@
         <div class="hero-inner container">
           <div class="hero-copy">
             <div class="hero-kicker-row">
-              <span class="hero-spotlight-badge">
-                <span class="hero-spotlight-dot" aria-hidden="true"></span>
-                <span>{{ isId() ? 'Pilihan Editor' : 'Editor’s Spotlight' }}</span>
-              </span>
-              <span class="hero-platform-tag">
-                <span class="poster-platform-dot" [style.background]="platformTone(d)"></span>
-                <span>{{ platformName(d.platformId) }}</span>
-              </span>
+              <span class="hero-kicker-label">{{ isId() ? 'Drama pilihan' : 'Featured drama' }}</span>
             </div>
 
             <h1>{{ d.title }}</h1>
@@ -39,18 +32,9 @@
               @if (ratingLabel(d); as rate) {
                 <span class="meta-pill meta-pill-rate">&#9733; {{ rate }}</span>
               }
-              @if (d.releaseYear) {
-                <span class="meta-pill">{{ d.releaseYear }}</span>
-              }
               <span class="meta-pill">{{
                 'common.episodeShort' | transloco: { n: d.latestEpisode ?? d.totalEpisodes ?? 1 }
               }}</span>
-              @if (hasLang(d, 'id')) {
-                <span class="tick-pill tick-sub">SUB ID</span>
-              }
-              @if (hasLang(d, 'en')) {
-                <span class="tick-pill tick-dub">SUB EN</span>
-              }
               @for (g of d.genres.slice(0, 3); track g) {
                 <span class="hero-genre-chip">{{ 'genre.' + g | transloco }}</span>
               }
@@ -92,11 +76,6 @@
                   <span class="drama-monogram">{{ monogram(d.title) }}</span>
                 </div>
                 <span class="poster-card-gradient" aria-hidden="true"></span>
-
-                <span class="poster-platform-pill">
-                  <span class="poster-platform-dot" [style.background]="platformTone(d)"></span>
-                  <span class="truncate">{{ platformName(d.platformId) }}</span>
-                </span>
 
                 @if (ratingLabel(d); as rate) {
                   <span class="hero-poster-rating">&#9733; {{ rate }}</span>

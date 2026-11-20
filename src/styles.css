@@ -1058,7 +1058,7 @@ img {
   background: transparent;
 }
 .drama-preview {
-  width: 292px;
+  width: 312px;
   overflow: hidden;
   border-radius: 12px;
   background: color-mix(in oklch, var(--bg) 94%, var(--surface));
@@ -1189,7 +1189,7 @@ img {
   font-size: 11.5px;
   line-height: 1.5;
   display: -webkit-box;
-  -webkit-line-clamp: 4;
+  -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -4263,6 +4263,7 @@ img {
   pointer-events: none;
 }
 .poster-bm-btn {
+  display: none;
   width: 24px;
   height: 24px;
   display: inline-flex;
@@ -6946,10 +6947,10 @@ html {
 
 .hero-kicker-row {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
   gap: 8px;
 }
+.hero-kicker-label { color: var(--d-accent); font-size: 11px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
 
 .hero-spotlight-badge {
   display: inline-flex;
@@ -7406,4 +7407,22 @@ html {
     width: 34px;
     height: 34px;
   }
+}
+
+
+/* Cleaner drama rails and recommendation artwork */
+.carousel,
+.rail { scrollbar-width: none; padding: 6px 2px 12px; }
+.carousel::-webkit-scrollbar,
+.rail::-webkit-scrollbar { display: none; }
+.drama-preview-facts { gap: 7px; padding: 8px 0; border-block: 1px solid var(--border); }
+.drama-preview-synopsis { -webkit-line-clamp: 3; }
+.drama-preview-episode { color: var(--muted); font: 700 10px var(--font-mono); }
+.watch-upnext-thumb img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.watch-upnext-thumb .drama-art { width: 100%; height: 100%; }
+.watch-ep-panel { min-width: 0; }
+@media (max-width: 720px) {
+  .watch-utility-row { flex-direction: column; align-items: stretch; }
+  .watch-utility-row > .flex { flex-wrap: wrap; }
+  .hero-controls-shell { bottom: 12px; }
 }

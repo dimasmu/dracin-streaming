@@ -6,12 +6,9 @@ import {
   input,
 } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { MessageService } from 'primeng/api';
 import type { Drama } from '../../../core/models/drama';
-import { BookmarkService } from '../../../core/services/bookmark.service';
 import { CatalogService } from '../../../core/services/catalog.service';
 import { DramaPreviewService } from '../../../core/services/drama-preview.service';
-import { I18nService } from '../../../core/services/i18n.service';
 import { monogram } from '../../../core/utils/format';
 
 @Component({
@@ -30,10 +27,7 @@ export class DramaCardComponent {
 
   protected readonly preview = inject(DramaPreviewService);
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
-  private readonly bookmarks = inject(BookmarkService);
   private readonly catalog = inject(CatalogService);
-  private readonly messages = inject(MessageService);
-  protected readonly i18n = inject(I18nService);
 
   protected readonly monogram = computed(() => monogram(this.drama().title));
 
@@ -74,27 +68,6 @@ export class DramaCardComponent {
     const mins = this.drama().durationMinutes ?? 2;
     return `${mins}m/ep`;
   });
-
-  protected readonly isBookmarked = computed(() => this.bookmarks.isBookmarked(this.drama().id));
-
-  protected toggleBookmark(event: Event): void {
-    event.preventDefault();
-    event.stopPropagation();
-    const added = this.bookmarks.toggle(this.drama().id);
-    const isId = this.i18n.lang() === 'id';
-    this.messages.add({
-      severity: added ? 'success' : 'info',
-      summary: added
-        ? isId
-          ? 'Ditambahkan ke Markah'
-          : 'Saved to Bookmarks'
-        : isId
-          ? 'Dihapus dari Markah'
-          : 'Removed from Bookmarks',
-      detail: this.drama().title,
-      life: 2400,
-    });
-  }
 
   protected onPointerEnter(): void {
     if (!this.preview.supportsHover()) return;
