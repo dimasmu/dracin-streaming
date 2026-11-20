@@ -9,6 +9,7 @@ import { RouterLink } from '@angular/router';
 import type { Drama } from '../../../core/models/drama';
 import { CatalogService } from '../../../core/services/catalog.service';
 import { DramaPreviewService } from '../../../core/services/drama-preview.service';
+import { I18nService } from '../../../core/services/i18n.service';
 import { monogram } from '../../../core/utils/format';
 
 @Component({
@@ -26,6 +27,7 @@ export class DramaCardComponent {
   readonly drama = input.required<Drama>();
 
   protected readonly preview = inject(DramaPreviewService);
+  protected readonly i18n = inject(I18nService);
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly catalog = inject(CatalogService);
 
