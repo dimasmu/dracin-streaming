@@ -113,6 +113,8 @@ export const DRAMAS: Drama[] = [
   },
   {
     id: 'wah-suamiku-ternyata-bos-besar',
+    posterUrl: 'https://acf.goodshort.com/videobook/202407/cover-CqfQ2Nt2cG.jpg',
+    backdropUrl: 'https://acf.goodshort.com/videobook/202407/cover-CqfQ2Nt2cG.jpg',
     slug: 'wah-suamiku-ternyata-bos-besar',
     title: 'Wah Suamiku Ternyata Bos Besar',
     synopsis: 'Seorang wanita biasa menikahi pria yang ia kira pekerja rendahan, namun perlahan menyadari suaminya adalah CEO perusahaan multinasional.',
@@ -572,6 +574,8 @@ export const DRAMAS: Drama[] = [
   },
   {
     id: 'cintaku-gagal-membuatmu-hangat-sulih-suara',
+    posterUrl: 'https://img.youtube.com/vi/uIKWJWW2XoU/maxresdefault.jpg',
+    backdropUrl: 'https://img.youtube.com/vi/uIKWJWW2XoU/maxresdefault.jpg',
     slug: 'cintaku-gagal-membuatmu-hangat-sulih-suara',
     title: 'Cintaku Gagal Membuatmu Hangat',
     synopsis: 'Kisah cinta satu arah yang menyakitkan, di mana seorang wanita mengorbankan segalanya untuk pria yang tak pernah membalas perasaannya hingga semuanya terlambat.',
@@ -977,6 +981,8 @@ export const DRAMAS: Drama[] = [
   },
   {
     id: 'putri-yang-tak-akan-tunduk',
+    posterUrl: 'https://img.youtube.com/vi/mglkOKl0XcE/maxresdefault.jpg',
+    backdropUrl: 'https://img.youtube.com/vi/mglkOKl0XcE/maxresdefault.jpg',
     slug: 'putri-yang-tak-akan-tunduk',
     title: 'Putri Yang Tak Akan Tunduk',
     synopsis: 'Putri konglomerat yang dibuang keluarganya bangkit dari keterpurukan, membangun kerajaan bisnisnya sendiri dan membalas semua yang pernah mengkhianatinya.',

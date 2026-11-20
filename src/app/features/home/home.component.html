@@ -16,7 +16,17 @@
     @for (d of featured(); track d.id) {
       <article class="hero-slide" [style.--slide-tone]="d.tone">
         <div class="hero-backdrop" aria-hidden="true">
-          <span class="hero-backdrop-monogram">{{ monogram(d.title) }}</span>
+          @if (d.backdropUrl || d.posterUrl) {
+            <img
+              class="hero-backdrop-image"
+              [src]="d.backdropUrl || d.posterUrl"
+              alt=""
+              loading="lazy"
+              decoding="async"
+            />
+          } @else {
+            <span class="hero-backdrop-monogram">{{ monogram(d.title) }}</span>
+          }
           <div class="hero-backdrop-scrim"></div>
         </div>
 
@@ -64,41 +74,6 @@
             </div>
           </div>
 
-          <div class="hero-showcase">
-            <a
-              class="hero-poster-showcase poster-card"
-              [routerLink]="['/watch', d.slug, d.latestEpisode ?? 1]"
-              [style.--card-tone]="d.tone"
-              [attr.aria-label]="d.title"
-            >
-              <div class="poster-card-media">
-                <div class="drama-art poster-artwork">
-                  <span class="drama-monogram">{{ monogram(d.title) }}</span>
-                </div>
-                <span class="poster-card-gradient" aria-hidden="true"></span>
-
-                @if (ratingLabel(d); as rate) {
-                  <span class="hero-poster-rating">&#9733; {{ rate }}</span>
-                }
-
-                <span class="poster-play-circle" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
-                </span>
-
-                <div class="poster-bottom-ticks" aria-hidden="true">
-                  <span class="tick-group">
-                    @if (hasLang(d, 'id')) {
-                      <span class="tick-pill tick-sub">SUB ID</span>
-                    }
-                    @if (hasLang(d, 'en')) {
-                      <span class="tick-pill tick-dub">SUB EN</span>
-                    }
-                    <span class="tick-pill tick-ep">{{ d.latestEpisode ?? d.totalEpisodes ?? 1 }} Eps</span>
-                  </span>
-                </div>
-              </div>
-            </a>
-          </div>
         </div>
       </article>
     }
