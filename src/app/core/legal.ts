@@ -5,8 +5,8 @@
 
 /** Placeholder addresses on a reserved domain: they cannot receive mail. */
 export const LEGAL_CONTACT = {
-  general: 'hello@dracin.example',
-  dmca: 'dmca@dracin.example',
+  general: 'hello@tiraiplay.example',
+  dmca: 'dmca@tiraiplay.example',
 } as const;
 
 export type LegalDocKey = 'terms' | 'privacy' | 'dmca';

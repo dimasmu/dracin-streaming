@@ -30,7 +30,7 @@ Always prefer the `angular-cli` MCP server tools over raw shell commands for Ang
    - Note: `run_target` does not support watch mode (`serve`). Use the `devserver_*` tools for the development server.
 
 5. **Manage Development Server (`devserver_start`, `devserver_wait_for_build`, `devserver_stop`)**
-   - Start the dev server in the background using `devserver_start` (default project port in `angular.json` is `4400`).
+   - Start the dev server in the background using `devserver_start` (default project port in `angular.json` is `4600`).
    - Immediately call `devserver_wait_for_build` after starting—and after every file edit—to verify compilation succeeds and inspect any build/template diagnostics.
    - Stop the server cleanly with `devserver_stop` when finished.
 

@@ -1,23 +1,58 @@
 <article
-  class="drama-card"
+  class="drama-card poster-card group"
   [style.--card-tone]="drama().tone"
   [attr.tabindex]="preview.supportsHover() ? -1 : null"
-  (pointerenter)="onPointerEnter()"
-  (pointerleave)="preview.scheduleClose()"
-  (focusin)="onFocusIn()"
-  (focusout)="preview.scheduleClose()"
 >
-  <div class="card-thumb">
-    <div class="drama-art">
+  <div class="poster-card-media">
+    <div class="drama-art poster-artwork">
       <span class="drama-monogram">{{ monogram() }}</span>
     </div>
-    <span class="card-shade"></span>
-    <span class="card-platform">{{ drama().platformId }}</span>
-    <span class="card-locale">{{ videoLangs() }}</span>
+    <span class="poster-card-gradient" aria-hidden="true"></span>
 
-    <span class="card-play-overlay" aria-hidden="true">
+    <span class="poster-platform-pill">
+      <span class="poster-platform-dot" [style.background]="platformTone()"></span>
+      <span class="truncate">{{ drama().platformId }}</span>
+    </span>
+
+    <div class="poster-top-right">
+      @if (ratingLabel(); as rate) {
+        <span class="poster-rate-badge">&#9733; {{ rate }}</span>
+      }
+      <button
+        type="button"
+        class="poster-bm-btn"
+        [class.is-saved]="isBookmarked()"
+        [attr.aria-pressed]="isBookmarked()"
+        [attr.aria-label]="
+          isBookmarked()
+            ? i18n.lang() === 'id'
+              ? 'Hapus dari markah'
+              : 'Remove bookmark'
+            : i18n.lang() === 'id'
+              ? 'Simpan ke markah'
+              : 'Save bookmark'
+        "
+        (click)="toggleBookmark($event)"
+      >
+        {{ isBookmarked() ? '&#9733;' : '&#9734;' }}
+      </button>
+    </div>
+
+    <span class="poster-play-circle" aria-hidden="true">
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
     </span>
+
+    <div class="poster-bottom-ticks" aria-hidden="true">
+      <span class="tick-group">
+        @if (hasIdSub()) {
+          <span class="tick-pill tick-sub">SUB ID</span>
+        }
+        @if (hasEnSub()) {
+          <span class="tick-pill tick-dub">SUB EN</span>
+        }
+        <span class="tick-pill tick-ep">{{ episode() }} Eps</span>
+      </span>
+    </div>
 
     <a
       class="card-hit"
@@ -26,8 +61,13 @@
     ></a>
   </div>
 
-  <div class="card-copy">
-    <h3>{{ drama().title }}</h3>
-    <p><i class="episode-dot"></i> {{ 'common.episodeShort' | transloco: { n: episode() } }} &middot; {{ genre() ? ('genre.' + genre() | transloco) : '' }}</p>
+  <div class="poster-card-body">
+    <h3 class="poster-card-title">
+      <a [routerLink]="['/watch', drama().slug, watchEpisode()]">{{ drama().title }}</a>
+    </h3>
+    <div class="poster-card-meta">
+      <span class="truncate">{{ genresLine() }}</span>
+      <span class="font-mono-tech shrink-0">{{ durationLabel() }}</span>
+    </div>
   </div>
 </article>

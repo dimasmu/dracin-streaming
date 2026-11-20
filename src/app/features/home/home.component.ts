@@ -1,20 +1,20 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   ElementRef,
   OnDestroy,
   OnInit,
-  afterNextRender,
   computed,
   inject,
   signal,
 } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
+import { MessageService } from 'primeng/api';
+import { type Drama } from '../../core/models/drama';
+import { BookmarkService } from '../../core/services/bookmark.service';
 import { CatalogService } from '../../core/services/catalog.service';
 import { DragScrollDirective } from '../../shared/directives/drag-scroll.directive';
 import { DramaCardComponent } from '../../shared/components/drama-card/drama-card.component';
-import type { Drama } from '../../core/models/drama';
 import { monogram, videoLangLabel } from '../../core/utils/format';
 import { I18nService } from '../../core/services/i18n.service';
 
@@ -23,24 +23,62 @@ const AUTO_ROTATE_MS = 7000;
 @Component({
   imports: [RouterLink, TranslocoPipe, DramaCardComponent, DragScrollDirective],
   templateUrl: './home.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HomeComponent implements OnInit, OnDestroy {
   protected readonly catalog = inject(CatalogService);
   protected readonly monogram = monogram;
   protected readonly videoLangs = (langs: readonly string[]) => videoLangLabel(langs, ' · ');
   private readonly i18n = inject(I18nService);
+  private readonly bookmarks = inject(BookmarkService);
+  private readonly messages = inject(MessageService);
   private readonly heroTrack = inject<ElementRef<HTMLElement>>(ElementRef);
 
-  protected readonly featured = signal<Drama[]>([]);
+  protected readonly featured = computed(() => this.catalog.featured());
   protected readonly current = signal(0);
+  protected readonly isId = computed(() => this.i18n.lang() === 'id');
+
+  protected isBookmarked(id: string): boolean {
+    return this.bookmarks.isBookmarked(id);
+  }
+
+  protected toggleBookmark(drama: Drama): void {
+    const added = this.bookmarks.toggle(drama.id);
+    this.messages.add({
+      severity: added ? 'success' : 'info',
+      summary: added
+        ? this.isId()
+          ? 'Disimpan ke Bookmark'
+          : 'Saved to Bookmarks'
+        : this.isId()
+          ? 'Dihapus dari Bookmark'
+          : 'Removed from Bookmarks',
+      detail: drama.title,
+      life: 2600,
+    });
+  }
+
+  protected hasLang(d: Drama, lang: 'id' | 'en'): boolean {
+    return d.videoLanguages.includes(lang) || d.subtitleLanguages.includes(lang);
+  }
+
+  protected ratingLabel(d: Drama): string | null {
+    return typeof d.rating === 'number' && isFinite(d.rating) ? d.rating.toFixed(1) : null;
+  }
+
+  protected platformTone(d: Drama): string {
+    return this.catalog.getPlatform(d.platformId)?.tone ?? d.tone;
+  }
+
+  protected platformName(platformId: string): string {
+    return this.catalog.getPlatform(platformId)?.name ?? platformId;
+  }
   protected readonly activeGenre = signal('All');
 
   /** Platform names selected in the homepage strip. */
   protected readonly selectedPlatforms = signal<ReadonlySet<string>>(new Set());
 
-  protected readonly trending = computed(() => this.catalog.trending(12));
-  protected readonly recent = computed(() => this.catalog.recent(12));
+  protected readonly trending = computed(() => this.catalog.trending(10));
+  protected readonly recent = computed(() => this.catalog.recent(10));
   protected readonly mostViewed = computed(() => this.catalog.mostViewed(10));
   protected readonly mostLiked = computed(() => this.catalog.mostLiked(10));
 
@@ -51,10 +89,10 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   protected readonly genreDramas = computed(() => {
     const g = this.activeGenre();
-    if (g === 'All') return this.catalog.trending(12);
+    if (g === 'All') return this.catalog.trending(10);
     return this.catalog
       .filter({ genres: [g], sort: 'popular' })
-      .slice(0, 12);
+      .slice(0, 10);
   });
 
   protected readonly platformCounts = computed<Record<string, number>>(() => {
@@ -66,8 +104,8 @@ export class HomeComponent implements OnInit, OnDestroy {
   /** Defaults to trending; narrows to the selected platforms once any are picked. */
   protected readonly platformResults = computed(() => {
     const selected = [...this.selectedPlatforms()];
-    if (selected.length === 0) return this.catalog.trending(12);
-    return this.catalog.filter({ platforms: selected, sort: 'popular' }).slice(0, 12);
+    if (selected.length === 0) return this.catalog.trending(10);
+    return this.catalog.filter({ platforms: selected, sort: 'popular' }).slice(0, 10);
   });
 
   protected readonly schedulePreview = computed(() => {
@@ -91,34 +129,61 @@ export class HomeComponent implements OnInit, OnDestroy {
   });
 
   private timer: ReturnType<typeof setInterval> | null = null;
+  private programmaticTimer: ReturnType<typeof setTimeout> | null = null;
+  private resizeObserver: ResizeObserver | null = null;
+  private programmaticScroll = false;
   private autoPaused = false;
+  private trackEl: HTMLElement | null = null;
 
   ngOnInit(): void {
-    const top = [...this.catalog.dramas].sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0)).slice(0, 3);
-    this.featured.set(top);
     this.startTimer();
 
     // Keep the dots in sync with the scroll position produced by dragging.
     const track = this.heroTrack.nativeElement.querySelector<HTMLElement>('.hero-track');
     if (track) {
       track.addEventListener('scroll', this.onHeroScroll, { passive: true });
+      track.addEventListener('scrollend', this.onHeroScrollEnd, { passive: true });
+      if (typeof ResizeObserver !== 'undefined') {
+        this.resizeObserver = new ResizeObserver(() => {
+          if (track.clientWidth > 0) {
+            this.programmaticScroll = true;
+            track.scrollTo({ left: this.current() * track.clientWidth, behavior: 'auto' });
+            this.releaseProgrammaticSoon(120);
+          }
+        });
+        this.resizeObserver.observe(track);
+      }
       this.trackEl = track;
     }
   }
 
   ngOnDestroy(): void {
     this.stopTimer();
+    if (this.programmaticTimer) {
+      clearTimeout(this.programmaticTimer);
+      this.programmaticTimer = null;
+    }
+    this.resizeObserver?.disconnect();
+    this.resizeObserver = null;
     this.trackEl?.removeEventListener('scroll', this.onHeroScroll);
+    this.trackEl?.removeEventListener('scrollend', this.onHeroScrollEnd);
   }
 
-  private trackEl: HTMLElement | null = null;
-
   private readonly onHeroScroll = (): void => {
+    if (this.programmaticScroll) return;
     const track = this.trackEl;
-    if (!track) return;
+    if (!track || !track.clientWidth) return;
     const index = Math.round(track.scrollLeft / track.clientWidth);
     const clamped = Math.max(0, Math.min(this.featured().length - 1, index));
     if (clamped !== this.current()) this.current.set(clamped);
+  };
+
+  private readonly onHeroScrollEnd = (): void => {
+    this.programmaticScroll = false;
+    if (this.programmaticTimer) {
+      clearTimeout(this.programmaticTimer);
+      this.programmaticTimer = null;
+    }
   };
 
   protected togglePlatform(name: string): void {
@@ -141,8 +206,9 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   private startTimer(): void {
+    this.stopTimer();
     this.timer = setInterval(() => {
-      if (!this.autoPaused) this.step(1);
+      if (!this.autoPaused) this.advance(1);
     }, AUTO_ROTATE_MS);
   }
 
@@ -154,6 +220,11 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   protected step(delta: number): void {
+    this.startTimer();
+    this.advance(delta);
+  }
+
+  private advance(delta: number): void {
     const len = this.featured().length;
     if (!len) return;
     const next = (this.current() + delta + len) % len;
@@ -162,15 +233,26 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   protected go(index: number): void {
+    this.startTimer();
     this.current.set(index);
     this.scrollHeroTo(index);
   }
 
+  private releaseProgrammaticSoon(ms: number): void {
+    if (this.programmaticTimer) clearTimeout(this.programmaticTimer);
+    this.programmaticTimer = setTimeout(() => {
+      this.programmaticScroll = false;
+      this.programmaticTimer = null;
+    }, ms);
+  }
+
   /** Drives the scroll-snap track; falls back silently if the DOM is absent. */
   private scrollHeroTo(index: number): void {
-    afterNextRender(() => {
-      const track = this.trackEl;
-      if (!track) return;
+    const track = this.trackEl;
+    if (!track) return;
+    this.programmaticScroll = true;
+    this.releaseProgrammaticSoon(700);
+    requestAnimationFrame(() => {
       track.scrollTo({ left: index * track.clientWidth, behavior: 'smooth' });
     });
   }

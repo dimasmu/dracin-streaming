@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   DestroyRef,
   inject,
@@ -18,7 +17,6 @@ import { I18nService } from '../../../core/services/i18n.service';
   selector: 'app-email-link',
   imports: [TranslocoPipe],
   templateUrl: './email-link.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EmailLinkComponent {
   readonly address = input.required<string>();

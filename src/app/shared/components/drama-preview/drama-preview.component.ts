@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, ElementRef, computed, inject } from '@angular/core';
+import { Component, ElementRef, computed, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { OverlayModule, ScrollStrategyOptions } from '@angular/cdk/overlay';
 import { MessageService } from 'primeng/api';
@@ -30,7 +30,6 @@ import { formatAired, monogram, ratingStars, videoLangLabel } from '../../../cor
   selector: 'app-drama-preview',
   imports: [RouterLink, OverlayModule, SkeletonModule, TranslocoPipe],
   templateUrl: './drama-preview.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DramaPreviewComponent {
   protected readonly preview = inject(DramaPreviewService);

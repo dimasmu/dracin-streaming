@@ -1,8 +1,21 @@
-<header class="topnav">
+<header class="topnav dracin-header">
   <div class="container topnav-inner">
-    <a class="logo" routerLink="/">DRA<b>.CIN</b></a>
+    <a class="logo group" routerLink="/">
+      <img
+        ngSrc="/tiraiplay-logo.png"
+        width="44"
+        height="32"
+        priority
+        alt="TiraiPlay"
+        class="logo-img"
+      />
+      <span class="logo-text">
+        <span class="logo-title">Tirai<b>Play</b></span>
+        <span class="logo-sub">TIRAI BAMBU &middot; C-DRAMA</span>
+      </span>
+    </a>
 
-    <nav class="nav-links" [attr.aria-label]="'nav.main' | transloco">
+    <nav class="nav-links nav-pill-bar" [attr.aria-label]="'nav.main' | transloco">
       <a routerLink="/" [attr.aria-current]="isActive('/') ? 'page' : null">
         <svg
           class="nav-icon"
@@ -12,6 +25,7 @@
           stroke-width="2"
           stroke-linecap="round"
           stroke-linejoin="round"
+          aria-hidden="true"
         >
           <path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z" />
           <polyline points="9 21 9 14 15 14 15 21" />
@@ -27,6 +41,7 @@
           stroke-width="2"
           stroke-linecap="round"
           stroke-linejoin="round"
+          aria-hidden="true"
         >
           <rect x="3" y="3" width="7" height="7" rx="1" />
           <rect x="14" y="3" width="7" height="7" rx="1" />
@@ -44,6 +59,7 @@
           stroke-width="2"
           stroke-linecap="round"
           stroke-linejoin="round"
+          aria-hidden="true"
         >
           <rect x="2" y="3" width="20" height="14" rx="2" />
           <path d="M8 21h8M12 17v4" />
@@ -62,6 +78,7 @@
           stroke-width="2"
           stroke-linecap="round"
           stroke-linejoin="round"
+          aria-hidden="true"
         >
           <rect x="3" y="4" width="18" height="18" rx="2" />
           <path d="M16 2v4M8 2v4M3 10h18" />
@@ -77,6 +94,7 @@
           stroke-width="2"
           stroke-linecap="round"
           stroke-linejoin="round"
+          aria-hidden="true"
         >
           <circle cx="11" cy="11" r="7" />
           <path d="m20 20-3.5-3.5" />
@@ -92,6 +110,7 @@
           stroke-width="2"
           stroke-linecap="round"
           stroke-linejoin="round"
+          aria-hidden="true"
         >
           <path d="M16 3h5v5M4 20L20.5 3.5M21 16v5h-5M15 15l6.1 6.1M4 4l5 5" />
         </svg>
@@ -119,58 +138,180 @@
     </button>
 
     <div class="header-tools">
-      <input
-        class="search"
-        [attr.aria-label]="'nav.searchLabel' | transloco"
-        [placeholder]="'nav.searchPlaceholder' | transloco"
-        [value]="query()"
-        (input)="onSearchInput($event)"
-        (keydown.enter)="submitSearch()"
-        (keydown.escape)="closeSearch()"
-      />
-      @if (searchOpen()) {
-        <div class="search-dropdown">
-          @if (searchLoading()) {
-            @for (i of [0, 1, 2, 3]; track i) {
-              <div class="search-result">
-                <p-skeleton shape="rectangle" width="56px" height="72px" />
-                <div class="flex flex-col gap-2 w-full">
-                  <p-skeleton width="60%" height="12px" />
-                  <p-skeleton width="85%" height="12px" />
-                  <p-skeleton width="45%" height="12px" />
-                </div>
-              </div>
-            }
-          } @else if (searchResults().length) {
-            @for (d of searchResults(); track d.id) {
-              <a class="search-result" [routerLink]="['/watch', d.slug, 1]" (click)="closeSearch()">
-                <span class="search-result-thumb" [style.--card-tone]="d.tone"
-                  ><span class="drama-art"></span
-                ></span>
-                <span class="search-result-body">
-                  <span class="search-result-title">{{ d.title }}</span>
-                  <span class="search-result-meta">
-                    @if (d.rating) {
-                      <span class="tag-episode">{{ d.rating.toFixed(1) }} &#9733;</span>
-                    }
-                    <span class="tag-episode">{{ 'common.episodeShort' | transloco: { n: d.latestEpisode } }}</span>
-                    <span class="tag-platform">{{ d.platformId }}</span>
-                  </span>
-                  <span class="search-result-synopsis">{{ d.synopsis }}</span>
-                  <span class="search-result-foot">
-                    <span>{{ d.genres[0] }}</span>
-                    <span>{{ 'videoLang.inline' | transloco: { langs: videoLangs(d) } }}</span>
-                  </span>
-                </span>
-              </a>
-            }
-          } @else {
-            <div class="search-dropdown-empty">
-              {{ 'nav.noResults' | transloco: { query: query() } }}
-            </div>
+      <div #searchWrap class="aw-search-wrap">
+        <div class="aw-search-bar" [class.is-open]="searchOpen()">
+          <button
+            type="button"
+            class="aw-search-icon-btn"
+            (click)="submitSearch()"
+            [attr.aria-label]="'nav.searchLabel' | transloco"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="w-4 h-4"
+            >
+              <circle cx="11" cy="11" r="7" />
+              <path d="m20 20-3.5-3.5" />
+            </svg>
+          </button>
+
+          <input
+            #searchInput
+            class="search aw-search-input"
+            type="search"
+            autocomplete="off"
+            [attr.aria-label]="'nav.searchLabel' | transloco"
+            [placeholder]="'nav.searchPlaceholder' | transloco"
+            [value]="query()"
+            (focus)="openSearchPopup()"
+            (input)="onSearchInput($event)"
+            (keydown)="onSearchKeydown($event)"
+          />
+
+          @if (query()) {
+            <button
+              type="button"
+              class="aw-search-clear"
+              (click)="clearSearch()"
+              [attr.aria-label]="i18n.lang() === 'id' ? 'Hapus pencarian' : 'Clear search'"
+            >
+              &#10005;
+            </button>
           }
+
+          <a
+            routerLink="/browse"
+            class="aw-search-filter-btn"
+            (click)="closeSearch()"
+            [attr.title]="i18n.lang() === 'id' ? 'Filter Lanjutan' : 'Advanced Filter'"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="w-3.5 h-3.5"
+              aria-hidden="true"
+            >
+              <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+            </svg>
+            <span class="hidden xl:inline">Filter</span>
+          </a>
+
+          <kbd class="kbd hidden xl:inline-flex" aria-hidden="true">S</kbd>
         </div>
-      }
+
+        @if (searchOpen()) {
+          <div class="search-dropdown aw-search-popup" role="region" [attr.aria-label]="'nav.searchLabel' | transloco">
+            <div class="aw-search-head">
+              <div class="aw-search-tabs" role="tablist">
+                @for (tab of quickTabs(); track tab.id) {
+                  <button
+                    type="button"
+                    class="aw-search-tab"
+                    [class.is-active]="searchTab() === tab.id"
+                    (click)="setSearchTab(tab.id)"
+                  >
+                    {{ tab.label }}
+                  </button>
+                }
+              </div>
+              <a routerLink="/browse" class="aw-search-adv-link" (click)="closeSearch()">
+                {{ i18n.lang() === 'id' ? 'Filter Lanjutan' : 'Advanced Filter' }}
+              </a>
+            </div>
+
+            <div class="aw-search-body">
+              @if (searchLoading()) {
+                @for (i of [0, 1, 2, 3]; track i) {
+                  <div class="search-result aw-search-item">
+                    <p-skeleton shape="rectangle" width="44px" height="62px" />
+                    <div class="flex flex-col gap-2 w-full">
+                      <p-skeleton width="62%" height="12px" />
+                      <p-skeleton width="85%" height="11px" />
+                      <p-skeleton width="48%" height="10px" />
+                    </div>
+                  </div>
+                }
+              } @else if (visibleResults().length) {
+                @if (!query().trim()) {
+                  <div class="aw-search-section-label">
+                    {{ i18n.lang() === 'id' ? 'POPULER SAAT INI' : 'POPULAR NOW' }}
+                  </div>
+                }
+                @for (d of visibleResults(); track d.id; let idx = $index) {
+                  <a
+                    class="search-result aw-search-item"
+                    [class.is-active]="activeResultIndex() === idx"
+                    [routerLink]="['/watch', d.slug, 1]"
+                    (mouseenter)="activeResultIndex.set(idx)"
+                    (click)="closeSearch()"
+                  >
+                    <span class="aw-search-thumb" [style.--card-tone]="d.tone">
+                      <span class="drama-art">
+                        <span class="drama-monogram aw-thumb-mono">{{ dramaMonogram(d) }}</span>
+                      </span>
+                    </span>
+                    <span class="min-w-0 flex-1 flex flex-col gap-1">
+                      <span class="flex items-center justify-between gap-2">
+                        <span class="search-result-title">{{ d.title }}</span>
+                        <span
+                          class="aw-status-pill"
+                          [class.is-completed]="d.status === 'completed'"
+                        >
+                          {{ d.status === 'completed' ? (i18n.lang() === 'id' ? 'TAMAT' : 'DONE') : 'ONGOING' }}
+                        </span>
+                      </span>
+
+                      <span class="flex flex-wrap items-center gap-y-1">
+                        @if (d.rating) {
+                          <span class="aw-dot">
+                            <span class="aw-dot-rating">&#9733; {{ d.rating.toFixed(1) }}</span>
+                          </span>
+                        }
+                        <span class="aw-dot">{{ d.latestEpisode ?? d.totalEpisodes ?? 0 }} Eps</span>
+                        <span class="aw-dot">{{ d.platformId }}</span>
+                        @if (d.releaseYear) {
+                          <span class="aw-dot">{{ d.releaseYear }}</span>
+                        }
+                        @if (hasLang(d, 'id')) {
+                          <span class="aw-dot"><span class="tick-pill tick-sub">SUB ID</span></span>
+                        } @else if (hasLang(d, 'en')) {
+                          <span class="aw-dot"><span class="tick-pill tick-dub">SUB EN</span></span>
+                        }
+                      </span>
+
+                      <span class="search-result-synopsis">{{ d.synopsis }}</span>
+                    </span>
+                  </a>
+                }
+              } @else {
+                <div class="search-dropdown-empty">
+                  {{ 'nav.noResults' | transloco: { query: query() } }}
+                </div>
+              }
+            </div>
+
+            <div class="aw-search-foot">
+              <span class="hidden sm:inline-flex items-center gap-1.5 text-[11px]" style="color: var(--d-muted)">
+                <kbd class="kbd">&uarr;&darr;</kbd>
+                <kbd class="kbd">&crarr;</kbd>
+                <kbd class="kbd">ESC</kbd>
+              </span>
+              <button type="button" class="aw-search-all-btn" (click)="submitSearch()">
+                {{ i18n.lang() === 'id' ? 'Lihat semua hasil' : 'View all results' }} ({{ totalMatches() }}) &rarr;
+              </button>
+            </div>
+          </div>
+        }
+      </div>
 
       <div class="language-toggle" role="group" [attr.aria-label]="'lang.switchTo' | transloco">
         @for (l of i18n.langs; track l.id) {
@@ -192,7 +333,9 @@
         class="theme-toggle"
         role="switch"
         [attr.aria-checked]="prefs.theme() === 'light'"
-        [attr.aria-label]="(prefs.theme() === 'light' ? 'nav.switchToDark' : 'nav.switchToLight') | transloco"
+        [attr.aria-label]="
+          (prefs.theme() === 'light' ? 'nav.switchToDark' : 'nav.switchToLight') | transloco
+        "
         (click)="prefs.toggleTheme()"
       >
         <span class="theme-track" aria-hidden="true">
@@ -225,7 +368,7 @@
         </span>
       </button>
 
-      <div class="account-menu">
+      <div #accountWrap class="account-menu">
         <button
           type="button"
           class="account-trigger"
@@ -284,6 +427,50 @@
               </svg>
               {{ 'nav.bookmarks' | transloco }}
             </a>
+            <a
+              class="account-item"
+              role="menuitem"
+              routerLink="/admin"
+              (click)="accountOpen.set(false)"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <rect x="3" y="3" width="7" height="9" rx="1.5" />
+                <rect x="14" y="3" width="7" height="5" rx="1.5" />
+                <rect x="14" y="12" width="7" height="9" rx="1.5" />
+                <rect x="3" y="16" width="7" height="5" rx="1.5" />
+              </svg>
+              {{ 'nav.adminCms' | transloco }}
+            </a>
+            @if (pwa.canInstall()) {
+              <button
+                type="button"
+                class="account-item"
+                role="menuitem"
+                [attr.aria-disabled]="pwa.installing() ? 'true' : null"
+                (click)="accountOpen.set(false); pwa.install()"
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M12 3v12m0 0-4-4m4 4 4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" />
+                </svg>
+                {{ 'nav.installApp' | transloco }}
+              </button>
+            }
             <button
               type="button"
               class="account-item"
@@ -335,9 +522,15 @@
 </header>
 
 <p-drawer [(visible)]="drawerVisible" position="right" [style]="{ width: 'min(320px, 86vw)' }">
-  <ng-template #header
-    ><span class="logo">DRA<b>.CIN</b></span></ng-template
-  >
+  <ng-template #header>
+    <span class="logo">
+      <img ngSrc="/tiraiplay-logo.png" width="36" height="26" alt="TiraiPlay" class="logo-img" />
+      <span class="logo-text">
+        <span class="logo-title">Tirai<b>Play</b></span>
+        <span class="logo-sub">TIRAI BAMBU &middot; C-DRAMA</span>
+      </span>
+    </span>
+  </ng-template>
   <nav class="flex flex-col gap-1 pt-2" [attr.aria-label]="'nav.mobile' | transloco">
     @for (item of navItems(); track item.path) {
       <a
@@ -349,9 +542,29 @@
         <span>{{ item.labelKey | transloco }}</span>
       </a>
     }
-    <a routerLink="/bookmarks" class="mobile-nav-item" (click)="drawerVisible.set(false)"
-      >{{ 'nav.bookmarks' | transloco }}</a
+    <button
+      type="button"
+      class="mobile-nav-item"
+      (click)="drawerVisible.set(false); random()"
     >
+      {{ 'nav.random' | transloco }}
+    </button>
+    <a routerLink="/bookmarks" class="mobile-nav-item" (click)="drawerVisible.set(false)">
+      {{ 'nav.bookmarks' | transloco }}
+    </a>
+    <a routerLink="/admin" class="mobile-nav-item" (click)="drawerVisible.set(false)">
+      {{ 'nav.adminCms' | transloco }}
+    </a>
+    @if (pwa.canInstall()) {
+      <button
+        type="button"
+        class="mobile-nav-item"
+        [attr.aria-disabled]="pwa.installing() ? 'true' : null"
+        (click)="drawerVisible.set(false); pwa.install()"
+      >
+        {{ 'nav.installApp' | transloco }}
+      </button>
+    }
   </nav>
   <div class="pt-4 mt-4" style="border-top: 1px solid var(--border)">
     <p class="eyebrow">{{ 'lang.label' | transloco }}</p>
@@ -370,6 +583,9 @@
     </div>
   </div>
   <button type="button" class="mobile-nav-item mt-4" (click)="prefs.toggleTheme()">
-    {{ 'nav.appearance' | transloco: { mode: (prefs.theme() === 'dark' ? 'nav.dark' : 'nav.light') | transloco } }}
+    {{
+      'nav.appearance'
+        | transloco: { mode: (prefs.theme() === 'dark' ? 'nav.dark' : 'nav.light') | transloco }
+    }}
   </button>
 </p-drawer>

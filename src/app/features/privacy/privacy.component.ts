@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { LEGAL_CONTACT, type LegalSection } from '../../core/legal';
@@ -8,7 +8,6 @@ import { LegalPageComponent } from '../../shared/components/legal-page/legal-pag
 @Component({
   imports: [RouterLink, TranslocoPipe, LegalPageComponent, EmailLinkComponent],
   templateUrl: './privacy.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PrivacyComponent {
   protected readonly email = LEGAL_CONTACT.general;

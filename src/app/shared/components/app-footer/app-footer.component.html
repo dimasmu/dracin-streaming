@@ -1,29 +1,68 @@
-<footer class="pagefoot">
-  <div class="container footer-grid">
-    <div class="footer-brand">
-      <a class="logo" routerLink="/">DRA<b>.CIN</b></a>
-      <p>{{ 'footer.about' | transloco }}</p>
+<footer class="pagefoot tirai-footer">
+  <div class="container py-10">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-8">
+      <div class="lg:col-span-5 space-y-3 footer-brand">
+        <a class="logo" routerLink="/">
+          <img
+            ngSrc="/tiraiplay-logo.png"
+            width="42"
+            height="30"
+            alt="TiraiPlay"
+            class="logo-img"
+          />
+          <span class="logo-text">
+            <span class="logo-title">Tirai<b>Play</b></span>
+            <span class="logo-sub">TIRAI BAMBU &middot; C-DRAMA</span>
+          </span>
+        </a>
+        <p class="footer-about-copy">{{ 'footer.about' | transloco }}</p>
+        <div class="flex flex-wrap items-center gap-2 pt-1">
+          <button
+            type="button"
+            class="footer-email-pill"
+            (click)="copyEmail(generalEmail)"
+            [attr.title]="generalEmail"
+          >
+            <span>{{ generalEmail }}</span>
+            <span class="footer-email-tag">{{ i18n.lang() === 'id' ? 'Salin' : 'Copy' }}</span>
+          </button>
+          <button
+            type="button"
+            class="footer-email-pill"
+            (click)="copyEmail(dmcaEmail)"
+            [attr.title]="dmcaEmail"
+          >
+            <span>{{ dmcaEmail }}</span>
+            <span class="footer-email-tag">{{ i18n.lang() === 'id' ? 'Salin' : 'Copy' }}</span>
+          </button>
+        </div>
+      </div>
+
+      <nav class="footer-col lg:col-span-2" [attr.aria-label]="'footer.explore' | transloco">
+        <h2>{{ 'footer.explore' | transloco }}</h2>
+        <a routerLink="/genre">{{ 'nav.genre' | transloco }}</a>
+        <a routerLink="/platform">{{ 'nav.platform' | transloco }}</a>
+        <a routerLink="/release-schedule">{{ 'nav.schedule' | transloco }}</a>
+        <a routerLink="/browse">{{ 'footer.browseAll' | transloco }}</a>
+      </nav>
+
+      <nav class="footer-col lg:col-span-3" [attr.aria-label]="'footer.help' | transloco">
+        <h2>{{ 'footer.help' | transloco }}</h2>
+        <a routerLink="/faq">{{ 'footer.faq' | transloco }}</a>
+        <a routerLink="/contact">{{ 'footer.contact' | transloco }}</a>
+        <a routerLink="/bookmarks">{{ 'nav.bookmarks' | transloco }}</a>
+        <a routerLink="/admin">{{ 'nav.adminCms' | transloco }}</a>
+      </nav>
+
+      <nav class="footer-col lg:col-span-2" [attr.aria-label]="'footer.legal' | transloco">
+        <h2>{{ 'footer.legal' | transloco }}</h2>
+        <a routerLink="/terms">{{ 'footer.terms' | transloco }}</a>
+        <a routerLink="/privacy">{{ 'footer.privacy' | transloco }}</a>
+        <a routerLink="/dmca">{{ 'footer.dmca' | transloco }}</a>
+      </nav>
     </div>
-    <nav class="footer-col" [attr.aria-label]="'footer.explore' | transloco">
-      <h2>{{ 'footer.explore' | transloco }}</h2>
-      <a routerLink="/genre">{{ 'nav.genre' | transloco }}</a>
-      <a routerLink="/platform">{{ 'nav.platform' | transloco }}</a>
-      <a routerLink="/release-schedule">{{ 'nav.schedule' | transloco }}</a>
-      <a routerLink="/browse">{{ 'footer.browseAll' | transloco }}</a>
-    </nav>
-    <nav class="footer-col" [attr.aria-label]="'footer.help' | transloco">
-      <h2>{{ 'footer.help' | transloco }}</h2>
-      <a routerLink="/faq">{{ 'footer.faq' | transloco }}</a>
-      <a routerLink="/contact">{{ 'footer.contact' | transloco }}</a>
-      <a routerLink="/bookmarks">{{ 'nav.bookmarks' | transloco }}</a>
-    </nav>
-    <nav class="footer-col" [attr.aria-label]="'footer.legal' | transloco">
-      <h2>{{ 'footer.legal' | transloco }}</h2>
-      <a routerLink="/terms">{{ 'footer.terms' | transloco }}</a>
-      <a routerLink="/privacy">{{ 'footer.privacy' | transloco }}</a>
-      <a routerLink="/dmca">{{ 'footer.dmca' | transloco }}</a>
-    </nav>
   </div>
+
   <div class="container footer-bottom">
     <span>{{ 'footer.copyright' | transloco }}</span>
     <span>{{ 'footer.tagline' | transloco }}</span>

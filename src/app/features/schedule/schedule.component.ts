@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { CatalogService } from '../../core/services/catalog.service';
@@ -10,7 +10,6 @@ import type { ReleaseScheduleItem } from '../../core/models/schedule';
 @Component({
   imports: [RouterLink, TranslocoPipe, EmptyStateComponent],
   templateUrl: './schedule.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ScheduleComponent {
   protected readonly catalog = inject(CatalogService);

@@ -1,0 +1,291 @@
+<div class="cms-app-shell relative z-10">
+  @if (cms.mobileSidebarOpen()) {
+    <div
+      class="fixed inset-0 z-30 bg-black/60 sm:hidden"
+      aria-hidden="true"
+      (click)="cms.setMobileSidebarOpen(false)"
+    ></div>
+  }
+
+  <aside
+    id="cmsSidebar"
+    class="cms-sidebar"
+    [class.is-collapsed]="cms.sidebarCollapsed()"
+    [class.is-mobile-open]="cms.mobileSidebarOpen()"
+    aria-label="Navigasi CMS Admin"
+  >
+    <div class="p-4 border-b flex items-center justify-between gap-2" style="border-color: var(--d-border);">
+      <a routerLink="/admin/dashboard" class="flex items-center gap-2.5 min-w-0" (click)="cms.setMobileSidebarOpen(false)">
+        <img ngSrc="/tiraiplay-logo.png" alt="Logo TiraiPlay" width="40" height="24" class="h-8 w-auto shrink-0" />
+        <div class="sb-hide min-w-0">
+          <div class="text-sm font-extrabold tracking-tight leading-none truncate">
+            Tirai<span style="color: var(--d-accent)">Play</span> CMS
+          </div>
+          <div class="font-mono-tech text-[10px] mt-1 truncate" style="color: var(--d-cyan);">
+            /admin · Workspace
+          </div>
+        </div>
+      </a>
+      <button
+        type="button"
+        aria-label="Tutup sidebar"
+        class="sm:hidden w-7 h-7 rounded-lg border inline-flex items-center justify-center text-xs font-bold cursor-pointer"
+        style="background: var(--d-surface-2); border-color: var(--d-border); color: var(--d-fg);"
+        (click)="cms.setMobileSidebarOpen(false)"
+      >
+        ✕
+      </button>
+    </div>
+
+    <div class="px-3 pt-3 sb-hide">
+      <a
+        routerLink="/"
+        class="w-full py-2 px-3 rounded-xl border text-xs font-bold flex items-center justify-between transition hover:opacity-90"
+        style="background: var(--d-surface-2); border-color: var(--d-border); color: var(--d-fg);"
+      >
+        <span>← Website Utama (/)</span>
+        <span class="font-mono-tech text-[10px]" style="color: var(--d-cyan);">Publik</span>
+      </a>
+    </div>
+
+    <nav class="flex-1 overflow-y-auto px-2.5 py-2 space-y-1">
+      @for (group of cms.navGroups; track group.label) {
+        <div class="mb-1.5">
+          <div class="cms-nav-group-label sb-hide">{{ group.label }}</div>
+          @for (item of group.items; track item.id) {
+            @if (cms.role() === 'user') {
+              <button
+                type="button"
+                class="cms-nav-btn opacity-55"
+                [title]="item.label"
+                (click)="cms.setMobileSidebarOpen(false)"
+              >
+                <span class="flex items-center gap-2.5 min-w-0">
+                  <i [class]="item.icon + ' text-xs shrink-0'"></i>
+                  <span class="sb-hide truncate">{{ item.label }}</span>
+                </span>
+                <span class="sb-hide text-[10px]">🔒</span>
+              </button>
+            } @else {
+              <a
+                [routerLink]="item.route"
+                [title]="item.label"
+                class="cms-nav-btn"
+                [class.is-active]="isActive(item.route)"
+                (click)="item.id === 'drama-editor' ? cms.editorPrefill.set(null) : null; cms.setMobileSidebarOpen(false)"
+              >
+                <span class="flex items-center gap-2.5 min-w-0">
+                  <i [class]="item.icon + ' text-xs shrink-0'"></i>
+                  <span class="sb-hide truncate">{{ item.label }}</span>
+                </span>
+                @if (item.id === 'dramas') {
+                  <span
+                    class="sb-hide px-1.5 py-0.5 rounded-full text-[10px] font-bold"
+                    style="background: var(--d-surface-2); color: var(--d-muted);"
+                  >
+                    {{ catalog.dramas.length }}
+                  </span>
+                }
+                @if (item.id === 'drama-editor' && cms.editingSlug() && isActive(item.route)) {
+                  <span
+                    class="sb-hide px-1.5 py-0.5 rounded-full text-[10px] font-bold"
+                    style="background: var(--d-gold-soft); color: var(--d-gold);"
+                  >
+                    Edit
+                  </span>
+                }
+                @if (item.id === 'moderation' && pendingRequestsCount() > 0) {
+                  <span
+                    class="sb-hide px-1.5 py-0.5 rounded-full text-[10px] font-bold"
+                    style="background: var(--d-gold-soft); color: var(--d-gold);"
+                  >
+                    {{ pendingRequestsCount() }}
+                  </span>
+                }
+                @if ((item.id === 'users' || item.id === 'settings') && !cms.can('manageUsers')) {
+                  <span class="sb-hide text-[10px]">🔒</span>
+                }
+              </a>
+            }
+          }
+        </div>
+      }
+    </nav>
+
+    <div class="p-3 border-t space-y-2.5" style="border-color: var(--d-border);">
+      <div class="flex items-center gap-2.5 p-2 rounded-xl border" style="background: var(--d-surface-2); border-color: var(--d-border);">
+        <div
+          class="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-extrabold text-white shrink-0"
+          style="background: linear-gradient(135deg, var(--d-accent), var(--d-cyan));"
+        >
+          {{ currentMeta().name.charAt(0) }}
+        </div>
+        <div class="sb-hide min-w-0 flex-1">
+          <p class="text-xs font-extrabold truncate">{{ currentMeta().name }}</p>
+          <p
+            class="font-mono-tech text-[9.5px] truncate"
+            style="color: var(--d-muted);"
+            [title]="currentMeta().email"
+          >
+            {{ currentMeta().email }}
+          </p>
+        </div>
+        <span
+          class="sb-hide px-2 py-0.5 rounded-full text-[10px] font-extrabold border"
+          [style.background]="currentMeta().badgeBg"
+          [style.color]="currentMeta().badgeColor"
+          style="border-color: var(--d-border-strong);"
+        >
+          {{ currentMeta().label }}
+        </span>
+      </div>
+    </div>
+  </aside>
+
+  <div class="flex-1 min-w-0 flex flex-col">
+    <header class="cms-topbar">
+      <div class="cms-topbar-inner px-3 sm:px-6 min-h-16 flex flex-wrap items-center justify-between gap-2 sm:gap-3 py-2 sm:py-0">
+        <div class="flex items-center gap-2.5 min-w-0">
+          <button
+            type="button"
+            aria-label="Buka menu sidebar"
+            class="sm:hidden w-9 h-9 rounded-xl border inline-flex items-center justify-center cursor-pointer shrink-0"
+            style="background: var(--d-surface-2); border-color: var(--d-border); color: var(--d-fg);"
+            (click)="cms.setMobileSidebarOpen(true)"
+          >
+            <i class="pi pi-bars text-sm"></i>
+          </button>
+
+          <button
+            type="button"
+            aria-label="Perkecil atau lebarkan sidebar"
+            class="hidden sm:inline-flex w-9 h-9 rounded-xl border items-center justify-center cursor-pointer shrink-0"
+            style="background: var(--d-surface); border-color: var(--d-border-strong); color: var(--d-fg);"
+            (click)="cms.toggleSidebarCollapsed()"
+          >
+            <i class="pi pi-arrows-h text-sm" style="color: var(--d-fg);"></i>
+          </button>
+
+          <span
+            class="hidden md:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-[11px] font-mono-tech truncate max-w-[320px]"
+            style="background: var(--d-surface-2); border-color: var(--d-border); color: var(--d-cyan);"
+          >
+            {{ routeBadge() }}
+          </span>
+        </div>
+
+        <div class="flex items-center gap-2 sm:gap-2.5">
+          <div class="hidden xl:block relative w-56">
+            <input
+              type="search"
+              [value]="cms.searchQuery()"
+              (input)="onGlobalSearch($event)"
+              placeholder="Cari judul, slug, tag..."
+              aria-label="Cari katalog CMS"
+              class="cms-input w-full"
+            />
+          </div>
+
+          <div
+            class="inline-flex p-1 rounded-xl border gap-0.5"
+            style="background: var(--d-surface-2); border-color: var(--d-border);"
+            role="group"
+            aria-label="Simulasi Role"
+          >
+            @for (r of roleOptions; track r.id) {
+              <button
+                type="button"
+                class="px-2.5 py-1 rounded-lg text-[11px] font-extrabold border-0 cursor-pointer transition"
+                [style.background]="cms.role() === r.id ? (r.id === 'user' ? 'var(--d-rose)' : r.id === 'editor' ? 'var(--d-cyan)' : 'var(--d-accent)') : 'transparent'"
+                [style.color]="cms.role() === r.id ? '#fff' : 'var(--d-muted)'"
+                (click)="switchRole(r.id)"
+              >
+                {{ r.label }}
+              </button>
+            }
+          </div>
+
+          @if (cms.can('createDrama')) {
+            <button
+              type="button"
+              class="h-9 px-3.5 rounded-xl text-xs font-extrabold border-0 cursor-pointer text-white inline-flex items-center gap-1.5 shadow-sm"
+              style="background: var(--d-accent);"
+              (click)="openCreateNew()"
+            >
+              <span>+</span>
+              <span class="hidden sm:inline">Tambah Drama</span>
+            </button>
+          }
+
+          <button
+            type="button"
+            aria-label="Ganti tema gelap atau terang"
+            class="w-9 h-9 rounded-xl border inline-flex items-center justify-center cursor-pointer shrink-0"
+            style="background: var(--d-surface); border-color: var(--d-border-strong); color: var(--d-fg);"
+            (click)="prefs.toggleTheme()"
+          >
+            <i
+              [class]="prefs.theme() === 'dark' ? 'pi pi-moon text-sm' : 'pi pi-sun text-sm'"
+              style="color: var(--d-fg);"
+            ></i>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="flex-1 p-4 sm:p-6 lg:p-8 max-w-[1380px] w-full mx-auto">
+      @if (cms.role() === 'user') {
+        <div class="max-w-2xl mx-auto my-8 cms-glass-card rounded-3xl p-8 text-center space-y-5">
+          <div
+            class="w-16 h-16 mx-auto rounded-2xl flex items-center justify-center text-3xl"
+            style="background: var(--d-rose-soft); color: var(--d-rose);"
+          >
+            🔒
+          </div>
+          <div class="space-y-2">
+            <span
+              class="inline-block px-3 py-1 rounded-full text-xs font-extrabold border"
+              style="background: var(--d-rose-soft); color: var(--d-rose); border-color: var(--d-border);"
+            >
+              HTTP 403 · Diblokir oleh adminGuard
+            </span>
+            <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight">
+              Akses Dashboard Admin Ditolak
+            </h1>
+            <p class="text-sm max-w-lg mx-auto" style="color: var(--d-muted);">
+              Akun dengan role <strong>User</strong> hanya memiliki izin menonton di Website Utama (<code>/</code>)
+              dan tidak dapat mengakses rute <code>/admin</code>.
+            </p>
+          </div>
+          <div class="flex flex-wrap justify-center gap-3 pt-2">
+            <a
+              routerLink="/"
+              class="px-4 py-2.5 rounded-xl border text-xs font-bold inline-flex items-center"
+              style="background: var(--d-surface-2); border-color: var(--d-border); color: var(--d-fg);"
+            >
+              ← Kembali ke Website Utama (/)
+            </a>
+            <button
+              type="button"
+              class="px-4 py-2.5 rounded-xl text-xs font-extrabold border-0 cursor-pointer text-white"
+              style="background: var(--d-cyan);"
+              (click)="switchRole('editor')"
+            >
+              Beralih ke Role Editor
+            </button>
+            <button
+              type="button"
+              class="px-4 py-2.5 rounded-xl text-xs font-extrabold border-0 cursor-pointer text-white"
+              style="background: var(--d-accent);"
+              (click)="switchRole('admin')"
+            >
+              Beralih ke Role Admin
+            </button>
+          </div>
+        </div>
+      } @else {
+        <router-outlet />
+      }
+    </main>
+  </div>
+</div>

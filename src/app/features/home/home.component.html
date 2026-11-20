@@ -15,64 +15,160 @@
   >
     @for (d of featured(); track d.id) {
       <article class="hero-slide" [style.--slide-tone]="d.tone">
-        <div class="hero-copy">
-          <p class="eyebrow">{{ 'home.editorsPick' | transloco: { platform: d.platformId } }}</p>
-          <h1>{{ d.title }}</h1>
-          <div class="hero-meta">
-            <span class="meta-pill">{{ d.releaseYear }}</span>
-            <span class="meta-pill">{{ 'common.episodeShort' | transloco: { n: d.latestEpisode } }}</span>
-            @for (g of d.genres; track g) {
-              <span>{{ 'genre.' + g | transloco }}</span>
-            }
-            <span>{{ d.platformId }}</span>
-            <span>{{ videoLangs(d.videoLanguages) }}</span>
+        <div class="hero-backdrop" aria-hidden="true">
+          <span class="hero-backdrop-monogram">{{ monogram(d.title) }}</span>
+          <div class="hero-backdrop-scrim"></div>
+        </div>
+
+        <div class="hero-inner container">
+          <div class="hero-copy">
+            <div class="hero-kicker-row">
+              <span class="hero-spotlight-badge">
+                <span class="hero-spotlight-dot" aria-hidden="true"></span>
+                <span>{{ isId() ? 'Pilihan Editor' : 'Editor’s Spotlight' }}</span>
+              </span>
+              <span class="hero-platform-tag">
+                <span class="poster-platform-dot" [style.background]="platformTone(d)"></span>
+                <span>{{ platformName(d.platformId) }}</span>
+              </span>
+            </div>
+
+            <h1>{{ d.title }}</h1>
+
+            <div class="hero-meta">
+              @if (ratingLabel(d); as rate) {
+                <span class="meta-pill meta-pill-rate">&#9733; {{ rate }}</span>
+              }
+              @if (d.releaseYear) {
+                <span class="meta-pill">{{ d.releaseYear }}</span>
+              }
+              <span class="meta-pill">{{
+                'common.episodeShort' | transloco: { n: d.latestEpisode ?? d.totalEpisodes ?? 1 }
+              }}</span>
+              @if (hasLang(d, 'id')) {
+                <span class="tick-pill tick-sub">SUB ID</span>
+              }
+              @if (hasLang(d, 'en')) {
+                <span class="tick-pill tick-dub">SUB EN</span>
+              }
+              @for (g of d.genres.slice(0, 3); track g) {
+                <span class="hero-genre-chip">{{ 'genre.' + g | transloco }}</span>
+              }
+            </div>
+
+            <p class="hero-description">{{ d.synopsis }}</p>
+
+            <div class="hero-actions">
+              <a class="btn btn-primary hero-cta-watch" [routerLink]="['/watch', d.slug, d.latestEpisode ?? 1]">
+                &#9654; {{ 'home.watchNow' | transloco }}
+              </a>
+              <button
+                type="button"
+                class="btn hero-cta-save"
+                [class.is-saved]="isBookmarked(d.id)"
+                [attr.aria-pressed]="isBookmarked(d.id)"
+                [attr.aria-label]="
+                  isBookmarked(d.id) ? ('card.removeBookmark' | transloco) : ('card.addBookmark' | transloco)
+                "
+                (click)="toggleBookmark(d)"
+              >
+                <span>{{ isBookmarked(d.id) ? '&#9733;' : '&#9734;' }}</span>
+                <span>{{
+                  isBookmarked(d.id) ? (isId() ? 'Tersimpan' : 'Saved') : isId() ? 'Simpan' : 'Save'
+                }}</span>
+              </button>
+            </div>
           </div>
-          <p class="hero-description">{{ d.synopsis }}</p>
-          <div class="hero-actions">
-            <a class="btn btn-primary" [routerLink]="['/watch', d.slug, d.latestEpisode]"
-              >&#9654; {{ 'home.watchNow' | transloco }}</a
+
+          <div class="hero-showcase">
+            <a
+              class="hero-poster-showcase poster-card"
+              [routerLink]="['/watch', d.slug, d.latestEpisode ?? 1]"
+              [style.--card-tone]="d.tone"
+              [attr.aria-label]="d.title"
             >
+              <div class="poster-card-media">
+                <div class="drama-art poster-artwork">
+                  <span class="drama-monogram">{{ monogram(d.title) }}</span>
+                </div>
+                <span class="poster-card-gradient" aria-hidden="true"></span>
+
+                <span class="poster-platform-pill">
+                  <span class="poster-platform-dot" [style.background]="platformTone(d)"></span>
+                  <span class="truncate">{{ platformName(d.platformId) }}</span>
+                </span>
+
+                @if (ratingLabel(d); as rate) {
+                  <span class="hero-poster-rating">&#9733; {{ rate }}</span>
+                }
+
+                <span class="poster-play-circle" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
+                </span>
+
+                <div class="poster-bottom-ticks" aria-hidden="true">
+                  <span class="tick-group">
+                    @if (hasLang(d, 'id')) {
+                      <span class="tick-pill tick-sub">SUB ID</span>
+                    }
+                    @if (hasLang(d, 'en')) {
+                      <span class="tick-pill tick-dub">SUB EN</span>
+                    }
+                    <span class="tick-pill tick-ep">{{ d.latestEpisode ?? d.totalEpisodes ?? 1 }} Eps</span>
+                  </span>
+                </div>
+              </div>
+            </a>
           </div>
         </div>
-        <div class="hero-art" [attr.data-monogram]="monogram(d.title)"></div>
       </article>
     }
   </div>
 
-  <button
-    class="slider-arrow slider-arrow-prev"
-    type="button"
-    [attr.aria-label]="'home.prevSlide' | transloco"
-    (click)="step(-1)"
-  >
-    &#8592;
-  </button>
-  <div class="slider-dots">
-    @for (d of featured(); track d.id; let i = $index) {
+  <div class="hero-controls-shell container">
+    <div class="slider-dots">
+      @for (d of featured(); track d.id; let i = $index) {
+        <button
+          class="slider-dot"
+          [class.active]="i === current()"
+          type="button"
+          [attr.aria-label]="'home.slide' | transloco: { n: i + 1 }"
+          [attr.aria-current]="i === current() ? 'true' : null"
+          (click)="go(i)"
+        ></button>
+      }
+    </div>
+
+    <div class="hero-nav-controls">
+      <span class="hero-slide-counter" aria-live="polite">{{ current() + 1 }} / {{ featured().length }}</span>
       <button
-        class="slider-dot"
-        [class.active]="i === current()"
+        class="hero-nav-btn"
         type="button"
-        [attr.aria-label]="'home.slide' | transloco: { n: i + 1 }"
-        [attr.aria-current]="i === current() ? 'true' : null"
-        (click)="go(i)"
-      ></button>
-    }
+        [attr.aria-label]="'home.prevSlide' | transloco"
+        (click)="step(-1)"
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 18l-6-6 6-6" />
+        </svg>
+      </button>
+      <button
+        class="hero-nav-btn"
+        type="button"
+        [attr.aria-label]="'home.nextSlide' | transloco"
+        (click)="step(1)"
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 18l6-6-6-6" />
+        </svg>
+      </button>
+    </div>
   </div>
-  <button
-    class="slider-arrow slider-arrow-next"
-    type="button"
-    [attr.aria-label]="'home.nextSlide' | transloco"
-    (click)="step(1)"
-  >
-    &#8594;
-  </button>
 </section>
 
-<div class="container page">
-  <section class="section">
+<div class="container page home-sections-stack">
+  <section class="section home-section-card">
     <div class="section-heading">
-      <h2 class="display">{{ 'home.trending' | transloco }}</h2>
+      <h2 class="display"><span class="editorial-accent-bar"></span>{{ 'home.trending' | transloco }}</h2>
       <a routerLink="/browse">{{ 'common.viewAllArrow' | transloco }}</a>
     </div>
     <div class="carousel" appDragScroll>
@@ -82,9 +178,9 @@
     </div>
   </section>
 
-  <section class="section">
+  <section class="section home-section-card">
     <div class="section-heading">
-      <h2 class="display">{{ 'home.recent' | transloco }}</h2>
+      <h2 class="display"><span class="editorial-accent-bar is-cyan"></span>{{ 'home.recent' | transloco }}</h2>
       <a routerLink="/browse">{{ 'common.viewAllArrow' | transloco }}</a>
     </div>
     <div class="carousel" appDragScroll>
@@ -95,8 +191,10 @@
   </section>
 
   <section class="section ranking-band">
-    <div>
-      <div class="section-heading"><h2 class="display">{{ 'home.mostViewed' | transloco }}</h2></div>
+    <div class="ranking-panel">
+      <div class="section-heading">
+        <h2 class="display"><span class="editorial-accent-bar"></span>{{ 'home.mostViewed' | transloco }}</h2>
+      </div>
       <div class="rank-list">
         @for (d of mostViewed(); track d.id; let i = $index) {
           <a class="rank-row" [routerLink]="['/watch', d.slug, 1]" [style.--card-tone]="d.tone">
@@ -110,8 +208,10 @@
         }
       </div>
     </div>
-    <div>
-      <div class="section-heading"><h2 class="display">{{ 'home.mostLiked' | transloco }}</h2></div>
+    <div class="ranking-panel">
+      <div class="section-heading">
+        <h2 class="display"><span class="editorial-accent-bar is-cyan"></span>{{ 'home.mostLiked' | transloco }}</h2>
+      </div>
       <div class="rank-list">
         @for (d of mostLiked(); track d.id; let i = $index) {
           <a class="rank-row" [routerLink]="['/watch', d.slug, 1]" [style.--card-tone]="d.tone">
@@ -127,9 +227,9 @@
     </div>
   </section>
 
-  <section class="section">
+  <section class="section home-section-card">
     <div class="section-heading">
-      <h2 class="display">{{ 'home.browseByGenre' | transloco }}</h2>
+      <h2 class="display"><span class="editorial-accent-bar"></span>{{ 'home.browseByGenre' | transloco }}</h2>
       <a routerLink="/genre">{{ 'common.viewAllArrow' | transloco }}</a>
     </div>
     <div class="genre-tabs" role="tablist" [attr.aria-label]="'home.browseByGenre' | transloco">
@@ -146,9 +246,9 @@
     </div>
   </section>
 
-  <section class="section">
+  <section class="section home-section-card">
     <div class="section-heading">
-      <h2 class="display">{{ 'home.browseByPlatform' | transloco }}</h2>
+      <h2 class="display"><span class="editorial-accent-bar is-cyan"></span>{{ 'home.browseByPlatform' | transloco }}</h2>
       <a routerLink="/platform">{{ 'common.viewAllArrow' | transloco }}</a>
     </div>
 
@@ -192,9 +292,9 @@
     }
   </section>
 
-  <section class="section">
+  <section class="section home-section-card">
     <div class="section-heading">
-      <h2 class="display">{{ 'home.comingUp' | transloco }}</h2>
+      <h2 class="display"><span class="editorial-accent-bar"></span>{{ 'home.comingUp' | transloco }}</h2>
       <a routerLink="/release-schedule">{{ 'home.fullSchedule' | transloco }}</a>
     </div>
     <div class="schedule-list">

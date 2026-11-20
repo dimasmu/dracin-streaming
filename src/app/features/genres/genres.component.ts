@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { PaginatorModule } from 'primeng/paginator';
 import { TranslocoPipe } from '@jsverse/transloco';
@@ -10,7 +10,6 @@ import { monogram } from '../../core/utils/format';
 @Component({
   imports: [RouterLink, PaginatorModule, TranslocoPipe, DramaCardComponent, EmptyStateComponent],
   templateUrl: './genres.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GenresComponent {
   protected readonly catalog = inject(CatalogService);
@@ -18,7 +17,7 @@ export class GenresComponent {
 
   /** Selected genre names; empty means "all genres". */
   protected readonly selectedGenres = signal<readonly string[]>([]);
-  protected readonly rows = signal(12);
+  protected readonly rows = signal(10);
   protected readonly first = signal(0);
 
   /** True when no genre is picked, i.e. the "All" chip is active. */

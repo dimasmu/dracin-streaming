@@ -89,6 +89,7 @@
     "browse": "Jelajahi",
     "random": "Acak",
     "bookmarks": "Markah",
+    "adminCms": "Dashboard CMS (/admin)",
     "openMenu": "Buka menu",
     "searchLabel": "Cari drama",
     "searchPlaceholder": "Cari judul drama",
@@ -106,7 +107,16 @@
     "signOut": "Keluar",
     "settingsNotice": "Pengaturan disimpan secara lokal di browser ini.",
     "noAccountNotice": "Prototipe ini tidak memiliki sistem akun.",
+    "installApp": "Pasang Aplikasi",
     "genreLabel": "Genre"
+  },
+  "pwa": {
+    "installedTitle": "TiraiPlay Terpasang",
+    "installedDetail": "Aplikasi sekarang bisa dibuka langsung dari layar utama.",
+    "updateReady": "Versi baru TiraiPlay tersedia",
+    "updateAction": "Muat ulang untuk menerapkan pembaruan.",
+    "reload": "Muat Ulang",
+    "offlineReady": "Siap dibuka secara offline"
   },
   "footer": {
     "about": "Direktori drama pendek Tiongkok dari berbagai platform. Metadata konten ditampilkan agar Anda lebih cepat menemukan serial.",
@@ -119,7 +129,7 @@
     "terms": "Ketentuan Layanan",
     "privacy": "Privasi",
     "dmca": "DMCA",
-    "copyright": "© 2026 DRA.CIN · Prototipe visual",
+    "copyright": "© 2026 TiraiPlay · Prototipe visual",
     "tagline": "Metadata · Platform sumber · Bahasa"
   },
   "empty": {
@@ -170,6 +180,8 @@
     "title": "Jelajahi Drama",
     "intro": "Cari dan filter seluruh katalog drama pendek Tiongkok berdasarkan genre, platform, tahun, bahasa subtitle, dan tanggal rilis.",
     "filters": "Filter",
+    "showFilters": "Filter",
+    "hideFilters": "Tutup Filter",
     "genre": "Genre",
     "allGenres": "Semua genre",
     "platform": "Platform",
@@ -205,7 +217,7 @@
   },
   "platforms": {
     "title": "Platform",
-    "intro": "Jelajahi drama berdasarkan platform sumbernya. DRA.CIN hanyalah direktori — tidak ada afiliasi atau kemitraan dengan platform-platform ini.",
+    "intro": "Jelajahi drama berdasarkan platform sumbernya. TiraiPlay hanyalah direktori — tidak ada afiliasi atau kemitraan dengan platform-platform ini.",
     "browseBy": "Jelajahi per Platform",
     "filterBy": "Filter berdasarkan platform",
     "platform": "Platform",
@@ -320,29 +332,29 @@
     "items": {
       "general": [
         {
-          "q": "Apa itu DRA.CIN?",
-          "a": "DRA.CIN adalah direktori metadata untuk drama pendek Tiongkok. Situs ini membantu Anda menemukan dan menelusuri serial berdasarkan genre dan platform sumber, dengan menampilkan judul, sinopsis, jumlah episode, dan informasi platform. DRA.CIN tidak menyiarkan konten video."
+          "q": "Apa itu TiraiPlay?",
+          "a": "TiraiPlay adalah direktori metadata untuk drama pendek Tiongkok. Situs ini membantu Anda menemukan dan menelusuri serial berdasarkan genre dan platform sumber, dengan menampilkan judul, sinopsis, jumlah episode, dan informasi platform. TiraiPlay tidak menyiarkan konten video."
         },
         {
-          "q": "Apakah DRA.CIN gratis digunakan?",
-          "a": "Ya. Mengakses dan menggunakan DRA.CIN gratis. Ini adalah prototipe visual yang berfungsi sebagai direktori metadata, bukan layanan streaming berbayar."
+          "q": "Apakah TiraiPlay gratis digunakan?",
+          "a": "Ya. Mengakses dan menggunakan TiraiPlay gratis. Ini adalah prototipe visual yang berfungsi sebagai direktori metadata, bukan layanan streaming berbayar."
         },
         {
           "q": "Di mana saya bisa menonton drama yang terdaftar?",
-          "a": "Setiap drama mencatat platform sumbernya (misalnya DramaBox, ReelShort, atau Anireels). Kunjungi platform tersebut untuk menonton. DRA.CIN tidak menjamin ketersediaan di platform pihak ketiga mana pun."
+          "a": "Setiap drama mencatat platform sumbernya (misalnya DramaBox, ReelShort, atau Anireels). Kunjungi platform tersebut untuk menonton. TiraiPlay tidak menjamin ketersediaan di platform pihak ketiga mana pun."
         },
         {
           "q": "Apakah metadata selalu akurat?",
-          "a": "DRA.CIN mengumpulkan metadata dari sumber publik dan berusaha menjaganya tetap akurat, tetapi tidak menjamin kelengkapannya. Jika menemukan kesalahan, laporkan lewat halaman Kontak."
+          "a": "TiraiPlay mengumpulkan metadata dari sumber publik dan berusaha menjaganya tetap akurat, tetapi tidak menjamin kelengkapannya. Jika menemukan kesalahan, laporkan lewat halaman Kontak."
         },
         {
-          "q": "Bahasa apa saja yang didukung DRA.CIN?",
+          "q": "Bahasa apa saja yang didukung TiraiPlay?",
           "a": "Situs tersedia dalam bahasa Inggris (EN) dan Indonesia (ID); ganti lewat tombol bahasa di bilah navigasi. Setiap episode juga punya video bahasa Indonesia dan Inggris sendiri, yang dipilih di halaman tonton. Kedua pilihan tersimpan secara lokal di browser Anda dan tidak perlu login."
         }
       ],
       "account": [
         {
-          "q": "Apakah saya perlu akun untuk menggunakan DRA.CIN?",
+          "q": "Apakah saya perlu akun untuk menggunakan TiraiPlay?",
           "a": "Tidak. Menjelajah, mencari, dan melihat metadata dapat dilakukan tanpa akun. Markah disimpan secara lokal di browser Anda."
         },
         {
@@ -351,7 +363,7 @@
         },
         {
           "q": "Apakah data pribadi saya aman?",
-          "a": "DRA.CIN hanya menyimpan bahasa situs, bahasa video, tema, dan markah Anda secara lokal di browser lewat localStorage. Tidak ada data pribadi yang dikirim ke server. Lihat kebijakan Privasi untuk detailnya."
+          "a": "TiraiPlay hanya menyimpan bahasa situs, bahasa video, tema, dan markah Anda secara lokal di browser lewat localStorage. Tidak ada data pribadi yang dikirim ke server. Lihat kebijakan Privasi untuk detailnya."
         }
       ],
       "content": [
@@ -374,12 +386,12 @@
       ],
       "legal": [
         {
-          "q": "Apakah DRA.CIN melanggar hak cipta?",
-          "a": "DRA.CIN adalah direktori metadata, bukan platform streaming. DRA.CIN tidak menyimpan atau memutar file video. Hak atas materi asli tetap dimiliki pemiliknya. Lihat kebijakan DMCA untuk permintaan penghapusan."
+          "q": "Apakah TiraiPlay melanggar hak cipta?",
+          "a": "TiraiPlay adalah direktori metadata, bukan platform streaming. TiraiPlay tidak menyimpan atau memutar file video. Hak atas materi asli tetap dimiliki pemiliknya. Lihat kebijakan DMCA untuk permintaan penghapusan."
         },
         {
           "q": "Apakah ada biaya untuk penggunaan konten?",
-          "a": "Menggunakan DRA.CIN untuk menelusuri metadata gratis. Menonton di platform streaming pihak ketiga mungkin dikenai biaya langganan mereka sendiri."
+          "a": "Menggunakan TiraiPlay untuk menelusuri metadata gratis. Menonton di platform streaming pihak ketiga mungkin dikenai biaya langganan mereka sendiri."
         },
         {
           "q": "Di mana saya bisa membaca ketentuan lengkap?",
@@ -392,19 +404,19 @@
           "a": "Pastikan Anda memakai browser terbaru (Chrome, Firefox, Edge, atau Safari). Membersihkan cache browser juga bisa membantu."
         },
         {
-          "q": "Apakah DRA.CIN tersedia di ponsel?",
-          "a": "Ya. DRA.CIN responsif dan menyesuaikan dengan layar ponsel, tablet, dan desktop."
+          "q": "Apakah TiraiPlay tersedia di ponsel?",
+          "a": "Ya. TiraiPlay responsif dan menyesuaikan dengan layar ponsel, tablet, dan desktop."
         },
         {
-          "q": "Mengapa video tidak diputar di DRA.CIN?",
-          "a": "DRA.CIN bukan platform streaming dan tidak menyediakan pemutar video sungguhan. Halaman tonton ini hanya UI demo — ikuti platform sumber untuk menonton."
+          "q": "Mengapa video tidak diputar di TiraiPlay?",
+          "a": "TiraiPlay bukan platform streaming dan tidak menyediakan pemutar video sungguhan. Halaman tonton ini hanya UI demo — ikuti platform sumber untuk menonton."
         }
       ]
     }
   },
   "contact": {
     "eyebrow": "Hubungi Kami",
-    "title": "Dukungan DRA.CIN",
+    "title": "Dukungan TiraiPlay",
     "intro": "Ada pertanyaan, laporan bug, atau permintaan konten? Isi formulir di bawah atau hubungi kami langsung.",
     "emailTitle": "Email",
     "emailText": "Kirim pertanyaan umum dan laporan masalah lewat email.",
@@ -414,7 +426,7 @@
     "responseTitle": "Waktu Respons",
     "responseText": "Kami berusaha membalas setiap pesan dalam 2–5 hari kerja. Permintaan hak cipta mungkin butuh waktu lebih lama untuk diverifikasi.",
     "protoTitle": "Situs Prototipe",
-    "protoText": "DRA.CIN saat ini berjalan sebagai prototipe visual. Tidak ada layanan streaming langsung maupun sistem akun pengguna aktif.",
+    "protoText": "TiraiPlay saat ini berjalan sebagai prototipe visual. Tidak ada layanan streaming langsung maupun sistem akun pengguna aktif.",
     "legalLinks": "Tautan Legal",
     "terms": "Ketentuan Layanan",
     "dmcaPolicy": "Kebijakan DMCA",
@@ -472,7 +484,7 @@
   "terms": {
     "crumb": "Ketentuan Layanan",
     "title": "Ketentuan Layanan",
-    "intro": "Dokumen ini memuat aturan, batasan, dan tanggung jawab yang berlaku atas penggunaan DRA.CIN sebagai direktori metadata drama pendek Tiongkok.",
+    "intro": "Dokumen ini memuat aturan, batasan, dan tanggung jawab yang berlaku atas penggunaan TiraiPlay sebagai direktori metadata drama pendek Tiongkok.",
     "toc1": "Pendahuluan",
     "toc2": "Layanan Kami",
     "toc3": "Akun Pengguna",
@@ -482,38 +494,38 @@
     "toc7": "Perubahan Kebijakan",
     "toc8": "Hukum yang Berlaku",
     "toc9": "Kontak",
-    "s1p1": "Dengan mengakses atau menggunakan DRA.CIN, Anda setuju terikat pada Ketentuan Layanan ini secara penuh. Jika Anda tidak setuju dengan salah satu ketentuan, Anda tidak boleh menggunakan platform ini.",
+    "s1p1": "Dengan mengakses atau menggunakan TiraiPlay, Anda setuju terikat pada Ketentuan Layanan ini secara penuh. Jika Anda tidak setuju dengan salah satu ketentuan, Anda tidak boleh menggunakan platform ini.",
     "s1p2": "Ketentuan ini dapat diperbarui sewaktu-waktu. Penggunaan yang berlanjut setelah perubahan berarti Anda menerima ketentuan yang telah direvisi.",
-    "s1note": "DRA.CIN adalah prototipe visual dan direktori metadata. DRA.CIN tidak mengoperasikan layanan streaming dan tidak menyediakan konten video apa pun.",
-    "s2intro": "DRA.CIN menyediakan akses ke:",
+    "s1note": "TiraiPlay adalah prototipe visual dan direktori metadata. TiraiPlay tidak mengoperasikan layanan streaming dan tidak menyediakan konten video apa pun.",
+    "s2intro": "TiraiPlay menyediakan akses ke:",
     "s2a": "Metadata drama termasuk judul, sinopsis, jumlah episode, genre, dan platform sumber.",
     "s2b": "Penelusuran dan pencarian berdasarkan genre, platform, jadwal, dan kriteria lain.",
     "s2c": "Tautan referensi ke platform pihak ketiga tempat konten tersedia.",
     "s2d": "Preferensi bahasa untuk situs dan video, yang disimpan secara lokal di browser.",
-    "s2not": "DRA.CIN tidak:",
+    "s2not": "TiraiPlay tidak:",
     "s2e": "Menyimpan atau memutar file video.",
     "s2f": "Menyediakan streaming atau unduhan.",
     "s2g": "Menjamin ketersediaan atau kelengkapan metadata yang ditampilkan.",
     "s2h": "Bertanggung jawab atas konten atau kebijakan platform pihak ketiga.",
     "s3p1": "Akses ke fitur tertentu mungkin memerlukan akun. Prototipe ini tidak menerapkan sistem akun sungguhan; markah dan preferensi disimpan secara lokal di browser Anda.",
-    "s3p2": "DRA.CIN dapat menangguhkan akses untuk aktivitas yang melanggar ketentuan ini.",
-    "s4p1": "Seluruh konten video, karya seni, dan materi berhak cipta yang dirujuk di DRA.CIN adalah milik pemiliknya masing-masing. DRA.CIN tidak mengklaim kepemilikan atas konten pihak ketiga mana pun. Tautan ke platform hanya untuk navigasi.",
+    "s3p2": "TiraiPlay dapat menangguhkan akses untuk aktivitas yang melanggar ketentuan ini.",
+    "s4p1": "Seluruh konten video, karya seni, dan materi berhak cipta yang dirujuk di TiraiPlay adalah milik pemiliknya masing-masing. TiraiPlay tidak mengklaim kepemilikan atas konten pihak ketiga mana pun. Tautan ke platform hanya untuk navigasi.",
     "s4warnBefore": "jika Anda pemilik hak dan yakin materi Anda ditampilkan tanpa izin, lihat",
     "s4warnAfter": "untuk meminta penghapusan.",
-    "s4p2": "“DRA.CIN”, logo, dan elemen visual terkait adalah milik DRA.CIN. Penggunaan merek ini tanpa izin tertulis dilarang.",
-    "s5p1": "DRA.CIN disediakan “apa adanya” dan “sebagaimana tersedia”, tanpa jaminan apa pun, tersurat maupun tersirat. DRA.CIN tidak bertanggung jawab atas kerugian tidak langsung, insidental, konsekuensial, atau hukuman yang timbul dari penggunaan platform.",
-    "s5p2": "Dengan menggunakan DRA.CIN, Anda setuju membebaskannya dari klaim, kerugian, kewajiban, dan biaya yang timbul dari penggunaan platform atau pelanggaran Anda atas ketentuan ini.",
+    "s4p2": "“TiraiPlay”, logo, dan elemen visual terkait adalah milik TiraiPlay. Penggunaan merek ini tanpa izin tertulis dilarang.",
+    "s5p1": "TiraiPlay disediakan “apa adanya” dan “sebagaimana tersedia”, tanpa jaminan apa pun, tersurat maupun tersirat. TiraiPlay tidak bertanggung jawab atas kerugian tidak langsung, insidental, konsekuensial, atau hukuman yang timbul dari penggunaan platform.",
+    "s5p2": "Dengan menggunakan TiraiPlay, Anda setuju membebaskannya dari klaim, kerugian, kewajiban, dan biaya yang timbul dari penggunaan platform atau pelanggaran Anda atas ketentuan ini.",
     "s6p2": "Lihat",
     "s6p2After": "untuk informasi lebih lanjut.",
-    "s7p1": "DRA.CIN dapat mengubah ketentuan ini sewaktu-waktu. Perubahan tercermin pada tanggal “Terakhir diperbarui”. Penggunaan yang berlanjut setelah perubahan berarti Anda menerima ketentuan yang telah direvisi; jika tidak setuju, Anda dapat berhenti menggunakan platform.",
+    "s7p1": "TiraiPlay dapat mengubah ketentuan ini sewaktu-waktu. Perubahan tercermin pada tanggal “Terakhir diperbarui”. Penggunaan yang berlanjut setelah perubahan berarti Anda menerima ketentuan yang telah direvisi; jika tidak setuju, Anda dapat berhenti menggunakan platform.",
     "s8p1": "Ketentuan ini diatur dan ditafsirkan berdasarkan hukum yurisdiksi yang berlaku. Sengketa akan diselesaikan melalui jalur yang sesuai.",
     "s9p1": "Untuk pertanyaan tentang ketentuan ini, gunakan",
-    "s6p1": "DRA.CIN menghormati privasi Anda. Satu-satunya data yang disimpan secara lokal di browser Anda adalah bahasa situs, bahasa video, preferensi tema, dan markah, melalui localStorage. Tidak ada data pribadi yang dikirim ke server DRA.CIN."
+    "s6p1": "TiraiPlay menghormati privasi Anda. Satu-satunya data yang disimpan secara lokal di browser Anda adalah bahasa situs, bahasa video, preferensi tema, dan markah, melalui localStorage. Tidak ada data pribadi yang dikirim ke server TiraiPlay."
   },
   "privacy": {
     "crumb": "Kebijakan Privasi",
     "title": "Kebijakan Privasi",
-    "intro": "Dokumen ini menjelaskan data apa yang dikumpulkan DRA.CIN, cara penggunaannya, dan langkah yang diambil untuk melindungi privasi Anda sebagai pengguna prototipe ini.",
+    "intro": "Dokumen ini menjelaskan data apa yang dikumpulkan TiraiPlay, cara penggunaannya, dan langkah yang diambil untuk melindungi privasi Anda sebagai pengguna prototipe ini.",
     "toc1": "Informasi yang Kami Kumpulkan",
     "toc2": "Cara Kami Menggunakan Data",
     "toc3": "Penyimpanan Data",
@@ -522,7 +534,7 @@
     "toc6": "Kebijakan DMCA",
     "toc7": "Perubahan Kebijakan",
     "toc8": "Kontak",
-    "s1p1": "DRA.CIN adalah prototipe visual yang berfungsi sebagai direktori metadata. Pada tahap saat ini, DRA.CIN tidak secara aktif mengumpulkan data pribadi penggunanya.",
+    "s1p1": "TiraiPlay adalah prototipe visual yang berfungsi sebagai direktori metadata. Pada tahap saat ini, TiraiPlay tidak secara aktif mengumpulkan data pribadi penggunanya.",
     "s1local": "Disimpan secara lokal (hanya di browser Anda):",
     "s1localItemBefore": "Bahasa situs, bahasa video, preferensi tema, dan markah Anda, disimpan melalui",
     "s1localItemAfter": "Data ini tidak pernah dikirim ke server.",
@@ -535,12 +547,12 @@
     "s2aText": "— disimpan secara lokal dan dipakai untuk menampilkan situs dan video dalam bahasa Anda, menerapkan tema, serta menyimpan drama pilihan Anda.",
     "s2b": "Pesan kontak",
     "s2bText": "— digunakan khusus untuk membalas pertanyaan, laporan bug, atau permintaan konten.",
-    "s2p": "DRA.CIN tidak menjual, menukar, atau membagikan data pribadi Anda untuk tujuan pemasaran.",
+    "s2p": "TiraiPlay tidak menjual, menukar, atau membagikan data pribadi Anda untuk tujuan pemasaran.",
     "s3p1Before": "Preferensi bahasa dan tema serta markah Anda disimpan di",
-    "s3p1Mid": "pada browser Anda sendiri. DRA.CIN tidak memiliki akses ke",
+    "s3p1Mid": "pada browser Anda sendiri. TiraiPlay tidak memiliki akses ke",
     "s3p1After": "Anda — data tetap berada di perangkat Anda dan dapat dihapus kapan saja lewat pengaturan browser.",
     "s3p2": "Data yang dikirim lewat formulir kontak, pada versi produksi, hanya akan disimpan selama diperlukan.",
-    "s4intro": "DRA.CIN tidak membagikan data pribadi Anda kepada pihak ketiga, kecuali:",
+    "s4intro": "TiraiPlay tidak membagikan data pribadi Anda kepada pihak ketiga, kecuali:",
     "s4a": "Kepatuhan hukum",
     "s4aText": "— jika diwajibkan oleh hukum atau proses hukum yang berlaku.",
     "s4b": "Placeholder analitik",
@@ -551,7 +563,7 @@
     "s5b": "Meminta penghapusan data pribadi yang telah Anda kirimkan.",
     "s5c": "Mengelola atau menghapus preferensi yang tersimpan di browser Anda.",
     "s5p": "Untuk menggunakan hak ini, gunakan",
-    "s6p": "DRA.CIN menghormati hak kekayaan intelektual. Lihat",
+    "s6p": "TiraiPlay menghormati hak kekayaan intelektual. Lihat",
     "s6pAfter": "untuk permintaan penghapusan.",
     "s7p": "Kebijakan ini dapat diperbarui seiring perkembangan platform. Perubahan tercermin pada tanggal “Terakhir diperbarui” di bagian atas dokumen ini. Penggunaan yang berlanjut setelah perubahan berarti Anda menerima kebijakan yang telah direvisi.",
     "s8p": "Untuk pertanyaan tentang kebijakan ini, gunakan",
@@ -562,7 +574,7 @@
     "crumb": "Kebijakan DMCA",
     "title1": "Kebijakan Hak Cipta",
     "title2": "(DMCA)",
-    "intro": "DRA.CIN menghormati hak kekayaan intelektual semua pihak. Kebijakan ini menjelaskan cara mengajukan permintaan penghapusan hak cipta berdasarkan Digital Millennium Copyright Act (DMCA).",
+    "intro": "TiraiPlay menghormati hak kekayaan intelektual semua pihak. Kebijakan ini menjelaskan cara mengajukan permintaan penghapusan hak cipta berdasarkan Digital Millennium Copyright Act (DMCA).",
     "toc1": "Ruang Lingkup Kebijakan",
     "toc2": "Pemberitahuan Pelanggaran",
     "toc21": "Daftar Periksa",
@@ -570,9 +582,9 @@
     "toc3": "Pemberitahuan Balasan",
     "toc4": "Pelanggar Berulang",
     "toc5": "Kontak",
-    "s1p1": "Kebijakan ini berlaku untuk semua konten yang teridentifikasi di platform, termasuk judul drama, sinopsis, karya seni, dan metadata lainnya. DRA.CIN adalah direktori metadata — tidak menyimpan atau memutar file video.",
-    "s1p2": "Jika Anda pemilik konten, atau perwakilan yang berwenang, dan yakin materi berhak cipta Anda ditampilkan di DRA.CIN tanpa izin, mekanisme di bawah ini memungkinkan Anda meminta penghapusan.",
-    "s1note": "Permintaan penghapusan hanya berlaku untuk metadata yang ditampilkan di DRA.CIN, bukan untuk konten di platform streaming pihak ketiga tempat drama dihosting.",
+    "s1p1": "Kebijakan ini berlaku untuk semua konten yang teridentifikasi di platform, termasuk judul drama, sinopsis, karya seni, dan metadata lainnya. TiraiPlay adalah direktori metadata — tidak menyimpan atau memutar file video.",
+    "s1p2": "Jika Anda pemilik konten, atau perwakilan yang berwenang, dan yakin materi berhak cipta Anda ditampilkan di TiraiPlay tanpa izin, mekanisme di bawah ini memungkinkan Anda meminta penghapusan.",
+    "s1note": "Permintaan penghapusan hanya berlaku untuk metadata yang ditampilkan di TiraiPlay, bukan untuk konten di platform streaming pihak ketiga tempat drama dihosting.",
     "s2p": "Untuk meminta penghapusan, Anda (atau perwakilan berwenang Anda) harus mengirim pemberitahuan tertulis yang memenuhi persyaratan DMCA kepada agen hak cipta yang kami tunjuk.",
     "s2warn": "Ketidakakuratan dalam pemberitahuan dapat berakibat pada tanggung jawab ganti rugi. Jika Anda ragu apakah suatu materi melanggar, konsultasikan dulu dengan pengacara.",
     "s21": "Informasi yang Diperlukan",
@@ -598,11 +610,11 @@
     "st4": "Konfirmasi",
     "st4p": "Kami akan mengirim konfirmasi ke alamat email yang tercantum dalam pemberitahuan setelah tindakan dilakukan.",
     "s3p": "Jika Anda yakin konten dihapus atau dinonaktifkan secara keliru, Anda dapat mengajukan pemberitahuan balasan. Isinya harus memuat informasi serupa dengan pemberitahuan awal dan pernyataan di bawah sumpah palsu bahwa penghapusan itu adalah kesalahan. Kami akan memprosesnya sesuai persyaratan DMCA.",
-    "s4p": "DRA.CIN mengambil tindakan tegas terhadap pelanggaran berulang. Jika seorang pengguna terbukti melanggar berulang kali, aksesnya dapat ditangguhkan atau dihentikan setelah dua atau lebih pemberitahuan yang sah.",
+    "s4p": "TiraiPlay mengambil tindakan tegas terhadap pelanggaran berulang. Jika seorang pengguna terbukti melanggar berulang kali, aksesnya dapat ditangguhkan atau dihentikan setelah dua atau lebih pemberitahuan yang sah.",
     "s5p": "Untuk mengajukan permintaan DMCA, gunakan",
     "s5pAfter": "atau kirim email langsung kepada kami.",
     "s5card": "Ditujukan kepada",
-    "s5cardText": "Agen Hak Cipta DRA.CIN",
+    "s5cardText": "Agen Hak Cipta TiraiPlay",
     "s5cardNote": "Alamat ini khusus untuk urusan hak cipta.",
     "reportNote": "Laporan diisi lewat formulir kontak, dengan kategori “Hak Cipta (DMCA)” yang sudah terpilih. Pada prototipe ini formulir hanya simulasi lokal: tidak ada yang dikirim ke server.",
     "reportButton": "Laporkan masalah hak cipta"

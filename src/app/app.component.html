@@ -1,9 +1,12 @@
-<div class="min-h-screen flex flex-col">
-  <app-header />
-  <main class="flex-1">
-    <router-outlet />
-  </main>
-  <app-footer />
-  <p-toast position="bottom-right" />
-  <app-drama-preview />
-</div>
+<div class="tirai-bamboo-bg" aria-hidden="true"></div>
+<router-outlet />
+@if (pwa.updateAvailable()) {
+  <div class="pwa-update-banner" role="status">
+    <span>{{ 'pwa.updateReady' | transloco }}</span>
+    <button type="button" class="btn btn-primary btn-compact" (click)="pwa.reloadForUpdate()">
+      {{ 'pwa.reload' | transloco }}
+    </button>
+  </div>
+}
+<p-toast position="bottom-right" />
+<app-drama-preview />

@@ -16,6 +16,7 @@ import { routes } from './app.routes';
 import { PRIMEUI_LICENSE_KEY } from './core/license';
 import { I18nLoader } from './core/i18n/i18n.loader';
 import { I18nService, SITE_LANGS } from './core/services/i18n.service';
+import { provideServiceWorker } from '@angular/service-worker';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -54,5 +55,9 @@ export const appConfig: ApplicationConfig = {
       },
     }),
     MessageService,
+    provideServiceWorker('ngsw-worker.js', {
+      enabled: !isDevMode(),
+      registrationStrategy: 'registerWhenStable:30000',
+    }),
   ],
 };

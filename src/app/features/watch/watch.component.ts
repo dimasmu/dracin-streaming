@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   DestroyRef,
   ElementRef,
@@ -25,10 +24,21 @@ import { EmptyStateComponent } from '../../shared/components/empty-state/empty-s
 import { DragScrollDirective } from '../../shared/directives/drag-scroll.directive';
 import { formatAired, monogram, ratingStars, videoLangLabel } from '../../core/utils/format';
 
-/** A comment you posted. Its author and time are translated when shown, so they follow the website language. */
 interface OwnComment {
+  id: string;
   body: string;
+  likes: number;
 }
+
+interface EpisodeRange {
+  index: number;
+  start: number;
+  end: number;
+  label: string;
+}
+
+const EP_CHUNK_SIZE = 30;
+const PLAYBACK_SPEEDS = [1, 1.25, 1.5, 2] as const;
 
 @Component({
   imports: [
@@ -41,7 +51,11 @@ interface OwnComment {
     DragScrollDirective,
   ],
   templateUrl: './watch.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  host: {
+    '(document:fullscreenchange)': 'onFullscreenChange()',
+    '(document:keydown)': 'onGlobalKeydown($event)',
+    '(document:click)': 'onDocumentClick($event)',
+  },
 })
 export class WatchComponent {
   readonly slug = input<string>();
@@ -54,12 +68,12 @@ export class WatchComponent {
   private readonly prefs = inject(PreferencesService);
   private readonly messages = inject(MessageService);
   private readonly router = inject(Router);
-  private readonly i18n = inject(I18nService);
+  protected readonly i18n = inject(I18nService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly playerEl = viewChild<ElementRef<HTMLElement>>('player');
 
   protected readonly monogram = monogram;
-  protected readonly stars = [0, 1, 2, 3, 4];
+  protected readonly stars = [1, 2, 3, 4, 5];
 
   protected readonly drama = computed(() =>
     this.slug() ? this.catalog.getBySlug(this.slug()!) : undefined,
@@ -75,13 +89,54 @@ export class WatchComponent {
 
   protected readonly hasPrev = computed(() => this.episodeNumber() > 1);
   protected readonly hasNext = computed(() => this.episodeNumber() < this.totalEpisodes());
-  protected readonly episodeNumbers = computed(() =>
+
+  protected readonly episodeRanges = computed<EpisodeRange[]>(() => {
+    const total = this.totalEpisodes();
+    const ranges: EpisodeRange[] = [];
+    for (let start = 1, idx = 0; start <= total; start += EP_CHUNK_SIZE, idx++) {
+      const end = Math.min(total, start + EP_CHUNK_SIZE - 1);
+      ranges.push({
+        index: idx,
+        start,
+        end,
+        label: `Episode ${start} – ${end}`,
+      });
+    }
+    return ranges;
+  });
+
+  protected readonly selectedRangeIndex = signal(0);
+
+  protected readonly visibleEpisodeNumbers = computed(() => {
+    const ranges = this.episodeRanges();
+    const range = ranges[this.selectedRangeIndex()] ?? ranges[0];
+    if (!range) return [1];
+    return Array.from({ length: range.end - range.start + 1 }, (_, i) => range.start + i);
+  });
+
+  protected readonly allEpisodeNumbers = computed(() =>
     Array.from({ length: this.totalEpisodes() }, (_, i) => i + 1),
   );
 
   protected readonly related = computed(() =>
-    this.drama() ? this.catalog.related(this.drama()!, 8) : [],
+    this.drama() ? this.catalog.related(this.drama()!, 10) : [],
   );
+
+  /** Up Next / Rekomendasi Lanjutan compact list in the right sidebar */
+  protected readonly upNextList = computed(() => this.related().slice(0, 4));
+
+  protected readonly dramaTags = computed<string[]>(() => {
+    const d = this.drama();
+    if (!d) return [];
+    if (d.tags && d.tags.length > 0) return d.tags;
+    return [
+      ...d.genres.map((g) => this.i18n.t(`genre.${g}`)),
+      d.platformId,
+      d.status === 'completed' ? (this.i18n.lang() === 'id' ? 'Tamat' : 'Completed') : 'Ongoing',
+      ...(d.releaseYear ? [String(d.releaseYear)] : []),
+    ];
+  });
+
   protected readonly bookmarked = computed(() =>
     this.drama() ? this.bookmarks.isBookmarked(this.drama()!.id) : false,
   );
@@ -98,25 +153,38 @@ export class WatchComponent {
       : '';
   });
 
-  // Demo-player state. There is no real media source behind any of this.
+  // Demo-player state
   protected readonly playing = signal(false);
-  protected readonly progress = signal(0);
+  protected readonly progress = signal(18);
   protected readonly muted = signal(false);
-  protected readonly quality = signal<'HD' | 'SD'>('HD');
+  protected readonly quality = signal<'1080p' | '720p'>('1080p');
+  protected readonly speedIndex = signal(0);
+  protected readonly speedLabel = computed(() => `${PLAYBACK_SPEEDS[this.speedIndex()]}x`);
+  protected readonly aspectVertical = signal(false);
+  protected readonly isFullscreen = signal(false);
+  protected readonly epMenuOpen = signal(false);
+  protected readonly reelTransition = signal<'up' | 'down' | ''>('');
+  protected readonly showReelsHint = signal(false);
+  protected readonly swipeFeedback = signal<string>('');
+  protected readonly swipeOffsetY = signal(0);
+  protected readonly shortcutsOpen = signal(false);
   protected readonly server = signal(1);
   protected readonly autoPlay = signal(true);
   protected readonly autoNext = signal(true);
   protected readonly lightsOut = signal(false);
   protected readonly vote = signal<'' | 'like' | 'dislike'>('');
+  protected readonly userScore = signal(0);
+
+  private swipeStartY: number | null = null;
+  private swipePointerId: number | null = null;
+  private lastWheelStepAt = 0;
+  private swipeFeedbackTimer: ReturnType<typeof setTimeout> | null = null;
+  private reelTransitionTimer: ReturnType<typeof setTimeout> | null = null;
+  private reelsHintTimer: ReturnType<typeof setTimeout> | null = null;
 
   /** Video versions this drama has, in display order. */
   protected readonly videoLangs = computed<VideoLang[]>(() => this.drama()?.videoLanguages ?? []);
 
-  /**
-   * Which video version is playing: the URL's `?v=` first, then what the
-   * viewer last chose, then the website language, then the first version.
-   * The website language is only a starting point; the two are independent.
-   */
   protected readonly videoLang = computed<VideoLang | ''>(() => {
     const langs = this.videoLangs();
     for (const wanted of [this.v(), this.prefs.videoLang(), this.i18n.lang()]) {
@@ -126,10 +194,8 @@ export class WatchComponent {
     return langs[0] ?? '';
   });
 
-  /** Query params that keep the chosen version while moving between episodes. */
   protected readonly versionParams = computed(() => (this.v() ? { v: this.videoLang() } : {}));
 
-  /** Dropdown options. Names follow the website language; values are the video versions. */
   protected readonly videoLangOptions = computed(() =>
     this.videoLangs().map((value) => ({ value, label: this.i18n.t('videoLang.' + value + 'Name') })),
   );
@@ -145,30 +211,197 @@ export class WatchComponent {
     this.formatTime(Math.floor((this.progress() / 100) * this.durationSeconds())),
   );
 
+  protected readonly commentSort = signal<'new' | 'top'>('new');
   private readonly ownComments = signal<OwnComment[]>([]);
-  protected readonly comments = computed(() => [
-    ...this.ownComments().map((c) => ({
+  private readonly likedComments = signal<ReadonlySet<string>>(new Set());
+
+  protected readonly comments = computed(() => {
+    const own = this.ownComments().map((c) => ({
+      id: c.id,
       author: this.i18n.t('watch.you'),
       time: this.i18n.t('watch.justNow'),
       body: c.body,
-    })),
-    ...[1, 2, 3].map((n) => ({
-      author: this.i18n.t(`watch.c${n}Author`),
-      time: this.i18n.t(`watch.c${n}Time`),
-      body: this.i18n.t(`watch.c${n}Body`),
-    })),
-  ]);  protected readonly draft = signal('');
+      likes: c.likes + (this.likedComments().has(c.id) ? 1 : 0),
+    }));
+    const presets = [
+      { id: 'c1', baseLikes: 24, n: 1 },
+      { id: 'c2', baseLikes: 15, n: 2 },
+      { id: 'c3', baseLikes: 9, n: 3 },
+    ].map((p) => ({
+      id: p.id,
+      author: this.i18n.t(`watch.c${p.n}Author`),
+      time: this.i18n.t(`watch.c${p.n}Time`),
+      body: this.i18n.t(`watch.c${p.n}Body`),
+      likes: p.baseLikes + (this.likedComments().has(p.id) ? 1 : 0),
+    }));
+    const list = [...own, ...presets];
+    if (this.commentSort() === 'top') {
+      return [...list].sort((a, b) => b.likes - a.likes);
+    }
+    return list;
+  });
+
+  protected readonly draft = signal('');
 
   private timer: ReturnType<typeof setInterval> | null = null;
 
   constructor() {
-    // A different episode or drama starts from the beginning, paused.
     effect(() => {
       this.slug();
-      this.episodeNumber();
-      untracked(() => this.stop(true));
+      const ep = this.episodeNumber();
+      untracked(() => {
+        this.stop(true);
+        this.selectedRangeIndex.set(Math.floor((ep - 1) / EP_CHUNK_SIZE));
+      });
     });
-    this.destroyRef.onDestroy(() => this.stop(false));
+    this.destroyRef.onDestroy(() => {
+      this.stop(false);
+      if (this.swipeFeedbackTimer) clearTimeout(this.swipeFeedbackTimer);
+      if (this.reelTransitionTimer) clearTimeout(this.reelTransitionTimer);
+      if (this.reelsHintTimer) clearTimeout(this.reelsHintTimer);
+    });
+  }
+
+  protected onFullscreenChange(): void {
+    const active = !!document.fullscreenElement;
+    this.isFullscreen.set(active);
+    this.epMenuOpen.set(false);
+    if (this.reelsHintTimer) clearTimeout(this.reelsHintTimer);
+    if (active) {
+      this.showReelsHint.set(true);
+      this.reelsHintTimer = setTimeout(() => this.showReelsHint.set(false), 2600);
+    } else {
+      this.showReelsHint.set(false);
+    }
+  }
+
+  protected onGlobalKeydown(event: KeyboardEvent): void {
+    if (event.key === 'Escape' && this.epMenuOpen()) {
+      this.epMenuOpen.set(false);
+      return;
+    }
+    if (!this.isFullscreen()) return;
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      this.stepEpisode(1);
+    } else if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      this.stepEpisode(-1);
+    }
+  }
+
+  protected onDocumentClick(event: MouseEvent): void {
+    if (!this.epMenuOpen()) return;
+    const target = event.target as HTMLElement | null;
+    if (!target?.closest('.watch-ep-dropdown-wrap')) {
+      this.epMenuOpen.set(false);
+    }
+  }
+
+  protected selectEpisode(ep: number): void {
+    this.epMenuOpen.set(false);
+    const d = this.drama();
+    if (!d || !isFinite(ep) || ep < 1 || ep > this.totalEpisodes()) return;
+    void this.router.navigate(['/watch', d.slug, ep], { queryParams: this.versionParams() });
+  }
+
+  protected stepEpisode(delta: -1 | 1): void {
+    const d = this.drama();
+    if (!d) return;
+    const target = this.episodeNumber() + delta;
+    if (target < 1 || target > this.totalEpisodes()) {
+      this.showSwipeFeedback(
+        delta > 0
+          ? this.i18n.lang() === 'id'
+            ? 'Episode terakhir'
+            : 'Last episode'
+          : this.i18n.lang() === 'id'
+            ? 'Episode pertama'
+            : 'First episode',
+      );
+      return;
+    }
+    this.reelTransition.set(delta > 0 ? 'up' : 'down');
+    if (this.reelTransitionTimer) clearTimeout(this.reelTransitionTimer);
+    this.reelTransitionTimer = setTimeout(() => this.reelTransition.set(''), 260);
+    this.showSwipeFeedback(`${delta > 0 ? '↑' : '↓'} Episode ${target}`);
+    void this.router.navigate(['/watch', d.slug, target], { queryParams: this.versionParams() });
+  }
+
+  protected onStagePointerDown(event: PointerEvent): void {
+    if (!this.isFullscreen() && !this.aspectVertical()) return;
+    const target = event.target as HTMLElement | null;
+    if (target?.closest('button, select, a, input, .watch-hud-bottom, .watch-ep-dropdown-wrap')) return;
+    this.swipeStartY = event.clientY;
+    this.swipePointerId = event.pointerId;
+    this.swipeOffsetY.set(0);
+  }
+
+  protected onStagePointerMove(event: PointerEvent): void {
+    if (this.swipeStartY === null || event.pointerId !== this.swipePointerId) return;
+    const dy = event.clientY - this.swipeStartY;
+    this.swipeOffsetY.set(Math.max(-90, Math.min(90, dy)));
+  }
+
+  protected onStagePointerUp(event: PointerEvent): void {
+    if (this.swipeStartY === null || event.pointerId !== this.swipePointerId) return;
+    const dy = event.clientY - this.swipeStartY;
+    this.swipeStartY = null;
+    this.swipePointerId = null;
+    this.swipeOffsetY.set(0);
+    if (Math.abs(dy) >= 56) {
+      // Swipe up (dy < 0) -> next episode; swipe down (dy > 0) -> previous episode (Instagram Reels)
+      this.stepEpisode(dy < 0 ? 1 : -1);
+    }
+  }
+
+  protected onStageWheel(event: WheelEvent): void {
+    if (!this.isFullscreen()) return;
+    if (Math.abs(event.deltaY) < 28) return;
+    event.preventDefault();
+    const now = Date.now();
+    if (now - this.lastWheelStepAt < 480) return;
+    this.lastWheelStepAt = now;
+    this.stepEpisode(event.deltaY > 0 ? 1 : -1);
+  }
+
+  private showSwipeFeedback(text: string): void {
+    this.swipeFeedback.set(text);
+    if (this.swipeFeedbackTimer) clearTimeout(this.swipeFeedbackTimer);
+    this.swipeFeedbackTimer = setTimeout(() => this.swipeFeedback.set(''), 1300);
+  }
+
+  protected selectRange(event: Event): void {
+    const idx = Number((event.target as HTMLSelectElement).value);
+    if (isFinite(idx) && idx >= 0) {
+      this.selectedRangeIndex.set(idx);
+    }
+  }
+
+  protected setCommentSort(event: Event): void {
+    const val = (event.target as HTMLSelectElement).value;
+    this.commentSort.set(val === 'top' ? 'top' : 'new');
+  }
+
+  protected isCommentLiked(id: string): boolean {
+    return this.likedComments().has(id);
+  }
+
+  protected toggleCommentLike(id: string): void {
+    const next = new Set(this.likedComments());
+    if (next.has(id)) next.delete(id);
+    else next.add(id);
+    this.likedComments.set(next);
+  }
+
+  protected rateDrama(score: number): void {
+    this.userScore.set(score);
+    this.messages.add({
+      severity: 'success',
+      summary: this.i18n.lang() === 'id' ? 'Penilaian disimpan' : 'Rating saved',
+      detail: `${score} / 5 ★`,
+      life: 2000,
+    });
   }
 
   protected togglePlay(): void {
@@ -189,8 +422,16 @@ export class WatchComponent {
     this.progress.set(Math.min(100, Math.max(0, ((event.clientX - rect.left) / rect.width) * 100)));
   }
 
+  protected cycleSpeed(): void {
+    this.speedIndex.update((i) => (i + 1) % PLAYBACK_SPEEDS.length);
+  }
+
   protected toggleQuality(): void {
-    this.quality.update((q) => (q === 'HD' ? 'SD' : 'HD'));
+    this.quality.update((q) => (q === '1080p' ? '720p' : '1080p'));
+  }
+
+  protected toggleAspect(): void {
+    this.aspectVertical.update((v) => !v);
   }
 
   protected toggleFullscreen(): void {
@@ -200,7 +441,6 @@ export class WatchComponent {
     else void el.requestFullscreen?.();
   }
 
-  /** Switch to the other video. Playback position is kept, like changing audio track in a real player. */
   protected setVideoLang(lang: VideoLang | null): void {
     if (!lang || lang === this.videoLang()) return;
     this.prefs.setVideoLang(lang);
@@ -251,13 +491,14 @@ export class WatchComponent {
   }
 
   protected onDraft(event: Event): void {
-    this.draft.set((event.target as HTMLTextAreaElement).value);
+    this.draft.set((event.target as HTMLInputElement | HTMLTextAreaElement).value);
   }
 
-  protected submitComment(): void {
+  protected submitComment(event?: Event): void {
+    event?.preventDefault();
     const body = this.draft().trim();
     if (!body) return;
-    this.ownComments.update((c) => [{ body }, ...c]);
+    this.ownComments.update((c) => [{ id: `own-${Date.now()}`, body, likes: 0 }, ...c]);
     this.draft.set('');
     this.messages.add({
       severity: 'success',

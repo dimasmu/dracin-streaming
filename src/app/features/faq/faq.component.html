@@ -1,60 +1,70 @@
-<main>
-  <div class="faq-hero">
-    <div class="container">
-      <p class="eyebrow">{{ 'faq.helpCenter' | transloco }}</p>
-      <h1 class="display">{{ 'faq.title' | transloco }}</h1>
-      <p>{{ 'faq.intro' | transloco }}</p>
-      <div class="faq-search-wrap">
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          aria-hidden="true"
-        >
-          <circle cx="11" cy="11" r="8" />
-          <path d="m21 21-4.35-4.35" />
-        </svg>
-        <input
-          class="faq-search"
-          type="search"
-          [placeholder]="'faq.searchPlaceholder' | transloco"
-          [attr.aria-label]="'faq.searchLabel' | transloco"
-          [value]="query()"
-          (input)="onQuery($event)"
-        />
-      </div>
-    </div>
-  </div>
-
+<main class="editorial-page">
   <div class="container">
-    <div class="faq-categories">
-      <h2 class="faq-categories-heading display">{{ 'faq.categories' | transloco }}</h2>
-      <div class="faq-category-grid">
-        @for (c of categories(); track c.id) {
-          <button
-            type="button"
-            class="faq-category-card"
-            [class.selected]="activeCategory() === c.id"
-            (click)="setCategory(c.id)"
+    <app-editorial-tabs active="faq" currentLabel="FAQ" />
+
+    <section class="editorial-hero-card">
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div class="space-y-2 max-w-2xl">
+          <div class="editorial-hero-eyebrow">
+            <span class="editorial-accent-bar is-cyan"></span>
+            <span class="editorial-eyebrow-text">{{ 'faq.helpCenter' | transloco }}</span>
+          </div>
+          <h1 class="display editorial-hero-title">{{ 'faq.title' | transloco }}</h1>
+          <p class="legal-lede">{{ 'faq.intro' | transloco }}</p>
+        </div>
+
+        <div class="faq-search-wrap faq-hero-search">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
           >
-            <div class="faq-cat-icon"><i [class]="c.icon" aria-hidden="true"></i></div>
-            <div class="text-left">
-              <p class="faq-cat-title">{{ c.name }}</p>
-              <p class="faq-cat-count">{{ 'faq.questionsCount' | transloco: { count: c.count } }}</p>
-            </div>
-          </button>
-        }
+            <circle cx="11" cy="11" r="8" />
+            <path d="m21 21-4.35-4.35" />
+          </svg>
+          <input
+            class="faq-search"
+            type="search"
+            [placeholder]="'faq.searchPlaceholder' | transloco"
+            [attr.aria-label]="'faq.searchLabel' | transloco"
+            [value]="query()"
+            (input)="onQuery($event)"
+          />
+        </div>
       </div>
+    </section>
+
+    <div class="faq-pill-strip" role="group" [attr.aria-label]="'faq.categories' | transloco">
+      <button
+        type="button"
+        class="faq-pill-btn"
+        [class.is-active]="activeCategory() === null"
+        (click)="activeCategory.set(null); openPanels.set([])"
+      >
+        <span>{{ i18n.lang() === 'id' ? 'Semua' : 'All' }}</span>
+        <span class="faq-pill-count">{{ items().length }}</span>
+      </button>
+      @for (c of categories(); track c.id) {
+        <button
+          type="button"
+          class="faq-pill-btn"
+          [class.is-active]="activeCategory() === c.id"
+          (click)="setCategory(c.id)"
+        >
+          <span>{{ c.name }}</span>
+          <span class="faq-pill-count">{{ c.count }}</span>
+        </button>
+      }
     </div>
 
-    <div class="faq-accordion">
-      <h2 class="faq-accordion-heading display">{{ 'faq.common' | transloco }}</h2>
+    <div class="faq-accordion editorial-faq-accordion">
       @if (visible().length) {
         <p-accordion [(value)]="openPanels" [multiple]="true">
-          @for (item of visible(); track $index; let i = $index) {
+          @for (item of visible(); track $index) {
             <p-accordion-panel [value]="itemKey(item)">
               <p-accordion-header>{{ item.q }}</p-accordion-header>
               <p-accordion-content>{{ item.a }}</p-accordion-content>
@@ -62,16 +72,27 @@
           }
         </p-accordion>
       } @else {
-        <p class="faq-no-results">
-          {{ 'faq.noResults' | transloco: { query: query() } }}
-        </p>
+        <div class="editorial-empty-box">
+          <p class="faq-no-results">
+            {{ 'faq.noResults' | transloco: { query: query() } }}
+          </p>
+        </div>
       }
     </div>
 
-    <div style="text-align: center; padding: 0 0 80px">
-      <p style="color: var(--muted); font-size: 13px; margin: 0 0 14px">
-        {{ 'faq.notFound' | transloco }}
-      </p>
+    <div class="editorial-cta-banner">
+      <div class="space-y-1">
+        <h2 class="text-sm font-extrabold" style="color: var(--d-fg)">
+          {{ 'faq.notFound' | transloco }}
+        </h2>
+        <p class="text-xs" style="color: var(--d-muted)">
+          {{
+            i18n.lang() === 'id'
+              ? 'Tim kami siap membantu lewat halaman kontak.'
+              : 'Reach out to our team on the contact page.'
+          }}
+        </p>
+      </div>
       <a class="btn btn-primary" routerLink="/contact">{{ 'faq.contactSupport' | transloco }}</a>
     </div>
   </div>

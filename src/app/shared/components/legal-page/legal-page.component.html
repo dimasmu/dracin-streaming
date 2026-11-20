@@ -1,39 +1,45 @@
-<main class="legal-main">
-  <div class="legal-hero">
-    <div class="container">
-      <nav class="legal-breadcrumb" [attr.aria-label]="'legalCommon.breadcrumb' | transloco">
-        <a routerLink="/">DRA.CIN</a>
-        <span aria-hidden="true">/</span>
-        <span>{{ 'common.legal' | transloco }}</span>
-        <span aria-hidden="true">/</span>
-        <span aria-current="page">{{ doc() + '.crumb' | transloco }}</span>
-      </nav>
-      <div class="legal-hero-inner">
-        <p class="eyebrow">{{ 'common.legal' | transloco }}</p>
-        <h1 class="display"><ng-content select="[legalTitle]" /></h1>
-        <p class="legal-lede"><ng-content select="[legalIntro]" /></p>
-        <div class="legal-meta">
-          @if (meta().version) {
-            <span class="legal-meta-item"
-              ><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.6 13.4 13.4 20.6a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8z" /><path d="M7.5 7.5h.01" /></svg><strong>{{ 'legalCommon.version' | transloco }}</strong> {{ meta().version }}</span
-            >
-          }
-          <span class="legal-meta-item"
-            ><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" /></svg><strong>{{ 'legalCommon.effective' | transloco }}</strong>
-            <time [attr.datetime]="meta().effective">{{ formatDate(meta().effective) }}</time></span
-          >
-          @if (meta().updated) {
-            <span class="legal-meta-item"
-              ><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></svg><strong>{{ 'legalCommon.lastUpdated' | transloco }}</strong>
-              <time [attr.datetime]="meta().updated">{{ formatDate(meta().updated!) }}</time></span
-            >
-          }
-        </div>
-      </div>
-    </div>
-  </div>
-
+<main class="legal-main editorial-page">
   <div class="container">
+    <app-editorial-tabs [active]="doc()" [currentLabel]="doc() + '.crumb' | transloco" />
+
+    <section class="editorial-hero-card">
+      <div class="editorial-hero-eyebrow">
+        <span class="editorial-accent-bar"></span>
+        <span class="editorial-eyebrow-text">{{ 'common.legal' | transloco }}</span>
+      </div>
+      <h1 class="display editorial-hero-title"><ng-content select="[legalTitle]" /></h1>
+      <p class="legal-lede"><ng-content select="[legalIntro]" /></p>
+      <div class="legal-meta">
+        @if (meta().version) {
+          <span class="legal-meta-item">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M20.6 13.4 13.4 20.6a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8z" />
+              <path d="M7.5 7.5h.01" />
+            </svg>
+            <strong>{{ 'legalCommon.version' | transloco }}</strong> {{ meta().version }}
+          </span>
+        }
+        <span class="legal-meta-item">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="3" y="4" width="18" height="18" rx="2" />
+            <path d="M16 2v4M8 2v4M3 10h18" />
+          </svg>
+          <strong>{{ 'legalCommon.effective' | transloco }}</strong>
+          <time [attr.datetime]="meta().effective">{{ formatDate(meta().effective) }}</time>
+        </span>
+        @if (meta().updated) {
+          <span class="legal-meta-item">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="9" />
+              <path d="M12 7v5l3 2" />
+            </svg>
+            <strong>{{ 'legalCommon.lastUpdated' | transloco }}</strong>
+            <time [attr.datetime]="meta().updated">{{ formatDate(meta().updated!) }}</time>
+          </span>
+        }
+      </div>
+    </section>
+
     <div class="legal-layout">
       <aside class="legal-sidebar" [attr.aria-label]="'legalCommon.docNav' | transloco">
         <nav class="legal-toc" [class.open]="tocOpen()">
@@ -54,12 +60,15 @@
             @for (s of numbered(); track s.id) {
               <li [class.level-2]="s.level === 2">
                 <a
+                  class="toc-link"
                   [href]="meta().path + '#' + s.id"
                   [class.active]="activeId() === s.id"
                   [attr.aria-current]="activeId() === s.id ? 'location' : null"
                   (click)="goTo($event, s.id)"
-                  ><span class="toc-num" aria-hidden="true">{{ s.number }}</span>{{ s.labelKey | transloco }}</a
                 >
+                  <span class="toc-num" aria-hidden="true">{{ s.number }}</span>
+                  <span>{{ s.labelKey | transloco }}</span>
+                </a>
               </li>
             }
           </ol>

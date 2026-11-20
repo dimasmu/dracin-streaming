@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { PaginatorModule } from 'primeng/paginator';
 import { TranslocoPipe } from '@jsverse/transloco';
@@ -10,7 +10,6 @@ import { monogram } from '../../core/utils/format';
 @Component({
   imports: [RouterLink, PaginatorModule, TranslocoPipe, DramaCardComponent, EmptyStateComponent],
   templateUrl: './platforms.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PlatformsComponent {
   protected readonly catalog = inject(CatalogService);
@@ -18,7 +17,7 @@ export class PlatformsComponent {
 
   /** Selected platform names; empty means "all platforms". */
   protected readonly selectedPlatforms = signal<readonly string[]>([]);
-  protected readonly rows = signal(12);
+  protected readonly rows = signal(10);
   protected readonly first = signal(0);
 
   /** True when no platform is picked, i.e. the "All" chip is active. */

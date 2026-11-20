@@ -1,9 +1,10 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { AccordionModule } from 'primeng/accordion';
 import { FAQ_CATEGORIES } from '../../data/faq';
 import { I18nService } from '../../core/services/i18n.service';
+import { EditorialTabsComponent } from '../../shared/components/editorial-tabs/editorial-tabs.component';
 
 interface FaqEntry {
   category: string;
@@ -12,12 +13,11 @@ interface FaqEntry {
 }
 
 @Component({
-  imports: [RouterLink, AccordionModule, TranslocoPipe],
+  imports: [RouterLink, AccordionModule, TranslocoPipe, EditorialTabsComponent],
   templateUrl: './faq.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FaqComponent {
-  private readonly i18n = inject(I18nService);
+  protected readonly i18n = inject(I18nService);
   private readonly transloco = inject(TranslocoService);
 
   protected readonly query = signal('');
@@ -25,7 +25,7 @@ export class FaqComponent {
   protected readonly openPanels = signal<string[]>([]);
 
   /** All questions in the website language. Re-evaluates when the language changes. */
-  private readonly items = computed<FaqEntry[]>(() => {
+  protected readonly items = computed<FaqEntry[]>(() => {
     this.i18n.lang();
     return FAQ_CATEGORIES.flatMap((c) => {
       const list = this.transloco.translate<{ q: string; a: string }[]>(`faq.items.${c.id}`);

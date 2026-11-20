@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
@@ -8,6 +8,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { I18nService } from '../../core/services/i18n.service';
 import { LEGAL_CONTACT } from '../../core/legal';
 import { EmailLinkComponent } from '../../shared/components/email-link/email-link.component';
+import { EditorialTabsComponent } from '../../shared/components/editorial-tabs/editorial-tabs.component';
 
 @Component({
   imports: [
@@ -17,9 +18,9 @@ import { EmailLinkComponent } from '../../shared/components/email-link/email-lin
     SelectModule,
     TranslocoPipe,
     EmailLinkComponent,
+    EditorialTabsComponent,
   ],
   templateUrl: './contact.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ContactComponent implements OnInit {
   protected readonly generalEmail = LEGAL_CONTACT.general;

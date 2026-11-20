@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   DestroyRef,
   ElementRef,
@@ -10,10 +9,11 @@ import {
   signal,
 } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { LEGAL_DOCS, type LegalDocKey, type LegalSection } from '../../../core/legal';
 import { I18nService } from '../../../core/services/i18n.service';
+import { EditorialTabsComponent } from '../editorial-tabs/editorial-tabs.component';
 
 /**
  * Frame shared by the three legal pages: breadcrumb, header, meta, section
@@ -22,9 +22,8 @@ import { I18nService } from '../../../core/services/i18n.service';
  */
 @Component({
   selector: 'app-legal-page',
-  imports: [RouterLink, TranslocoPipe],
+  imports: [TranslocoPipe, EditorialTabsComponent],
   templateUrl: './legal-page.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LegalPageComponent {
   /** Which document this is. Drives meta data and the "other documents" list. */

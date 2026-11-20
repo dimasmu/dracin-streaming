@@ -1,15 +1,18 @@
-<main>
-  <div class="contact-hero">
-    <div class="container">
-      <p class="eyebrow">{{ 'contact.eyebrow' | transloco }}</p>
-      <h1 class="display">{{ 'contact.title' | transloco }}</h1>
-      <p>{{ 'contact.intro' | transloco }}</p>
-    </div>
-  </div>
-
+<main class="editorial-page">
   <div class="container">
-    <div class="contact-grid">
-      <div class="contact-info">
+    <app-editorial-tabs active="contact" [currentLabel]="'footer.contact' | transloco" />
+
+    <section class="editorial-hero-card">
+      <div class="editorial-hero-eyebrow">
+        <span class="editorial-accent-bar"></span>
+        <span class="editorial-eyebrow-text">{{ 'contact.eyebrow' | transloco }}</span>
+      </div>
+      <h1 class="display editorial-hero-title">{{ 'contact.title' | transloco }}</h1>
+      <p class="legal-lede">{{ 'contact.intro' | transloco }}</p>
+    </section>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 pb-16 items-start">
+      <div class="lg:col-span-5 space-y-3 contact-info">
         <div class="contact-info-card">
           <h3>{{ 'contact.emailTitle' | transloco }}</h3>
           <p>{{ 'contact.emailText' | transloco }}</p>
@@ -17,7 +20,11 @@
         </div>
         <div class="contact-info-card">
           <h3>{{ 'contact.dmcaTitle' | transloco }}</h3>
-          <p>{{ 'contact.dmcaTextBefore' | transloco }} <a routerLink="/dmca">{{ 'contact.dmcaLink' | transloco }}</a>.</p>
+          <p>
+            {{ 'contact.dmcaTextBefore' | transloco }}
+            <a routerLink="/dmca">{{ 'contact.dmcaLink' | transloco }}</a
+            >.
+          </p>
           <p class="contact-value"><app-email-link [address]="dmcaEmail" /></p>
         </div>
         <div class="contact-info-card">
@@ -30,76 +37,87 @@
         </div>
         <div class="contact-info-card">
           <h3>{{ 'contact.legalLinks' | transloco }}</h3>
-          <p>
-            <a routerLink="/terms">{{ 'contact.terms' | transloco }}</a> &middot;
-            <a routerLink="/dmca">{{ 'contact.dmcaPolicy' | transloco }}</a> &middot;
-            <a routerLink="/faq">{{ 'contact.faq' | transloco }}</a>
+          <p class="flex flex-wrap items-center gap-2 pt-1">
+            <a class="editorial-inline-pill" routerLink="/terms">{{ 'contact.terms' | transloco }}</a>
+            <a class="editorial-inline-pill" routerLink="/privacy">{{ 'footer.privacy' | transloco }}</a>
+            <a class="editorial-inline-pill" routerLink="/dmca">{{ 'contact.dmcaPolicy' | transloco }}</a>
+            <a class="editorial-inline-pill" routerLink="/faq">{{ 'contact.faq' | transloco }}</a>
           </p>
         </div>
       </div>
 
-      <div class="contact-form-wrap">
-        <h2 class="display">{{ 'contact.send' | transloco }}</h2>
-        <p>{{ 'contact.required' | transloco }}</p>
+      <div class="lg:col-span-7 contact-form-wrap">
+        <div class="space-y-1 mb-5">
+          <h2 class="display text-2xl">{{ 'contact.send' | transloco }}</h2>
+          <p class="text-xs" style="color: var(--d-muted)">{{ 'contact.required' | transloco }}</p>
+        </div>
 
         @if (!submitted()) {
-          <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
-            <div class="contact-field">
-              <label for="cf-name">{{ 'contact.name' | transloco }}</label>
-              <input
-                pInputText
-                id="cf-name"
-                type="text"
-                formControlName="name"
-                [placeholder]="'contact.namePlaceholder' | transloco"
-                autocomplete="name"
-                [class.invalid]="isInvalid('name')"
-              />
+          <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate class="space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="contact-field">
+                <label for="cf-name">{{ 'contact.name' | transloco }}</label>
+                <input
+                  pInputText
+                  id="cf-name"
+                  type="text"
+                  formControlName="name"
+                  [placeholder]="'contact.namePlaceholder' | transloco"
+                  autocomplete="name"
+                  [class.invalid]="isInvalid('name')"
+                />
+              </div>
+              <div class="contact-field">
+                <label for="cf-email">{{ 'contact.email' | transloco }}</label>
+                <input
+                  pInputText
+                  id="cf-email"
+                  type="email"
+                  formControlName="email"
+                  placeholder="email@example.com"
+                  autocomplete="email"
+                  [class.invalid]="isInvalid('email')"
+                />
+              </div>
             </div>
-            <div class="contact-field">
-              <label for="cf-email">{{ 'contact.email' | transloco }}</label>
-              <input
-                pInputText
-                id="cf-email"
-                type="email"
-                formControlName="email"
-                placeholder="email@example.com"
-                autocomplete="email"
-                [class.invalid]="isInvalid('email')"
-              />
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="contact-field">
+                <label for="cf-subject">{{ 'contact.subject' | transloco }}</label>
+                <input
+                  pInputText
+                  id="cf-subject"
+                  type="text"
+                  formControlName="subject"
+                  [placeholder]="'contact.subjectPlaceholder' | transloco"
+                  [class.invalid]="isInvalid('subject')"
+                />
+              </div>
+              <div class="contact-field">
+                <label for="cf-category">{{ 'contact.category' | transloco }}</label>
+                <p-select
+                  inputId="cf-category"
+                  [options]="categoryOptions()"
+                  optionLabel="label"
+                  optionValue="value"
+                  [placeholder]="'contact.categoryPlaceholder' | transloco"
+                  [formControl]="form.controls.category"
+                  [style]="{ width: '100%' }"
+                  [class.invalid]="isInvalid('category')"
+                />
+              </div>
             </div>
-            <div class="contact-field">
-              <label for="cf-subject">{{ 'contact.subject' | transloco }}</label>
-              <input
-                pInputText
-                id="cf-subject"
-                type="text"
-                formControlName="subject"
-                [placeholder]="'contact.subjectPlaceholder' | transloco"
-                [class.invalid]="isInvalid('subject')"
-              />
-            </div>
-            <div class="contact-field">
-              <label for="cf-category">{{ 'contact.category' | transloco }}</label>
-              <p-select
-                inputId="cf-category"
-                [options]="categoryOptions()"
-                optionLabel="label"
-                optionValue="value"
-                [placeholder]="'contact.categoryPlaceholder' | transloco"
-                [formControl]="form.controls.category"
-                [style]="{ width: '100%' }"
-                [class.invalid]="isInvalid('category')"
-              />
-            </div>
+
             <div class="contact-field">
               <label for="cf-message">{{ 'contact.message' | transloco }}</label>
               <textarea
                 id="cf-message"
+                rows="4"
                 formControlName="message"
                 [placeholder]="'contact.messagePlaceholder' | transloco"
               ></textarea>
             </div>
+
             <div class="contact-form-footer">
               <p class="contact-note">{{ 'contact.note' | transloco }}</p>
               <button class="btn btn-primary" type="submit" [disabled]="sending()">
@@ -108,23 +126,15 @@
             </div>
           </form>
         } @else {
-          <div
-            style="
-              margin-top: 20px;
-              padding: 16px;
-              background: color-mix(in oklch, var(--success) 10%, var(--surface));
-              border: 1px solid color-mix(in oklch, var(--success) 30%, var(--border));
-              border-radius: 8px;
-              color: var(--fg);
-              font-size: 12px;
-            "
-          >
-            <strong class="display" style="display: block; margin-bottom: 6px"
-              >{{ 'contact.recorded' | transloco }}</strong
-            >
-            {{ 'contact.recordedText' | transloco }}
-            <div style="margin-top: 14px">
-              <button class="btn btn-compact" type="button" (click)="reset()">{{ 'contact.sendAnother' | transloco }}</button>
+          <div class="editorial-callout info space-y-3">
+            <strong class="display text-base block">{{ 'contact.recorded' | transloco }}</strong>
+            <p class="text-xs leading-relaxed" style="color: var(--d-muted)">
+              {{ 'contact.recordedText' | transloco }}
+            </p>
+            <div>
+              <button class="btn btn-compact" type="button" (click)="reset()">
+                {{ 'contact.sendAnother' | transloco }}
+              </button>
             </div>
           </div>
         }

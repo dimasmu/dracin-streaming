@@ -1,14 +1,125 @@
-<main class="container page">
-  <div class="page-head">
-    <div>
-      <h1 class="display">{{ 'browse.title' | transloco }}</h1>
-      <p>{{ 'browse.intro' | transloco }}</p>
+<main class="container page catalog-page">
+  <div class="catalog-head">
+    <div class="flex flex-wrap items-center gap-3">
+      <span class="editorial-accent-bar"></span>
+      <div>
+        <div class="flex flex-wrap items-center gap-2.5">
+          <h1 class="display catalog-title">{{ 'browse.title' | transloco }}</h1>
+          <span class="catalog-count-badge">
+            {{ 'common.dramasFound' | transloco: { count: filtered().length } }}
+          </span>
+        </div>
+        <p class="catalog-subtitle">{{ 'browse.intro' | transloco }}</p>
+      </div>
     </div>
-    <span class="count">{{ 'common.dramasFound' | transloco: { count: filtered().length } }}</span>
+
+    <div class="flex flex-wrap items-center gap-2">
+      <button
+        type="button"
+        class="catalog-mobile-filter-btn"
+        [class.is-open]="mobileFiltersOpen()"
+        [attr.aria-expanded]="mobileFiltersOpen()"
+        aria-controls="browse-filter-sidebar"
+        (click)="mobileFiltersOpen.set(!mobileFiltersOpen())"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          class="w-3.5 h-3.5"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+        </svg>
+        <span>{{ (mobileFiltersOpen() ? 'browse.hideFilters' : 'browse.showFilters') | transloco }}</span>
+        @if (hasActiveFilters()) {
+          <span class="catalog-filter-dot">{{ activeChips().length }}</span>
+        }
+      </button>
+
+      @if (hasActiveFilters()) {
+        <button type="button" class="catalog-reset-btn" (click)="reset()">
+          {{ 'browse.resetAll' | transloco }}
+        </button>
+      }
+    </div>
   </div>
 
-  <div class="browse-layout">
-    <aside class="browse-sidebar" [attr.aria-label]="'browse.filters' | transloco">
+  <div class="browse-layout catalog-layout">
+    <!-- Left Sticky Glass Filter Sidebar (Collapsible on mobile <= 820px) -->
+    <aside
+      id="browse-filter-sidebar"
+      class="browse-sidebar catalog-sidebar"
+      [class.is-mobile-open]="mobileFiltersOpen()"
+      [attr.aria-label]="'browse.filters' | transloco"
+    >
+      <div class="catalog-sidebar-head">
+        <span class="catalog-sidebar-title">
+          <svg
+            viewBox="0 0 24 24"
+            class="w-3.5 h-3.5"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+          </svg>
+          {{ 'browse.filters' | transloco }}
+        </span>
+        @if (hasActiveFilters()) {
+          <span class="catalog-filter-dot">{{ activeChips().length }}</span>
+        }
+      </div>
+
+      <div class="filter-group">
+        <label class="filter-label" for="browse-sidebar-q">
+          {{ i18n.lang() === 'id' ? 'Kata Kunci' : 'Keyword' }}
+        </label>
+        <div class="catalog-sidebar-search">
+          <input
+            id="browse-sidebar-q"
+            class="search catalog-q-input"
+            type="search"
+            [placeholder]="'browse.searchPlaceholder' | transloco"
+            [value]="query()"
+            (input)="onQuery($event)"
+            [attr.aria-label]="'browse.searchLabel' | transloco"
+          />
+          @if (query()) {
+            <button
+              type="button"
+              class="catalog-q-clear"
+              (click)="query.set(''); first.set(0)"
+              [attr.aria-label]="i18n.lang() === 'id' ? 'Hapus kata kunci' : 'Clear keyword'"
+            >
+              &#10005;
+            </button>
+          }
+        </div>
+      </div>
+
+      <div class="filter-group">
+        <span class="filter-label">{{ i18n.lang() === 'id' ? 'Status Tayang' : 'Status' }}</span>
+        <div class="catalog-status-pills" role="group">
+          @for (st of statusOptions(); track st.value) {
+            <button
+              type="button"
+              class="catalog-status-pill"
+              [class.is-active]="statusFilter() === st.value"
+              (click)="setStatus(st.value)"
+            >
+              {{ st.label }}
+            </button>
+          }
+        </div>
+      </div>
+
       <div class="filter-group">
         <span class="filter-label">{{ 'browse.genre' | transloco }}</span>
         <p-select
@@ -23,6 +134,7 @@
           [style]="{ width: '100%' }"
         />
       </div>
+
       <div class="filter-group">
         <span class="filter-label">{{ 'browse.platform' | transloco }}</span>
         <p-select
@@ -37,6 +149,7 @@
           [style]="{ width: '100%' }"
         />
       </div>
+
       <div class="filter-group">
         <span class="filter-label">{{ 'browse.year' | transloco }}</span>
         <p-select
@@ -51,6 +164,7 @@
           [style]="{ width: '100%' }"
         />
       </div>
+
       <div class="filter-group">
         <span class="filter-label">{{ 'browse.subtitle' | transloco }}</span>
         <p-select
@@ -65,44 +179,268 @@
           [style]="{ width: '100%' }"
         />
       </div>
+
       <div class="filter-group">
         <span class="filter-label">{{ 'browse.releaseDate' | transloco }}</span>
         <div class="grid grid-cols-2 gap-2">
-          <input type="date" class="date-input" [(ngModel)]="dateFrom" [attr.aria-label]="'browse.fromDate' | transloco" />
-          <input type="date" class="date-input" [(ngModel)]="dateTo" [attr.aria-label]="'browse.toDate' | transloco" />
-        </div>
-      </div>
-      <button class="facet-clear" type="button" (click)="reset()">{{ 'browse.resetAll' | transloco }}</button>
-    </aside>
-
-    <div class="browse-content">
-      <div class="browse-toolbar">
-        <input
-          class="search"
-          [placeholder]="'browse.searchPlaceholder' | transloco"
-          [value]="query()"
-          (input)="onQuery($event)"
-          [attr.aria-label]="'browse.searchLabel' | transloco"
-        />
-        <div class="toolbar-sort">
-          <label class="toolbar-sort-label" for="sort">{{ 'browse.sort' | transloco }}</label>
-          <p-select
-            inputId="sort"
-            [options]="sortOptions()"
-            optionLabel="label"
-            optionValue="value"
-            [(ngModel)]="sort"
-            [style]="{ minWidth: '150px' }"
+          <input
+            type="date"
+            class="date-input"
+            [(ngModel)]="dateFrom"
+            [attr.aria-label]="'browse.fromDate' | transloco"
+          />
+          <input
+            type="date"
+            class="date-input"
+            [(ngModel)]="dateTo"
+            [attr.aria-label]="'browse.toDate' | transloco"
           />
         </div>
       </div>
 
-      @if (filtered().length) {
-        <div class="drama-grid">
-          @for (d of paged(); track d.id) {
-            <app-drama-card [drama]="d" />
+      <button class="facet-clear catalog-sidebar-reset" type="button" (click)="reset()">
+        {{ 'browse.resetAll' | transloco }}
+      </button>
+    </aside>
+
+    <!-- Main Catalog Content -->
+    <div class="browse-content">
+      <!-- Horizontal Ordering + Grid Switcher + A-Z Strip + Active Chips -->
+      <div class="catalog-toolbar-card">
+        <div class="catalog-toolbar-top">
+          <div class="catalog-sort-strip" role="group" [attr.aria-label]="'browse.sort' | transloco">
+            <span class="catalog-sort-label">{{ 'browse.sort' | transloco }}</span>
+            <div class="catalog-sort-pills">
+              @for (opt of sortOptions(); track opt.value) {
+                <button
+                  type="button"
+                  class="catalog-sort-pill"
+                  [class.is-active]="sort() === opt.value"
+                  [attr.aria-pressed]="sort() === opt.value"
+                  (click)="setSort(opt.value)"
+                >
+                  {{ opt.label }}
+                </button>
+              }
+            </div>
+          </div>
+
+          <div
+            class="catalog-view-modes"
+            role="group"
+            [attr.aria-label]="i18n.lang() === 'id' ? 'Mode tampilan grid' : 'Grid view mode'"
+          >
+            <button
+              type="button"
+              class="view-mode-btn"
+              [class.is-active]="viewMode() === 'grid'"
+              [attr.aria-pressed]="viewMode() === 'grid'"
+              [attr.title]="i18n.lang() === 'id' ? 'Grid Besar (4 kolom)' : 'Large Grid (4 cols)'"
+              (click)="setViewMode('grid')"
+            >
+              <svg viewBox="0 0 24 24" class="w-3.5 h-3.5" fill="currentColor" aria-hidden="true">
+                <rect x="3" y="3" width="8" height="8" rx="1.5" />
+                <rect x="13" y="3" width="8" height="8" rx="1.5" />
+                <rect x="3" y="13" width="8" height="8" rx="1.5" />
+                <rect x="13" y="13" width="8" height="8" rx="1.5" />
+              </svg>
+            </button>
+            <button
+              type="button"
+              class="view-mode-btn"
+              [class.is-active]="viewMode() === 'compact'"
+              [attr.aria-pressed]="viewMode() === 'compact'"
+              [attr.title]="i18n.lang() === 'id' ? 'Grid Padat (5 kolom)' : 'Compact Grid (5 cols)'"
+              (click)="setViewMode('compact')"
+            >
+              <svg viewBox="0 0 24 24" class="w-3.5 h-3.5" fill="currentColor" aria-hidden="true">
+                <rect x="3" y="3" width="5" height="5" rx="1" />
+                <rect x="9.5" y="3" width="5" height="5" rx="1" />
+                <rect x="16" y="3" width="5" height="5" rx="1" />
+                <rect x="3" y="9.5" width="5" height="5" rx="1" />
+                <rect x="9.5" y="9.5" width="5" height="5" rx="1" />
+                <rect x="16" y="9.5" width="5" height="5" rx="1" />
+                <rect x="3" y="16" width="5" height="5" rx="1" />
+                <rect x="9.5" y="16" width="5" height="5" rx="1" />
+                <rect x="16" y="16" width="5" height="5" rx="1" />
+              </svg>
+            </button>
+            <button
+              type="button"
+              class="view-mode-btn"
+              [class.is-active]="viewMode() === 'list'"
+              [attr.aria-pressed]="viewMode() === 'list'"
+              [attr.title]="i18n.lang() === 'id' ? 'Daftar Detail' : 'Detail List'"
+              (click)="setViewMode('list')"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                class="w-3.5 h-3.5"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.2"
+                stroke-linecap="round"
+                aria-hidden="true"
+              >
+                <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- A-Z Quick Filter Strip -->
+        <div
+          class="catalog-az-strip"
+          role="group"
+          [attr.aria-label]="i18n.lang() === 'id' ? 'Filter huruf awal judul' : 'Filter by first letter'"
+        >
+          <button
+            type="button"
+            class="az-pill"
+            [class.is-active]="activeLetter() === ''"
+            (click)="activeLetter.set(''); first.set(0)"
+          >
+            {{ i18n.lang() === 'id' ? 'Semua' : 'All' }}
+          </button>
+          <button
+            type="button"
+            class="az-pill"
+            [class.is-active]="activeLetter() === '#'"
+            (click)="setLetter('#')"
+          >
+            #
+          </button>
+          @for (ch of alphabet; track ch) {
+            <button
+              type="button"
+              class="az-pill"
+              [class.is-active]="activeLetter() === ch"
+              (click)="setLetter(ch)"
+            >
+              {{ ch }}
+            </button>
           }
         </div>
+
+        <!-- Active Filter Chips -->
+        @if (hasActiveFilters()) {
+          <div class="catalog-active-chips">
+            @for (chip of activeChips(); track chip.key) {
+              <button type="button" class="catalog-chip" (click)="chip.remove()">
+                <span>{{ chip.label }}</span>
+                <span class="catalog-chip-x" aria-hidden="true">&#10005;</span>
+              </button>
+            }
+          </div>
+        }
+      </div>
+
+      @if (filtered().length) {
+        @if (viewMode() === 'list') {
+          <div class="catalog-list-view">
+            @for (d of paged(); track d.id) {
+              <article class="catalog-list-card" [style.--card-tone]="d.tone">
+                <a
+                  class="catalog-list-thumb"
+                  [routerLink]="['/watch', d.slug, d.latestEpisode ?? 1]"
+                  [attr.aria-label]="d.title"
+                >
+                  <div class="drama-art">
+                    <span class="drama-monogram catalog-list-mono">{{ dramaMonogram(d) }}</span>
+                  </div>
+                </a>
+
+                <div class="catalog-list-body">
+                  <div class="flex flex-wrap items-center justify-between gap-2">
+                    <div class="flex flex-wrap items-center gap-2 min-w-0">
+                      <a
+                        class="catalog-list-title"
+                        [routerLink]="['/watch', d.slug, d.latestEpisode ?? 1]"
+                      >
+                        {{ d.title }}
+                      </a>
+                      <span
+                        class="aw-status-pill"
+                        [class.is-completed]="d.status === 'completed'"
+                      >
+                        {{
+                          d.status === 'completed'
+                            ? i18n.lang() === 'id'
+                              ? 'TAMAT'
+                              : 'DONE'
+                            : 'ONGOING'
+                        }}
+                      </span>
+                    </div>
+
+                    <div class="flex items-center gap-1.5 shrink-0">
+                      <button
+                        type="button"
+                        class="poster-bm-btn catalog-list-bm"
+                        [class.is-saved]="isBookmarked(d.id)"
+                        [attr.aria-pressed]="isBookmarked(d.id)"
+                        (click)="toggleBookmark(d, $event)"
+                      >
+                        {{ isBookmarked(d.id) ? '&#9733;' : '&#9734;' }}
+                      </button>
+                      <a
+                        class="btn btn-primary btn-compact"
+                        [routerLink]="['/watch', d.slug, d.latestEpisode ?? 1]"
+                      >
+                        &#9654; {{ 'home.watchNow' | transloco }}
+                      </a>
+                    </div>
+                  </div>
+
+                  <div class="flex flex-wrap items-center gap-y-1.5">
+                    <span class="aw-dot">
+                      <span
+                        class="poster-platform-dot"
+                        [style.background]="platformTone(d.platformId)"
+                      ></span>
+                      <span>{{ d.platformId }}</span>
+                    </span>
+                    @if (d.rating) {
+                      <span class="aw-dot">
+                        <span class="aw-dot-rating">&#9733; {{ d.rating.toFixed(1) }}</span>
+                      </span>
+                    }
+                    <span class="aw-dot">{{ d.latestEpisode ?? d.totalEpisodes ?? 0 }} Eps</span>
+                    @if (d.releaseYear) {
+                      <span class="aw-dot">{{ d.releaseYear }}</span>
+                    }
+                    <span class="aw-dot">{{ d.durationMinutes ?? 2 }}m/ep</span>
+                    @if (hasLang(d, 'id')) {
+                      <span class="aw-dot"><span class="tick-pill tick-sub">SUB ID</span></span>
+                    }
+                    @if (hasLang(d, 'en')) {
+                      <span class="aw-dot"><span class="tick-pill tick-dub">SUB EN</span></span>
+                    }
+                  </div>
+
+                  <p class="catalog-list-synopsis">{{ d.synopsis }}</p>
+
+                  <div class="flex flex-wrap items-center gap-1.5 pt-0.5">
+                    @for (g of d.genres; track g) {
+                      <span class="catalog-genre-tag">{{ 'genre.' + g | transloco }}</span>
+                    }
+                  </div>
+                </div>
+              </article>
+            }
+          </div>
+        } @else {
+          <div
+            class="drama-grid"
+            [class.catalog-grid-large]="viewMode() === 'grid'"
+            [class.catalog-grid-compact]="viewMode() === 'compact'"
+          >
+            @for (d of paged(); track d.id) {
+              <app-drama-card [drama]="d" />
+            }
+          </div>
+        }
+
         @if (pageCount() > 1) {
           <div class="pagination">
             <p-paginator
@@ -119,7 +457,9 @@
           [title]="'browse.noMatchTitle' | transloco"
           [message]="'browse.noMatchMessage' | transloco"
         >
-          <button class="btn btn-primary" type="button" (click)="reset()">{{ 'browse.resetFilters' | transloco }}</button>
+          <button class="btn btn-primary" type="button" (click)="reset()">
+            {{ 'browse.resetFilters' | transloco }}
+          </button>
         </app-empty-state>
       }
     </div>

@@ -1,0 +1,1529 @@
+@switch (activeTab()) {
+  @case ('dashboard') {
+    <div class="space-y-6">
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center gap-2.5">
+          <span class="w-1 h-5 rounded-full" style="background: var(--d-accent);"></span>
+          <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight">Dashboard Utama</h1>
+        </div>
+        <a
+          routerLink="/admin/dramas"
+          class="px-3.5 py-2 rounded-xl border text-xs font-bold inline-flex items-center"
+          style="background: var(--d-surface-2); border-color: var(--d-border); color: var(--d-fg);"
+        >
+          Kelola Katalog →
+        </a>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+        <div class="cms-glass-card rounded-2xl p-4 space-y-1.5">
+          <div class="flex justify-between text-xs">
+            <span class="font-semibold" style="color: var(--d-muted);">Total Drama</span>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold" style="background: var(--d-accent-soft); color: var(--d-accent);">
+              {{ heroCount() }} Hero
+            </span>
+          </div>
+          <div class="text-2xl font-extrabold">{{ totalDramas() }}</div>
+          <p class="text-[11px]" style="color: var(--d-muted);">
+            {{ totalDramas() - ongoingCount() }} Tamat · {{ ongoingCount() }} Ongoing
+          </p>
+        </div>
+
+        <div class="cms-glass-card rounded-2xl p-4 space-y-1.5">
+          <div class="flex justify-between text-xs">
+            <span class="font-semibold" style="color: var(--d-muted);">Episode Terindeks</span>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold" style="background: var(--d-cyan-soft); color: var(--d-cyan);">1m/ep</span>
+          </div>
+          <div class="text-2xl font-extrabold">{{ totalEpisodesSum() }}</div>
+          <p class="text-[11px]" style="color: var(--d-muted);">Rata-rata {{ avgEpisodes() }} eps/judul</p>
+        </div>
+
+        <div class="cms-glass-card rounded-2xl p-4 space-y-1.5">
+          <div class="flex justify-between text-xs">
+            <span class="font-semibold" style="color: var(--d-muted);">Bahasa Video</span>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold" style="background: var(--d-surface-2);">Deklaratif</span>
+          </div>
+          <div class="text-2xl font-extrabold">{{ idVideoCount() }} ID · {{ enVideoCount() }} EN</div>
+          <p class="text-[11px]" style="color: var(--d-muted);">1 track bahasa per judul</p>
+        </div>
+
+        <div class="cms-glass-card rounded-2xl p-4 space-y-1.5">
+          <div class="flex justify-between text-xs">
+            <span class="font-semibold" style="color: var(--d-muted);">Request &amp; Tiket</span>
+            <a routerLink="/admin/moderation" class="text-[11px] font-bold underline" style="color: var(--d-gold);">Tinjau</a>
+          </div>
+          <div class="text-2xl font-extrabold">{{ cms.requests().length + cms.dmcaTickets().length }}</div>
+          <p class="text-[11px]" style="color: var(--d-muted);">{{ cms.comments().length }} komentar aktif</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 xl:grid-cols-12 gap-6">
+        <section class="xl:col-span-7 cms-glass-card rounded-2xl p-5 space-y-4">
+          <div class="flex justify-between items-center">
+            <div class="flex items-center gap-2">
+              <span class="w-1 h-4 rounded-full" style="background: var(--d-cyan);"></span>
+              <h2 class="text-base font-extrabold">Statistik Mingguan</h2>
+            </div>
+            <a routerLink="/admin/analytics" class="text-xs font-bold" style="color: var(--d-accent);">Analitik →</a>
+          </div>
+          <div class="grid grid-cols-7 gap-3 items-end h-44 pt-4 px-2">
+            @for (b of weeklyBars; track b.d) {
+              <div class="flex flex-col items-center gap-1.5 h-full justify-end">
+                <span class="font-mono-tech text-[10px] font-bold" style="color: var(--d-muted);">{{ b.v }}k</span>
+                <div
+                  class="w-full max-w-[34px] rounded-t-xl relative overflow-hidden"
+                  [style.height.%]="b.v"
+                  style="background: linear-gradient(180deg, var(--d-accent), var(--d-cyan));"
+                >
+                  <span class="absolute bottom-1 inset-x-0 text-center text-[9px] font-extrabold text-white/90">{{ b.e }}e</span>
+                </div>
+                <span class="text-[11px] font-bold">{{ b.d }}</span>
+              </div>
+            }
+          </div>
+        </section>
+
+        <section class="xl:col-span-5 cms-glass-card rounded-2xl p-5 space-y-3">
+          <div class="flex items-center gap-2">
+            <span class="w-1 h-4 rounded-full" style="background: var(--d-gold);"></span>
+            <h2 class="text-base font-extrabold">Log Aktivitas Terbaru</h2>
+          </div>
+          <div class="space-y-2 max-h-52 overflow-y-auto pr-1">
+            @for (l of cms.activityLog(); track $index) {
+              <div class="p-2.5 rounded-xl border text-xs" style="background: var(--d-surface-2); border-color: var(--d-border);">
+                <div class="flex items-center justify-between">
+                  <strong style="color: var(--d-accent);">{{ l.actor }}</strong>
+                  <span class="font-mono-tech text-[10px]" style="color: var(--d-muted);">{{ l.time }}</span>
+                </div>
+                <p class="mt-0.5">{{ l.action }}</p>
+              </div>
+            }
+          </div>
+        </section>
+      </div>
+
+      <section class="cms-glass-card rounded-2xl overflow-hidden">
+        <div class="px-5 py-3.5 border-b flex justify-between items-center" style="border-color: var(--d-border);">
+          <h2 class="text-base font-extrabold">Top 5 Drama Terpopuler</h2>
+          <a routerLink="/admin/dramas" class="text-xs font-bold" style="color: var(--d-accent);">Lihat Semua →</a>
+        </div>
+        <div class="overflow-x-auto" tabindex="0" role="region" aria-label="Tabel Top 5 Drama Terpopuler">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr class="border-b" style="background: var(--d-surface-2); border-color: var(--d-border); color: var(--d-muted);">
+                <th class="py-2.5 px-4">Judul</th>
+                <th class="py-2.5 px-3">Platform</th>
+                <th class="py-2.5 px-3">Bahasa</th>
+                <th class="py-2.5 px-3">Episode</th>
+                <th class="py-2.5 px-4 text-right">Aksi</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y" style="border-color: var(--d-border);">
+              @for (d of top5Dramas(); track d.id) {
+                <tr>
+                  <td class="py-2.5 px-4 font-bold">{{ d.title }}</td>
+                  <td class="py-2.5 px-3">{{ d.platformId }}</td>
+                  <td class="py-2.5 px-3">
+                    <span class="px-2 py-0.5 rounded text-[10px] font-bold" style="background: var(--d-accent-soft); color: var(--d-accent);">
+                      SUB {{ primaryLangCode(d) }}
+                    </span>
+                  </td>
+                  <td class="py-2.5 px-3 font-mono-tech">{{ d.latestEpisode }}/{{ d.totalEpisodes }} Eps</td>
+                  <td class="py-2.5 px-4 text-right">
+                    <a
+                      [routerLink]="['/admin/dramas', d.slug, 'edit']"
+                      class="px-2.5 py-1 rounded-lg border text-[11px] font-bold inline-block"
+                      style="background: var(--d-surface-2); border-color: var(--d-border); color: var(--d-fg);"
+                    >
+                      Edit
+                    </a>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  }
+
+  @case ('analytics') {
+    <div class="space-y-6">
+      <div class="flex items-center gap-2.5">
+        <span class="w-1 h-5 rounded-full" style="background: var(--d-cyan);"></span>
+        <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight">Analitik &amp; Performa Katalog</h1>
+      </div>
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <section class="lg:col-span-6 cms-glass-card rounded-2xl p-5 space-y-3.5">
+          <h2 class="text-base font-extrabold">Distribusi Genre Drama</h2>
+          @for (g of genreStats(); track g.name) {
+            <div>
+              <div class="flex justify-between text-xs mb-1">
+                <span class="font-bold">{{ g.name }}</span>
+                <span class="font-mono-tech" style="color: var(--d-muted);">{{ g.count }} judul</span>
+              </div>
+              <div class="w-full h-2 rounded-full overflow-hidden" style="background: var(--d-surface-2);">
+                <div class="h-full rounded-full" [style.width.%]="g.pct" style="background: var(--d-accent);"></div>
+              </div>
+            </div>
+          }
+        </section>
+        <section class="lg:col-span-6 cms-glass-card rounded-2xl p-5 space-y-3.5">
+          <h2 class="text-base font-extrabold">Corong Retensi Penonton (1m/ep)</h2>
+          @for (f of retentionFunnel; track f.step) {
+            <div class="p-3 rounded-xl border space-y-1.5" style="background: var(--d-surface-2); border-color: var(--d-border);">
+              <div class="flex justify-between text-xs">
+                <span class="font-bold">{{ f.step }}</span>
+                <span class="font-mono-tech font-extrabold" style="color: var(--d-cyan);">{{ f.pct }}%</span>
+              </div>
+              <div class="w-full h-2.5 rounded-full overflow-hidden" style="background: var(--d-surface);">
+                <div
+                  class="h-full rounded-full"
+                  [style.width.%]="f.pct"
+                  style="background: linear-gradient(90deg, var(--d-accent), var(--d-cyan));"
+                ></div>
+              </div>
+            </div>
+          }
+        </section>
+      </div>
+    </div>
+  }
+
+  @case ('dramas') {
+    <div class="space-y-5">
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center gap-2.5 flex-wrap">
+          <span class="w-1 h-5 rounded-full" style="background: var(--d-accent);"></span>
+          <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight">Katalog Drama</h1>
+          <span class="px-2.5 py-0.5 rounded-full text-xs font-bold" style="background: var(--d-accent-soft); color: var(--d-accent);">
+            {{ filteredDramas().length }} dari {{ totalDramas() }} Judul
+          </span>
+        </div>
+        <a
+          routerLink="/admin/dramas/new"
+          class="px-3.5 py-2 rounded-xl text-xs font-extrabold inline-flex items-center gap-1.5"
+          style="background: var(--d-accent); color: #fff;"
+          (click)="cms.editorPrefill.set(null)"
+        >
+          + Tambah Drama
+        </a>
+      </div>
+
+      <div class="cms-glass-card rounded-2xl p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        <input
+          type="search"
+          [value]="cms.searchQuery()"
+          (input)="cms.searchQuery.set(inputVal($event))"
+          placeholder="Filter judul, slug, tag..."
+          class="cms-input w-full"
+        />
+        <select
+          [value]="filterPlatform()"
+          (change)="filterPlatform.set(selectVal($event))"
+          aria-label="Filter platform"
+          class="cms-select w-full"
+        >
+          <option value="">Semua Platform</option>
+          @for (p of catalog.platforms; track p.id) {
+            <option [value]="p.name">{{ p.name }}</option>
+          }
+        </select>
+        <select
+          [value]="filterStatus()"
+          (change)="filterStatus.set(selectVal($event))"
+          aria-label="Filter status"
+          class="cms-select w-full"
+        >
+          <option value="">Semua Status</option>
+          <option value="completed">Tamat</option>
+          <option value="ongoing">Ongoing</option>
+          <option value="upcoming">Akan Datang</option>
+        </select>
+        <div class="flex gap-2">
+          <select
+            [value]="filterLang()"
+            (change)="filterLang.set(selectVal($event))"
+            aria-label="Filter bahasa"
+            class="cms-select flex-1"
+          >
+            <option value="">Semua Bahasa</option>
+            <option value="ID">Sub ID</option>
+            <option value="EN">Sub EN</option>
+          </select>
+          <button
+            type="button"
+            class="px-3 rounded-xl border text-xs font-bold cursor-pointer"
+            style="background: var(--d-surface-2); border-color: var(--d-border); color: var(--d-fg);"
+            (click)="resetCatalogFilters()"
+          >
+            Reset
+          </button>
+        </div>
+      </div>
+
+      @if (selectedIds().size > 0) {
+        <div
+          class="cms-glass-card rounded-xl px-4 py-2.5 flex flex-wrap justify-between items-center gap-2 border"
+          style="border-color: var(--d-accent);"
+        >
+          <span class="text-xs font-extrabold" style="color: var(--d-accent);">
+            {{ selectedIds().size }} drama dipilih
+          </span>
+          <div class="flex flex-wrap gap-2">
+            <button
+              type="button"
+              class="px-2.5 py-1 rounded-lg text-[11px] font-bold border-0 cursor-pointer text-white"
+              style="background: var(--d-accent);"
+              (click)="applyBulk('featured')"
+            >
+              Jadikan Hero
+            </button>
+            <button
+              type="button"
+              class="px-2.5 py-1 rounded-lg text-[11px] font-bold border-0 cursor-pointer text-white"
+              style="background: var(--d-cyan);"
+              (click)="applyBulk('completed')"
+            >
+              Set Tamat
+            </button>
+            <button
+              type="button"
+              [disabled]="!cms.can('deleteDrama')"
+              [title]="cms.can('deleteDrama') ? 'Hapus terpilih' : 'Khusus role Admin'"
+              class="px-2.5 py-1 rounded-lg text-[11px] font-bold border-0"
+              [class.cursor-pointer]="cms.can('deleteDrama')"
+              [class.opacity-40]="!cms.can('deleteDrama')"
+              style="background: var(--d-rose-soft); color: var(--d-rose);"
+              (click)="applyBulk('delete')"
+            >
+              Hapus Terpilih
+            </button>
+          </div>
+        </div>
+      }
+
+      <div class="cms-glass-card rounded-2xl overflow-hidden">
+        <div class="overflow-x-auto" tabindex="0" role="region" aria-label="Tabel Katalog Drama CMS">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr class="border-b" style="background: var(--d-surface-2); border-color: var(--d-border); color: var(--d-muted);">
+                <th class="py-3 px-3 w-8">
+                  <input
+                    type="checkbox"
+                    [checked]="selectedIds().size > 0 && selectedIds().size === filteredDramas().length"
+                    (change)="onToggleAll($event)"
+                    aria-label="Pilih semua drama"
+                    class="accent-emerald-600 cursor-pointer"
+                  />
+                </th>
+                <th class="py-3 px-3">Drama &amp; Metadata</th>
+                <th class="py-3 px-3">Platform</th>
+                <th class="py-3 px-3">Bahasa</th>
+                <th class="py-3 px-3">Status &amp; Eps</th>
+                <th class="py-3 px-3">Rating</th>
+                <th class="py-3 px-3 text-center">Hero</th>
+                <th class="py-3 px-4 text-right">Aksi</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y" style="border-color: var(--d-border);">
+              @for (d of filteredDramas(); track d.id) {
+                <tr>
+                  <td class="py-3 px-3">
+                    <input
+                      type="checkbox"
+                      [checked]="selectedIds().has(d.id)"
+                      (change)="toggleSelect(d.id, !selectedIds().has(d.id))"
+                      [attr.aria-label]="'Pilih ' + d.title"
+                      class="accent-emerald-600 cursor-pointer"
+                    />
+                  </td>
+                  <td class="py-3 px-3">
+                    <div class="flex items-center gap-3 min-w-[220px]">
+                      <div
+                        class="w-9 aspect-[2/3] rounded-lg relative overflow-hidden shrink-0 border"
+                        [style.--card-tone]="d.tone"
+                        style="border-color: var(--d-border);"
+                      >
+                        <div class="drama-art"><span class="drama-monogram" style="font-size: 20px;">{{ monogram(d.title) }}</span></div>
+                      </div>
+                      <div class="min-w-0">
+                        <p class="font-extrabold truncate max-w-[230px]">{{ d.title }}</p>
+                        <p class="font-mono-tech text-[10px] truncate max-w-[230px]" style="color: var(--d-muted);">
+                          /{{ d.slug }} · {{ d.releaseYear }}
+                        </p>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="py-3 px-3 whitespace-nowrap">
+                    <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-bold border" style="background: var(--d-surface-2); border-color: var(--d-border);">
+                      <span class="w-2 h-2 rounded-full" [style.background]="platformColor(d.platformId)"></span>
+                      {{ d.platformId }}
+                    </span>
+                  </td>
+                  <td class="py-3 px-3">
+                    <span
+                      class="px-2 py-0.5 rounded text-[10px] font-extrabold"
+                      [style.background]="primaryLangCode(d) === 'ID' ? 'var(--d-accent-soft)' : 'var(--d-cyan-soft)'"
+                      [style.color]="primaryLangCode(d) === 'ID' ? 'var(--d-accent)' : 'var(--d-cyan)'"
+                    >
+                      SUB {{ primaryLangCode(d) }}
+                    </span>
+                  </td>
+                  <td class="py-3 px-3 whitespace-nowrap">
+                    <span class="font-mono-tech text-[10px]">
+                      {{ d.status === 'completed' ? 'Tamat' : d.status === 'ongoing' ? 'Ongoing' : 'Segera' }} · {{ d.latestEpisode }}/{{ d.totalEpisodes }}
+                    </span>
+                    <div class="w-20 h-1.5 rounded-full overflow-hidden mt-1" style="background: var(--d-surface-2);">
+                      <div class="h-full" [style.width.%]="episodeProgress(d)" style="background: var(--d-accent);"></div>
+                    </div>
+                  </td>
+                  <td class="py-3 px-3 font-bold text-amber-400">★ {{ (d.rating ?? 0).toFixed(1) }}</td>
+                  <td class="py-3 px-3 text-center">
+                    <button
+                      type="button"
+                      role="switch"
+                      [attr.aria-checked]="d.featured"
+                      [attr.aria-label]="'Hero spotlight ' + d.title"
+                      class="cms-switch-pill"
+                      [style.background]="d.featured ? 'var(--d-accent)' : 'var(--d-surface-3)'"
+                      (click)="toggleFeatured(d)"
+                    ></button>
+                  </td>
+                  <td class="py-3 px-4 text-right whitespace-nowrap">
+                    <div class="inline-flex gap-1.5">
+                      <a
+                        [routerLink]="['/admin/dramas', d.slug, 'edit']"
+                        class="px-2.5 py-1 rounded-lg border text-[11px] font-bold"
+                        style="background: var(--d-surface-2); border-color: var(--d-border); color: var(--d-fg);"
+                      >
+                        Edit
+                      </a>
+                      <button
+                        type="button"
+                        class="px-2.5 py-1 rounded-lg border text-[11px] font-bold cursor-pointer"
+                        style="background: var(--d-surface-2); border-color: var(--d-border); color: var(--d-cyan);"
+                        (click)="openEpisodesForDrama(d.id)"
+                      >
+                        Eps
+                      </button>
+                      <button
+                        type="button"
+                        [disabled]="!cms.can('deleteDrama')"
+                        [title]="cms.can('deleteDrama') ? 'Hapus permanen' : 'Khusus Admin'"
+                        class="px-2.5 py-1 rounded-lg border text-[11px] font-bold"
+                        [class.cursor-pointer]="cms.can('deleteDrama')"
+                        [class.opacity-40]="!cms.can('deleteDrama')"
+                        style="background: var(--d-rose-soft); border-color: transparent; color: var(--d-rose);"
+                        (click)="pendingDelete.set(d)"
+                      >
+                        Hapus
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  }
+
+  @case ('drama-editor') {
+    <div class="space-y-6">
+      <div class="flex flex-wrap items-center justify-between gap-4">
+        <div class="space-y-1.5">
+          <div class="flex flex-wrap items-center gap-2">
+            <a
+              routerLink="/admin/dramas"
+              class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-bold"
+              style="background: var(--d-surface-2); border-color: var(--d-border); color: var(--d-fg);"
+            >
+              ← Kembali ke Katalog
+            </a>
+            <span
+              class="font-mono-tech text-[11px] px-2.5 py-1 rounded-lg border"
+              style="background: var(--d-surface-2); border-color: var(--d-border); color: var(--d-cyan);"
+            >
+              {{ editingDrama() ? 'Mode Sunting Metadata' : 'Halaman Tambah Baru' }}
+            </span>
+          </div>
+          <div class="flex items-center gap-2.5 pt-1">
+            <span class="w-1 h-6 rounded-full" style="background: var(--d-accent);"></span>
+            <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight">
+              {{ editingDrama() ? 'Edit Drama: ' + editingDrama()!.title : 'Buat Drama Baru ke Website & CMS' }}
+            </h1>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            class="px-3.5 py-2 rounded-xl border text-xs font-bold cursor-pointer"
+            style="background: var(--d-surface-2); border-color: var(--d-border); color: var(--d-fg);"
+            (click)="resetEditorForm()"
+          >
+            Reset Isian
+          </button>
+          <a
+            routerLink="/admin/dramas"
+            class="px-4 py-2 rounded-xl border text-xs font-bold inline-flex items-center"
+            style="background: var(--d-surface-2); border-color: var(--d-border); color: var(--d-fg);"
+          >
+            Batal
+          </a>
+          <button
+            type="button"
+            class="px-5 py-2 rounded-xl text-xs font-extrabold border-0 cursor-pointer text-white shadow-sm"
+            style="background: var(--d-accent);"
+            (click)="saveDramaEditor()"
+          >
+            {{ editingDrama() ? 'Simpan Perubahan' : 'Terbitkan Drama' }}
+          </button>
+        </div>
+      </div>
+
+      <form
+        [formGroup]="editorForm"
+        (ngSubmit)="saveDramaEditor()"
+        class="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start"
+      >
+        <div class="xl:col-span-8 space-y-5">
+          <section class="cms-glass-card rounded-2xl p-5 sm:p-6 space-y-4">
+            <div class="flex items-center gap-2.5 pb-3 border-b" style="border-color: var(--d-border);">
+              <span class="w-1 h-5 rounded-full" style="background: var(--d-accent);"></span>
+              <div>
+                <h2 class="text-base font-extrabold">Informasi Utama &amp; Identitas</h2>
+                <p class="text-xs" style="color: var(--d-muted);">
+                  Metadata drama langsung tersinkron ke halaman Website Utama (/) setelah disimpan.
+                </p>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label for="fTitle" class="block text-xs font-bold mb-1.5">Judul Drama *</label>
+                <input
+                  id="fTitle"
+                  type="text"
+                  formControlName="title"
+                  (input)="onEditorTitleInput()"
+                  placeholder="Contoh: Tabib Sakti Penakluk Kota"
+                  class="cms-input w-full h-11"
+                />
+              </div>
+              <div>
+                <div class="flex items-center justify-between mb-1.5">
+                  <label for="fSlug" class="text-xs font-bold">Slug URL *</label>
+                  <button
+                    type="button"
+                    class="text-[11px] font-bold border-0 bg-transparent cursor-pointer"
+                    style="color: var(--d-accent);"
+                    (click)="regenerateSlug()"
+                  >
+                    Buat dari Judul
+                  </button>
+                </div>
+                <input
+                  id="fSlug"
+                  type="text"
+                  formControlName="slug"
+                  placeholder="tabib-sakti-penakluk-kota"
+                  class="cms-input w-full h-11 font-mono-tech"
+                />
+                <p class="mt-1 text-[11px] font-mono-tech truncate" style="color: var(--d-cyan);">
+                  tiraiplay.app/drama/{{ editorPreview().slug }}
+                </p>
+              </div>
+            </div>
+
+            <div>
+              <label for="fOriginalTitle" class="block text-xs font-bold mb-1.5">
+                Judul Asli (Hanzi / Judul Global)
+              </label>
+              <input
+                id="fOriginalTitle"
+                type="text"
+                formControlName="originalTitle"
+                placeholder="Contoh: 霸道总裁的秘密 / The Hidden Miracle Doctor"
+                class="cms-input w-full"
+              />
+            </div>
+
+            <div>
+              <label for="fSynopsis" class="block text-xs font-bold mb-1.5">Sinopsis Lengkap *</label>
+              <textarea
+                id="fSynopsis"
+                rows="5"
+                formControlName="synopsis"
+                placeholder="Tuliskan alur cerita utama seri drama pendek ini..."
+                class="cms-textarea w-full"
+              ></textarea>
+            </div>
+          </section>
+
+          <section class="cms-glass-card rounded-2xl p-5 sm:p-6 space-y-4">
+            <div class="flex items-center gap-2.5 pb-3 border-b" style="border-color: var(--d-border);">
+              <span class="w-1 h-5 rounded-full" style="background: var(--d-cyan);"></span>
+              <div>
+                <h2 class="text-base font-extrabold">Kredit Produksi, Genre &amp; Tag</h2>
+                <p class="text-xs" style="color: var(--d-muted);">
+                  Sutradara, daftar pemeran, kategori genre, serta kata kunci pencarian.
+                </p>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div>
+                <label for="fDirector" class="block text-xs font-bold mb-1.5">Sutradara</label>
+                <input id="fDirector" type="text" formControlName="director" placeholder="Zhang Wei" class="cms-input w-full" />
+              </div>
+              <div>
+                <label for="fCountry" class="block text-xs font-bold mb-1.5">Negara Asal</label>
+                <input id="fCountry" type="text" formControlName="country" class="cms-input w-full" />
+              </div>
+              <div>
+                <label for="fCast" class="block text-xs font-bold mb-1.5">Pemeran (pisahkan koma)</label>
+                <input id="fCast" type="text" formControlName="castText" placeholder="Lin Yi, Zhao Lusi" class="cms-input w-full" />
+              </div>
+            </div>
+
+            <div>
+              <span class="block text-xs font-bold mb-2">Genre Drama * (Pilih minimal 1)</span>
+              <div class="flex flex-wrap gap-2">
+                @for (g of catalog.genres; track g.id) {
+                  <label
+                    class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border text-xs font-bold cursor-pointer select-none"
+                    style="background: var(--d-surface-2); border-color: var(--d-border);"
+                  >
+                    <input
+                      type="checkbox"
+                      [checked]="editorForm.controls.genres.value.includes(g.name)"
+                      (change)="toggleEditorGenre(g.name)"
+                      class="accent-emerald-600 cursor-pointer"
+                    />
+                    <span>{{ g.name }}</span>
+                  </label>
+                }
+              </div>
+            </div>
+
+            <div>
+              <label for="fTags" class="block text-xs font-bold mb-1.5">Tag Deskripsi &amp; Trope (pisahkan koma)</label>
+              <input
+                id="fTags"
+                type="text"
+                formControlName="tagsText"
+                placeholder="CEO Menyamar, Nikah Kontrak, Balas Dendam"
+                class="cms-input w-full"
+              />
+            </div>
+          </section>
+
+          <section class="cms-glass-card rounded-2xl p-5 sm:p-6 space-y-4">
+            <div class="flex items-center gap-2.5 pb-3 border-b" style="border-color: var(--d-border);">
+              <span class="w-1 h-5 rounded-full" style="background: var(--d-gold);"></span>
+              <div>
+                <h2 class="text-base font-extrabold">Platform, Bahasa Video &amp; Statistik Episode</h2>
+                <p class="text-xs" style="color: var(--d-muted);">
+                  1 track bahasa deklaratif (Sub ID atau Sub EN) beserta durasi dan jadwal rilis.
+                </p>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div>
+                <label for="fPlatform" class="block text-xs font-bold mb-1.5">Platform Sumber *</label>
+                <select id="fPlatform" formControlName="platformId" class="cms-select w-full h-10">
+                  @for (p of catalog.platforms; track p.id) {
+                    <option [value]="p.name">{{ p.name }}</option>
+                  }
+                </select>
+              </div>
+              <div>
+                <label for="fLang" class="block text-xs font-bold mb-1.5">Bahasa Video *</label>
+                <select id="fLang" formControlName="videoLang" class="cms-select w-full h-10">
+                  <option value="id">Indonesia (Sub ID)</option>
+                  <option value="en">Inggris (Sub EN)</option>
+                </select>
+              </div>
+              <div>
+                <label for="fStatus" class="block text-xs font-bold mb-1.5">Status Tayang *</label>
+                <select id="fStatus" formControlName="status" class="cms-select w-full h-10">
+                  <option value="completed">Tamat</option>
+                  <option value="ongoing">Ongoing</option>
+                  <option value="upcoming">Akan Datang</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+              <div>
+                <label for="fYear" class="block text-[11px] font-bold mb-1" style="color: var(--d-muted);">Tahun Rilis</label>
+                <input id="fYear" type="number" min="2018" max="2030" formControlName="releaseYear" class="cms-input w-full" />
+              </div>
+              <div>
+                <label for="fDuration" class="block text-[11px] font-bold mb-1" style="color: var(--d-muted);">Durasi / Ep</label>
+                <input id="fDuration" type="number" min="1" max="30" formControlName="durationMinutes" class="cms-input w-full" />
+              </div>
+              <div>
+                <label for="fTotalEp" class="block text-[11px] font-bold mb-1" style="color: var(--d-muted);">Total Ep</label>
+                <input id="fTotalEp" type="number" min="1" max="500" formControlName="totalEpisodes" class="cms-input w-full" />
+              </div>
+              <div>
+                <label for="fLatestEp" class="block text-[11px] font-bold mb-1" style="color: var(--d-muted);">Ep Rilis</label>
+                <input id="fLatestEp" type="number" min="1" max="500" formControlName="latestEpisode" class="cms-input w-full" />
+              </div>
+              <div>
+                <label for="fRating" class="block text-[11px] font-bold mb-1" style="color: var(--d-muted);">Rating (1–10)</label>
+                <input id="fRating" type="number" step="0.1" min="1" max="10" formControlName="rating" class="cms-input w-full" />
+              </div>
+              <div>
+                <label for="fTrend" class="block text-[11px] font-bold mb-1" style="color: var(--d-muted);">Skor Tren</label>
+                <input id="fTrend" type="number" min="0" max="5000" formControlName="trendingScore" class="cms-input w-full" />
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+              <div>
+                <label for="fStreamUrl" class="block text-xs font-bold mb-1.5">URL Stream HLS Awal (Opsional)</label>
+                <input
+                  id="fStreamUrl"
+                  type="url"
+                  formControlName="streamUrl"
+                  placeholder="https://cdn.tiraiplay.example/streams/episode-1.m3u8"
+                  class="cms-input w-full font-mono-tech"
+                />
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label for="fSchDay" class="block text-xs font-bold mb-1.5">Tambah Slot Jadwal</label>
+                  <select id="fSchDay" formControlName="scheduleDay" class="cms-select w-full">
+                    <option value="">Tidak perlu</option>
+                    @for (day of scheduleDays; track day) {
+                      <option [value]="day">{{ day }}</option>
+                    }
+                  </select>
+                </div>
+                <div>
+                  <label for="fSchTime" class="block text-xs font-bold mb-1.5">Jam Tayang</label>
+                  <input id="fSchTime" type="text" formControlName="scheduleTime" class="cms-input w-full font-mono-tech" />
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <aside class="xl:col-span-4 space-y-5 xl:sticky xl:top-20 xl:self-start">
+          <div class="cms-glass-card rounded-2xl p-5 space-y-4">
+            <div class="flex items-center justify-between gap-2 pb-2.5 border-b" style="border-color: var(--d-border);">
+              <div class="flex items-center gap-2">
+                <span class="w-1 h-5 rounded-full" style="background: var(--d-accent);"></span>
+                <h2 class="text-sm font-extrabold">Pratinjau Kartu TiraiPlay</h2>
+              </div>
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold" style="background: var(--d-accent-soft); color: var(--d-accent);">
+                Live Sync
+              </span>
+            </div>
+
+            <div class="rounded-2xl overflow-hidden border p-3.5 space-y-3" style="background: var(--d-surface-2); border-color: var(--d-border-strong);">
+              <div
+                class="aspect-[2/3] rounded-xl overflow-hidden border relative shadow-lg"
+                [style.--card-tone]="editorPreview().tone"
+                style="border-color: var(--d-border-strong);"
+              >
+                <div class="drama-art">
+                  <span class="drama-monogram">{{ editorPreview().monogram }}</span>
+                </div>
+                <span class="card-shade"></span>
+                <div class="absolute inset-x-0 top-0 p-2.5 flex items-center justify-between gap-1.5 z-10">
+                  <span class="px-2 py-0.5 rounded-md text-[10px] font-bold text-white bg-black/50 border border-white/15">
+                    {{ editorPreview().statusLabel }}
+                  </span>
+                  @if (editorPreview().featured) {
+                    <span class="px-2 py-0.5 rounded-md text-[10px] font-extrabold text-amber-200 bg-amber-500/30 border border-amber-300/30">
+                      ★ Hero
+                    </span>
+                  }
+                </div>
+                <div class="absolute inset-x-0 bottom-0 p-3 pt-10 bg-gradient-to-t from-black/90 via-black/45 to-transparent space-y-1.5 z-10">
+                  <div class="flex flex-wrap items-center gap-1.5">
+                    <span class="px-2 py-0.5 rounded text-[10px] font-extrabold text-white" style="background: var(--d-accent);">
+                      {{ editorPreview().langBadge }}
+                    </span>
+                    <span class="px-2 py-0.5 rounded text-[10px] font-bold text-white bg-black/50 border border-white/15">
+                      Ep {{ editorPreview().latestEpisode }}/{{ editorPreview().totalEpisodes }}
+                    </span>
+                    <span class="px-2 py-0.5 rounded text-[10px] font-bold text-amber-300 bg-black/50 border border-white/15">
+                      ★ {{ editorPreview().rating }}
+                    </span>
+                  </div>
+                  <p class="text-sm font-extrabold text-white leading-snug line-clamp-2">{{ editorPreview().title }}</p>
+                </div>
+              </div>
+
+              <div class="space-y-2">
+                <div class="flex items-center justify-between gap-2 text-[11px]">
+                  <span class="inline-flex items-center gap-1.5 font-bold">
+                    <span class="w-2 h-2 rounded-full" [style.background]="platformColor(editorPreview().platformId)"></span>
+                    {{ editorPreview().platformId }}
+                  </span>
+                  <span class="font-mono-tech" style="color: var(--d-muted);">{{ editorPreview().releaseYear }}</span>
+                </div>
+                @if (editorPreview().originalTitle) {
+                  <p class="text-[11px] font-medium truncate" style="color: var(--d-muted);">
+                    Judul Asli: {{ editorPreview().originalTitle }}
+                  </p>
+                }
+                <p class="text-xs leading-relaxed line-clamp-3" style="color: var(--d-muted);">
+                  {{ editorPreview().synopsis }}
+                </p>
+                <div class="flex flex-wrap gap-1 pt-0.5">
+                  @for (g of editorPreview().genres; track g) {
+                    <span class="px-2 py-0.5 rounded-md text-[10px] font-bold" style="background: var(--d-accent-soft); color: var(--d-accent);">
+                      {{ g }}
+                    </span>
+                  }
+                </div>
+                @if (editorPreview().tags.length) {
+                  <div class="flex flex-wrap gap-1">
+                    @for (t of editorPreview().tags.slice(0, 4); track t) {
+                      <span class="px-1.5 py-0.5 rounded text-[10px] border" style="border-color: var(--d-border); color: var(--d-muted);">
+                        #{{ t }}
+                      </span>
+                    }
+                  </div>
+                }
+              </div>
+            </div>
+
+            <div class="space-y-3 pt-1">
+              <div>
+                <label for="fScene" class="block text-xs font-bold mb-1.5">Tema Warna Kartu &amp; Hero</label>
+                <select
+                  id="fScene"
+                  formControlName="scene"
+                  (change)="onSceneSelect(selectVal($event))"
+                  class="cms-select w-full"
+                >
+                  @for (sc of sceneEntries; track sc.id) {
+                    <option [value]="sc.id">{{ sc.label }}</option>
+                  }
+                </select>
+              </div>
+
+              <label
+                class="flex items-center justify-between p-3 rounded-xl border cursor-pointer"
+                style="background: var(--d-surface-2); border-color: var(--d-border);"
+              >
+                <div>
+                  <span class="block text-xs font-bold">Hero Spotlight</span>
+                  <span class="text-[11px]" style="color: var(--d-muted);">Tampilkan di carousel beranda</span>
+                </div>
+                <input id="fFeatured" type="checkbox" formControlName="featured" class="w-4 h-4 accent-emerald-600 cursor-pointer" />
+              </label>
+            </div>
+
+            <div class="pt-2 border-t space-y-1.5" style="border-color: var(--d-border);">
+              <p class="text-[11px] font-bold" style="color: var(--d-muted);">Kelengkapan Metadata</p>
+              @for (chk of editorPreview().checks; track chk.label) {
+                <div class="flex items-center justify-between text-xs py-1">
+                  <span [style.color]="chk.ok ? 'var(--d-fg)' : 'var(--d-muted)'">{{ chk.label }}</span>
+                  <span
+                    class="px-2 py-0.5 rounded-full text-[10px] font-extrabold"
+                    [style.background]="chk.ok ? 'var(--d-accent-soft)' : 'var(--d-surface-2)'"
+                    [style.color]="chk.ok ? 'var(--d-accent)' : 'var(--d-muted)'"
+                  >
+                    {{ chk.ok ? 'Siap' : 'Wajib' }}
+                  </span>
+                </div>
+              }
+            </div>
+
+            <div class="flex items-center gap-2.5 pt-2">
+              <a
+                routerLink="/admin/dramas"
+                class="flex-1 py-2.5 rounded-xl border text-xs font-bold text-center"
+                style="background: var(--d-surface-2); border-color: var(--d-border); color: var(--d-fg);"
+              >
+                Batal
+              </a>
+              <button
+                type="submit"
+                class="flex-1 py-2.5 rounded-xl text-xs font-extrabold border-0 cursor-pointer text-white shadow-sm"
+                style="background: var(--d-accent);"
+              >
+                {{ editingDrama() ? 'Simpan Perubahan' : 'Terbitkan Drama' }}
+              </button>
+            </div>
+          </div>
+        </aside>
+      </form>
+    </div>
+  }
+
+  @case ('episodes') {
+    @if (selectedEpDrama(); as drama) {
+      <div class="space-y-6">
+        <div class="flex flex-wrap justify-between items-center gap-3">
+          <div class="flex items-center gap-2.5">
+            <span class="w-1 h-5 rounded-full" style="background: var(--d-cyan);"></span>
+            <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight">Episode &amp; Stream Video</h1>
+          </div>
+          <select
+            [value]="drama.id"
+            (change)="selectedEpDramaId.set(selectVal($event)); epSearch.set('')"
+            aria-label="Pilih drama"
+            class="cms-select max-w-xs w-full"
+          >
+            @for (d of catalog.dramas; track d.id) {
+              <option [value]="d.id">{{ d.title }} ({{ d.latestEpisode }}/{{ d.totalEpisodes }})</option>
+            }
+          </select>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <div class="lg:col-span-5 space-y-5">
+            <section class="cms-glass-card rounded-2xl p-5 space-y-3">
+              <h2 class="text-base font-extrabold">{{ drama.title }}</h2>
+              <p class="text-xs" style="color: var(--d-muted);">
+                {{ drama.platformId }} · Bahasa Video: <strong>SUB {{ primaryLangCode(drama) }}</strong> · {{ drama.latestEpisode }}/{{ drama.totalEpisodes }} Eps
+              </p>
+              <div class="space-y-2.5 pt-2 border-t" style="border-color: var(--d-border);">
+                <h3 class="text-xs font-extrabold">Tambah Episode Tunggal</h3>
+                <div class="grid grid-cols-3 gap-2.5">
+                  <input
+                    type="number"
+                    min="1"
+                    [value]="epNum()"
+                    (input)="epNum.set(+inputVal($event) || 1)"
+                    placeholder="No."
+                    class="cms-input"
+                  />
+                  <input
+                    type="text"
+                    [value]="epTitle()"
+                    (input)="epTitle.set(inputVal($event))"
+                    placeholder="Judul episode..."
+                    class="cms-input col-span-2"
+                  />
+                </div>
+                <input
+                  type="url"
+                  [value]="epUrl()"
+                  (input)="epUrl.set(inputVal($event))"
+                  placeholder="https://cdn.tiraiplay.example/streams/ep.m3u8"
+                  class="cms-input w-full font-mono-tech"
+                />
+                <button
+                  type="button"
+                  class="w-full py-2 rounded-xl text-xs font-extrabold border-0 cursor-pointer text-white"
+                  style="background: var(--d-accent);"
+                  (click)="submitEpisode()"
+                >
+                  Simpan Episode
+                </button>
+              </div>
+            </section>
+
+            <section class="cms-glass-card rounded-2xl p-5 space-y-3">
+              <h2 class="text-sm font-extrabold">Generator Massal Episode</h2>
+              <div class="grid grid-cols-2 gap-2.5">
+                <input
+                  type="number"
+                  min="1"
+                  [value]="epGenFrom()"
+                  (input)="epGenFrom.set(+inputVal($event) || 1)"
+                  placeholder="Dari Ep"
+                  class="cms-input"
+                />
+                <input
+                  type="number"
+                  min="1"
+                  [value]="epGenTo()"
+                  (input)="epGenTo.set(+inputVal($event) || 1)"
+                  placeholder="Sampai Ep"
+                  class="cms-input"
+                />
+              </div>
+              <button
+                type="button"
+                class="w-full py-2 rounded-xl text-xs font-extrabold border-0 cursor-pointer text-white"
+                style="background: var(--d-cyan);"
+                (click)="generateBulkEpisodes()"
+              >
+                Generate Rentang Episode
+              </button>
+            </section>
+          </div>
+
+          <section class="lg:col-span-7 cms-glass-card rounded-2xl p-5 space-y-4">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <h2 class="text-base font-extrabold">Daftar Episode ({{ filteredEpisodes().length }})</h2>
+              <input
+                type="search"
+                [value]="epSearch()"
+                (input)="epSearch.set(inputVal($event))"
+                placeholder="Cari episode..."
+                class="cms-input w-full sm:w-52"
+              />
+            </div>
+            <div class="space-y-2 max-h-[480px] overflow-y-auto pr-1">
+              @for (ep of filteredEpisodes(); track ep.number) {
+                <div
+                  class="flex flex-wrap items-center justify-between gap-3 p-3 rounded-xl border text-xs"
+                  style="background: var(--d-surface-2); border-color: var(--d-border);"
+                >
+                  <div class="min-w-0 flex-1">
+                    <div class="flex items-center gap-2">
+                      <span class="font-mono-tech font-bold" style="color: var(--d-accent);">EP {{ ep.number }}</span>
+                      <strong class="truncate">{{ ep.title }}</strong>
+                    </div>
+                    <p class="font-mono-tech text-[10px] truncate mt-0.5" style="color: var(--d-muted);">
+                      {{ ep.streamUrl }} · {{ ep.durationMinutes }} mnt
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    class="px-2.5 py-1 rounded-lg border-0 text-[10px] font-extrabold cursor-pointer"
+                    [style.background]="ep.status === 'Tayang' ? 'var(--d-accent-soft)' : 'var(--d-gold-soft)'"
+                    [style.color]="ep.status === 'Tayang' ? 'var(--d-accent)' : 'var(--d-gold)'"
+                    (click)="cms.toggleEpisodeStatus(drama, ep.number)"
+                  >
+                    {{ ep.status }}
+                  </button>
+                </div>
+              }
+            </div>
+          </section>
+        </div>
+      </div>
+    }
+  }
+
+  @case ('schedule') {
+    <div class="space-y-6">
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center gap-2.5">
+          <span class="w-1 h-5 rounded-full" style="background: var(--d-accent);"></span>
+          <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight">Jadwal Rilis Mingguan</h1>
+        </div>
+      </div>
+
+      <section class="cms-glass-card rounded-2xl p-5 grid grid-cols-1 sm:grid-cols-12 gap-3 items-end">
+        <div class="sm:col-span-5">
+          <label for="schDramaSelect" class="block text-[10px] font-bold mb-1" style="color: var(--d-muted);">Drama</label>
+          <select
+            id="schDramaSelect"
+            [value]="schDramaId() || catalog.dramas[0]?.id"
+            (change)="schDramaId.set(selectVal($event))"
+            class="cms-select w-full"
+          >
+            @for (d of catalog.dramas; track d.id) {
+              <option [value]="d.id">{{ d.title }}</option>
+            }
+          </select>
+        </div>
+        <div class="sm:col-span-3">
+          <label for="schDaySelect" class="block text-[10px] font-bold mb-1" style="color: var(--d-muted);">Hari</label>
+          <select
+            id="schDaySelect"
+            [value]="schDay()"
+            (change)="schDay.set(selectVal($event))"
+            class="cms-select w-full"
+          >
+            @for (day of scheduleDays; track day) {
+              <option [value]="day">{{ day }}</option>
+            }
+          </select>
+        </div>
+        <div class="sm:col-span-2">
+          <label for="schTimeInput" class="block text-[10px] font-bold mb-1" style="color: var(--d-muted);">Jam WIB</label>
+          <input
+            id="schTimeInput"
+            type="text"
+            [value]="schTime()"
+            (input)="schTime.set(inputVal($event))"
+            class="cms-input w-full font-mono-tech"
+          />
+        </div>
+        <div class="sm:col-span-2">
+          <button
+            type="button"
+            class="w-full h-9 rounded-xl text-xs font-extrabold border-0 cursor-pointer text-white"
+            style="background: var(--d-accent);"
+            (click)="submitScheduleSlot()"
+          >
+            + Jadwal
+          </button>
+        </div>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+        @for (day of scheduleDays; track day) {
+          <div class="cms-glass-card rounded-2xl p-4 space-y-2.5">
+            <div class="flex justify-between items-center border-b pb-2" style="border-color: var(--d-border);">
+              <h2 class="text-sm font-extrabold">{{ day }}</h2>
+            </div>
+            @for (slot of cms.scheduleSlots(); track slot.id) {
+              @if (slot.day === day) {
+                <div
+                  class="p-2.5 rounded-xl border text-xs flex justify-between items-center gap-2"
+                  style="background: var(--d-surface-2); border-color: var(--d-border);"
+                >
+                  <div class="min-w-0">
+                    <span class="font-mono-tech text-[10px] font-bold" style="color: var(--d-cyan);">
+                      {{ slot.time }} WIB · Ep {{ slot.ep }}
+                    </span>
+                    <p class="font-extrabold truncate">{{ dramaTitleById(slot.dramaId) }}</p>
+                  </div>
+                  <button
+                    type="button"
+                    class="px-2 py-1 rounded-lg border-0 text-[10px] font-bold cursor-pointer"
+                    style="background: var(--d-rose-soft); color: var(--d-rose);"
+                    (click)="cms.removeScheduleSlot(slot.id)"
+                  >
+                    Hapus
+                  </button>
+                </div>
+              }
+            }
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  @case ('taxonomy') {
+    <div class="space-y-6">
+      <div class="flex items-center gap-2.5">
+        <span class="w-1 h-5 rounded-full" style="background: var(--d-cyan);"></span>
+        <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight">Platform Sumber &amp; Genre</h1>
+      </div>
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <section class="lg:col-span-6 cms-glass-card rounded-2xl p-5 space-y-4">
+          <h2 class="text-base font-extrabold">Platform ({{ catalog.platforms.length }})</h2>
+          <div class="flex gap-2">
+            <input
+              type="text"
+              [value]="newPlatName()"
+              (input)="newPlatName.set(inputVal($event))"
+              placeholder="Nama platform baru..."
+              class="cms-input flex-1"
+            />
+            <button
+              type="button"
+              class="px-3.5 rounded-xl text-xs font-extrabold border-0 cursor-pointer text-white"
+              style="background: var(--d-accent);"
+              (click)="submitPlatform()"
+            >
+              + Tambah
+            </button>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            @for (p of catalog.platforms; track p.id) {
+              <div
+                class="flex items-center justify-between p-3 rounded-xl border text-xs"
+                style="background: var(--d-surface-2); border-color: var(--d-border);"
+              >
+                <span class="flex items-center gap-2 font-bold">
+                  <span class="w-3 h-3 rounded-full" [style.background]="p.tone"></span>
+                  {{ p.name }}
+                </span>
+                <span class="font-mono-tech text-[10px]" style="color: var(--d-muted);">
+                  {{ catalog.countByPlatform(p.name) }}
+                </span>
+              </div>
+            }
+          </div>
+        </section>
+
+        <section class="lg:col-span-6 cms-glass-card rounded-2xl p-5 space-y-4">
+          <h2 class="text-base font-extrabold">Genre ({{ catalog.genres.length }})</h2>
+          <div class="flex gap-2">
+            <input
+              type="text"
+              [value]="newGenreName()"
+              (input)="newGenreName.set(inputVal($event))"
+              placeholder="Nama genre baru..."
+              class="cms-input flex-1"
+            />
+            <button
+              type="button"
+              class="px-3.5 rounded-xl text-xs font-extrabold border-0 cursor-pointer text-white"
+              style="background: var(--d-cyan);"
+              (click)="submitGenre()"
+            >
+              + Tambah
+            </button>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            @for (g of catalog.genres; track g.id) {
+              <span
+                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-bold"
+                style="background: var(--d-surface-2); border-color: var(--d-border);"
+              >
+                <span>{{ g.name }}</span>
+                <span
+                  class="font-mono-tech text-[10px] px-1.5 py-0.5 rounded"
+                  style="background: var(--d-accent-soft); color: var(--d-accent);"
+                >
+                  {{ catalog.countByGenre(g.name) }}
+                </span>
+              </span>
+            }
+          </div>
+        </section>
+      </div>
+    </div>
+  }
+
+  @case ('moderation') {
+    <div class="space-y-6">
+      <div class="flex items-center gap-2.5">
+        <span class="w-1 h-5 rounded-full" style="background: var(--d-gold);"></span>
+        <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight">Request Penonton, Komentar &amp; DMCA</h1>
+      </div>
+
+      <section class="cms-glass-card rounded-2xl p-5 space-y-3">
+        <h2 class="text-base font-extrabold">Antrean Request Penonton ({{ cms.requests().length }})</h2>
+        @for (r of cms.requests(); track r.id) {
+          <div
+            class="flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-xl border text-xs"
+            style="background: var(--d-surface-2); border-color: var(--d-border);"
+          >
+            <div class="min-w-0 flex-1 space-y-1">
+              <div class="flex flex-wrap items-center gap-2">
+                <strong>{{ r.title }}</strong>
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold" style="background: var(--d-accent-soft); color: var(--d-accent);">
+                  {{ r.platform }} · SUB {{ r.lang }}
+                </span>
+                <span class="font-mono-tech text-[10px]" style="color: var(--d-muted);">▲ {{ r.votes }}</span>
+              </div>
+              <p style="color: var(--d-muted);">{{ r.note }}</p>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+              <select
+                [value]="r.status"
+                (change)="onRequestStatusChange(r.id, $event)"
+                class="cms-select h-8"
+              >
+                <option value="Ditinjau">Ditinjau</option>
+                <option value="Terjadwal">Terjadwal</option>
+                <option value="Tersedia">Tersedia</option>
+              </select>
+              <button
+                type="button"
+                class="h-8 px-3 rounded-lg text-[11px] font-extrabold border-0 cursor-pointer text-white"
+                style="background: var(--d-accent);"
+                (click)="convertRequestToDrama(r)"
+              >
+                + Konversi ke Drama
+              </button>
+            </div>
+          </div>
+        }
+      </section>
+
+      <div class="grid grid-cols-1 xl:grid-cols-12 gap-6">
+        <section class="xl:col-span-7 cms-glass-card rounded-2xl p-5 space-y-2.5">
+          <h2 class="text-base font-extrabold">Moderasi Komentar ({{ cms.comments().length }})</h2>
+          @for (c of cms.comments(); track c.id) {
+            <div
+              class="p-3 rounded-xl border text-xs flex justify-between gap-3"
+              style="background: var(--d-surface-2); border-color: var(--d-border);"
+            >
+              <div>
+                <div class="flex flex-wrap items-center gap-2">
+                  <strong>{{ c.author }}</strong>
+                  <span style="color: var(--d-cyan);">{{ c.drama }} Ep {{ c.ep }}</span>
+                  <span style="color: var(--d-muted);">{{ c.time }}</span>
+                </div>
+                <p class="mt-1">{{ c.body }}</p>
+              </div>
+              <div class="flex flex-col gap-1.5 shrink-0">
+                <button
+                  type="button"
+                  class="px-2.5 py-1 rounded-lg border text-[10px] font-bold cursor-pointer"
+                  style="background: var(--d-surface); border-color: var(--d-border); color: var(--d-fg);"
+                  (click)="cms.toggleCommentVisibility(c.id)"
+                >
+                  {{ c.status }}
+                </button>
+                <button
+                  type="button"
+                  class="px-2.5 py-1 rounded-lg border-0 text-[10px] font-bold cursor-pointer"
+                  style="background: var(--d-rose-soft); color: var(--d-rose);"
+                  (click)="cms.deleteComment(c.id)"
+                >
+                  Hapus
+                </button>
+              </div>
+            </div>
+          }
+        </section>
+
+        <section class="xl:col-span-5 cms-glass-card rounded-2xl p-5 space-y-2.5">
+          <h2 class="text-base font-extrabold">Tiket DMCA &amp; Koreksi</h2>
+          @for (t of cms.dmcaTickets(); track t.id) {
+            <div class="p-3 rounded-xl border text-xs space-y-1" style="background: var(--d-surface-2); border-color: var(--d-border);">
+              <div class="flex justify-between items-center">
+                <span class="font-mono-tech font-bold" style="color: var(--d-accent);">{{ t.id }}</span>
+                <select
+                  [value]="t.status"
+                  (change)="onTicketStatusChange(t.id, $event)"
+                  class="cms-select h-7 text-[11px]"
+                >
+                  <option value="Terbuka">Terbuka</option>
+                  <option value="Diproses">Diproses</option>
+                  <option value="Selesai">Selesai</option>
+                </select>
+              </div>
+              <p class="font-bold">{{ t.target }}</p>
+              <p style="color: var(--d-muted);">{{ t.type }} · {{ t.date }}</p>
+            </div>
+          }
+        </section>
+      </div>
+    </div>
+  }
+
+  @case ('users') {
+    <div class="space-y-6">
+      <div class="flex flex-wrap justify-between items-center gap-3">
+        <div class="flex items-center gap-2.5">
+          <span class="w-1 h-5 rounded-full" style="background: var(--d-accent);"></span>
+          <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight">Pengguna &amp; 3-Role RBAC</h1>
+        </div>
+        @if (cms.can('manageUsers')) {
+          <div class="flex flex-wrap gap-2">
+            <input
+              type="text"
+              [value]="newUserName()"
+              (input)="newUserName.set(inputVal($event))"
+              placeholder="Nama lengkap..."
+              class="cms-input w-32"
+            />
+            <input
+              type="email"
+              [value]="newUserEmail()"
+              (input)="newUserEmail.set(inputVal($event))"
+              placeholder="email@tiraiplay.example"
+              class="cms-input w-44"
+            />
+            <select
+              [value]="newUserRole()"
+              (change)="onNewUserRoleChange($event)"
+              class="cms-select"
+            >
+              <option value="editor">Editor</option>
+              <option value="user">User</option>
+              <option value="admin">Admin</option>
+            </select>
+            <button
+              type="button"
+              class="h-9 px-3 rounded-xl text-xs font-extrabold border-0 cursor-pointer text-white"
+              style="background: var(--d-accent);"
+              (click)="submitNewUser()"
+            >
+              + Akun
+            </button>
+          </div>
+        } @else {
+          <span
+            class="px-3 py-1.5 rounded-xl text-xs font-bold border"
+            style="background: var(--d-gold-soft); border-color: var(--d-border-strong); color: var(--d-gold);"
+          >
+            🔒 Mode Baca Saja (Khusus Admin)
+          </span>
+        }
+      </div>
+
+      <section class="cms-glass-card rounded-2xl overflow-hidden">
+        <div class="p-4 border-b flex flex-wrap justify-between gap-3" style="border-color: var(--d-border);">
+          <input
+            type="search"
+            [value]="userSearch()"
+            (input)="userSearch.set(inputVal($event))"
+            placeholder="Cari pengguna..."
+            class="cms-input w-full sm:w-64"
+          />
+          <div class="flex gap-1.5">
+            @for (r of roleFilters; track r) {
+              <button
+                type="button"
+                class="px-3 py-1.5 rounded-lg text-xs font-bold border-0 cursor-pointer"
+                [style.background]="userFilterRole() === r ? 'var(--d-accent)' : 'var(--d-surface-2)'"
+                [style.color]="userFilterRole() === r ? '#fff' : 'var(--d-fg)'"
+                (click)="userFilterRole.set(r)"
+              >
+                {{ roleFilterLabel(r) }}
+              </button>
+            }
+          </div>
+        </div>
+        <div class="overflow-x-auto" tabindex="0" role="region" aria-label="Tabel Manajemen Pengguna CMS">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr class="border-b" style="background: var(--d-surface-2); border-color: var(--d-border); color: var(--d-muted);">
+                <th class="py-3 px-4">Pengguna</th>
+                <th class="py-3 px-4">Role</th>
+                <th class="py-3 px-4">Status</th>
+                <th class="py-3 px-4 text-right">Aksi</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y" style="border-color: var(--d-border);">
+              @for (u of filteredUsers(); track u.id) {
+                <tr>
+                  <td class="py-3 px-4">
+                    <p class="font-extrabold">{{ u.name }}</p>
+                    <p class="font-mono-tech text-[11px]" style="color: var(--d-muted);">{{ u.email }}</p>
+                  </td>
+                  <td class="py-3 px-4">
+                    @if (cms.can('manageUsers')) {
+                      <select
+                        [value]="u.role"
+                        (change)="onUserRoleChange(u.id, $event)"
+                        class="cms-select h-8"
+                      >
+                        <option value="admin">Admin</option>
+                        <option value="editor">Editor</option>
+                        <option value="user">User</option>
+                      </select>
+                    } @else {
+                      <span
+                        class="px-2.5 py-0.5 rounded-full text-[11px] font-bold border"
+                        [style.background]="roleMeta[u.role].badgeBg"
+                        [style.color]="roleMeta[u.role].badgeColor"
+                        style="border-color: var(--d-border-strong);"
+                      >
+                        {{ roleMeta[u.role].label }}
+                      </span>
+                    }
+                  </td>
+                  <td class="py-3 px-4">
+                    <span
+                      class="px-2 py-0.5 rounded-full text-[10px] font-bold"
+                      [style.background]="u.status === 'Aktif' ? 'var(--d-accent-soft)' : 'var(--d-rose-soft)'"
+                      [style.color]="u.status === 'Aktif' ? 'var(--d-accent)' : 'var(--d-rose)'"
+                    >
+                      {{ u.status }}
+                    </span>
+                  </td>
+                  <td class="py-3 px-4 text-right">
+                    <button
+                      type="button"
+                      [disabled]="!cms.can('manageUsers')"
+                      class="px-2.5 py-1 rounded-lg border text-[11px] font-bold"
+                      [class.cursor-pointer]="cms.can('manageUsers')"
+                      [class.opacity-40]="!cms.can('manageUsers')"
+                      style="background: var(--d-surface-2); border-color: var(--d-border); color: var(--d-fg);"
+                      (click)="cms.toggleUserStatus(u.id)"
+                    >
+                      {{ u.status === 'Aktif' ? 'Tangguhkan' : 'Aktifkan' }}
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  }
+
+  @case ('settings') {
+    <div class="space-y-6">
+      <div class="flex items-center gap-2.5">
+        <span class="w-1 h-5 rounded-full" style="background: var(--d-cyan);"></span>
+        <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight">Pengaturan &amp; Ekspor Katalog</h1>
+      </div>
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <section class="lg:col-span-6 cms-glass-card rounded-2xl p-5 space-y-4">
+          <h2 class="text-base font-extrabold">Banner Pengumuman Website Utama</h2>
+          <div class="flex gap-2">
+            <input
+              #annField
+              type="text"
+              [value]="cms.siteAnnouncement()"
+              class="cms-input flex-1"
+            />
+            <button
+              type="button"
+              [disabled]="!cms.can('manageSettings')"
+              class="px-4 rounded-xl text-xs font-extrabold border-0 cursor-pointer text-white"
+              style="background: var(--d-accent);"
+              (click)="saveAnnouncement(annField.value)"
+            >
+              Simpan
+            </button>
+          </div>
+          <pre
+            class="p-3.5 rounded-xl border text-[11px] font-mono-tech overflow-x-auto leading-relaxed"
+            style="background: var(--d-surface-2); border-color: var(--d-border);"
+          >PublicLayoutComponent ('/') vs AdminLayoutComponent ('/admin')
+- '/admin/dashboard' -> Dashboard Utama
+- '/admin/dramas' -> Katalog Drama
+- '/admin/dramas/new' -> Buat Drama (Halaman Penuh)
+- '/admin/dramas/:slug/edit' -> Edit Drama (Halaman Penuh)</pre>
+        </section>
+
+        <section class="lg:col-span-6 cms-glass-card rounded-2xl p-5 space-y-3">
+          <div class="flex justify-between items-center">
+            <h2 class="text-base font-extrabold">Ekspor Metadata JSON</h2>
+            <button
+              type="button"
+              class="px-3 py-1.5 rounded-xl text-xs font-extrabold border-0 cursor-pointer text-white"
+              style="background: var(--d-cyan);"
+              (click)="copyCatalogJson()"
+            >
+              Salin JSON ({{ totalDramas() }})
+            </button>
+          </div>
+          <pre
+            class="p-3.5 rounded-xl border text-[11px] font-mono-tech max-h-60 overflow-auto"
+            style="background: var(--d-surface-2); border-color: var(--d-border); color: var(--d-muted);"
+          >{{ sampleCatalogJson() }}</pre>
+        </section>
+      </div>
+    </div>
+  }
+}
+
+@if (pendingDelete(); as delDrama) {
+  <div class="cms-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="cmsDeleteTitle">
+    <div class="cms-glass-card rounded-2xl w-full max-w-md p-6 space-y-4 shadow-2xl text-center">
+      <div
+        class="w-12 h-12 mx-auto rounded-2xl flex items-center justify-center text-xl"
+        style="background: var(--d-rose-soft); color: var(--d-rose);"
+      >
+        🗑️
+      </div>
+      <div class="space-y-1">
+        <h2 id="cmsDeleteTitle" class="text-lg font-extrabold tracking-tight">Hapus Drama dari Katalog?</h2>
+        <p class="text-xs leading-relaxed" style="color: var(--d-muted);">
+          Judul "{{ delDrama.title }}" akan dihapus permanen dari Website Utama (/) dan CMS.
+        </p>
+      </div>
+      <div class="flex justify-center gap-2.5 pt-1">
+        <button
+          type="button"
+          class="px-4 py-2 rounded-xl border text-xs font-bold cursor-pointer"
+          style="background: var(--d-surface-2); border-color: var(--d-border); color: var(--d-fg);"
+          (click)="pendingDelete.set(null)"
+        >
+          Batal
+        </button>
+        <button
+          type="button"
+          class="px-4 py-2 rounded-xl text-xs font-extrabold border-0 cursor-pointer text-white"
+          style="background: var(--d-rose);"
+          (click)="confirmDeleteDrama()"
+        >
+          Ya, Hapus Permanen
+        </button>
+      </div>
+    </div>
+  </div>
+}

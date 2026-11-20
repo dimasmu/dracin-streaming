@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { BookmarkService } from '../../core/services/bookmark.service';
@@ -11,7 +11,6 @@ import { I18nService } from '../../core/services/i18n.service';
 @Component({
   imports: [RouterLink, TranslocoPipe, DramaCardComponent, EmptyStateComponent],
   templateUrl: './bookmarks.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BookmarksComponent {
   private readonly bookmarks = inject(BookmarkService);
