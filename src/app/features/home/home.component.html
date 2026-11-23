@@ -1,120 +1,112 @@
 <section class="hero" [attr.aria-label]="'home.featured' | transloco">
-  <div
-    class="hero-track"
-    appDragScroll
-    tabindex="0"
-    role="region"
-    aria-roledescription="carousel"
-    [attr.aria-label]="'home.featured' | transloco"
-    (keydown.arrow-left)="step(-1); $event.preventDefault()"
-    (keydown.arrow-right)="step(1); $event.preventDefault()"
-    (pointerenter)="pauseAuto()"
-    (pointerleave)="resumeAuto()"
-    (focusin)="pauseAuto()"
-    (focusout)="resumeAuto()"
-  >
-    @for (d of featured(); track d.id) {
-      <article class="hero-slide" [style.--slide-tone]="d.tone">
-        <div class="hero-backdrop" aria-hidden="true">
-          @if (d.backdropUrl || d.posterUrl) {
-            <img
-              class="hero-backdrop-image"
-              [src]="d.backdropUrl || d.posterUrl"
-              alt=""
-              loading="lazy"
-              decoding="async"
-            />
-          } @else {
-            <span class="hero-backdrop-monogram">{{ monogram(d.title) }}</span>
+  <div class="container">
+    <div class="hero-frame">
+      <div
+        class="hero-track"
+        appDragScroll
+        tabindex="0"
+        role="region"
+        aria-roledescription="carousel"
+        [attr.aria-label]="'home.featured' | transloco"
+        (keydown.arrow-left)="step(-1); $event.preventDefault()"
+        (keydown.arrow-right)="step(1); $event.preventDefault()"
+        (pointerenter)="pauseAuto()"
+        (pointerleave)="resumeAuto()"
+        (focusin)="pauseAuto()"
+        (focusout)="resumeAuto()"
+      >
+        @for (d of featured(); track d.id) {
+          <article class="hero-slide" [style.--slide-tone]="d.tone">
+            <div class="hero-backdrop" aria-hidden="true">
+              @if ((d.backdropUrl || d.posterUrl) && !isBackdropBroken(d.id)) {
+                <img
+                  class="hero-backdrop-image"
+                  [src]="d.backdropUrl || d.posterUrl"
+                  alt=""
+                  loading="lazy"
+                  decoding="async"
+                  (load)="onBackdropLoad(d.id, $event)"
+                  (error)="markBackdropBroken(d.id)"
+                />
+              } @else {
+                <span class="hero-backdrop-monogram">{{ monogram(d.title) }}</span>
+              }
+              <div class="hero-backdrop-scrim"></div>
+            </div>
+
+            <div class="hero-inner">
+              <div class="hero-copy">
+                <div class="hero-kicker-row">
+                  <span class="hero-kicker-label">{{ isId() ? 'Drama pilihan' : 'Featured drama' }}</span>
+                </div>
+
+                <h1>{{ d.title }}</h1>
+
+                <div class="hero-meta">
+                  @if (ratingLabel(d); as rate) {
+                    <span class="meta-pill meta-pill-rate">&#9733; {{ rate }}</span>
+                  }
+                  <span class="meta-pill">{{
+                    'common.episodeShort' | transloco: { n: d.latestEpisode ?? d.totalEpisodes ?? 1 }
+                  }}</span>
+                  @for (g of d.genres.slice(0, 3); track g) {
+                    <span class="hero-genre-chip">{{ 'genre.' + g | transloco }}</span>
+                  }
+                </div>
+
+                <p class="hero-description">{{ d.synopsis }}</p>
+
+                <div class="hero-actions">
+                  <a class="btn btn-primary hero-cta-watch" [routerLink]="['/watch', d.slug, d.latestEpisode ?? 1]">
+                    &#9654; {{ 'home.watchNow' | transloco }}
+                  </a>
+                  <button
+                    type="button"
+                    class="btn hero-cta-save"
+                    [class.is-saved]="isBookmarked(d.id)"
+                    [attr.aria-pressed]="isBookmarked(d.id)"
+                    [attr.aria-label]="
+                      isBookmarked(d.id) ? ('card.removeBookmark' | transloco) : ('card.addBookmark' | transloco)
+                    "
+                    (click)="toggleBookmark(d)"
+                  >
+                    <svg
+                      viewBox="0 0 24 24"
+                      width="15"
+                      height="15"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linejoin="round"
+                      [attr.fill]="isBookmarked(d.id) ? 'currentColor' : 'none'"
+                      aria-hidden="true"
+                    >
+                      <path d="M6 4.5A2.5 2.5 0 0 1 8.5 2h7A2.5 2.5 0 0 1 18 4.5V21l-6-3.5L6 21z" />
+                    </svg>
+                    <span>{{
+                      isBookmarked(d.id) ? (isId() ? 'Tersimpan' : 'Saved') : isId() ? 'Simpan' : 'Save'
+                    }}</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </article>
+        }
+      </div>
+
+      <div class="hero-controls-shell">
+        <div class="slider-dots">
+          @for (d of featured(); track d.id; let i = $index) {
+            <button
+              class="slider-dot"
+              [class.active]="i === current()"
+              type="button"
+              [attr.aria-label]="'home.slide' | transloco: { n: i + 1 }"
+              [attr.aria-current]="i === current() ? 'true' : null"
+              (click)="go(i)"
+            ></button>
           }
-          <div class="hero-backdrop-scrim"></div>
         </div>
-
-        <div class="hero-inner container">
-          <div class="hero-copy">
-            <div class="hero-kicker-row">
-              <span class="hero-kicker-label">{{ isId() ? 'Drama pilihan' : 'Featured drama' }}</span>
-            </div>
-
-            <h1>{{ d.title }}</h1>
-
-            <div class="hero-meta">
-              @if (ratingLabel(d); as rate) {
-                <span class="meta-pill meta-pill-rate">&#9733; {{ rate }}</span>
-              }
-              <span class="meta-pill">{{
-                'common.episodeShort' | transloco: { n: d.latestEpisode ?? d.totalEpisodes ?? 1 }
-              }}</span>
-              @for (g of d.genres.slice(0, 3); track g) {
-                <span class="hero-genre-chip">{{ 'genre.' + g | transloco }}</span>
-              }
-            </div>
-
-            <p class="hero-description">{{ d.synopsis }}</p>
-
-            <div class="hero-actions">
-              <a class="btn btn-primary hero-cta-watch" [routerLink]="['/watch', d.slug, d.latestEpisode ?? 1]">
-                &#9654; {{ 'home.watchNow' | transloco }}
-              </a>
-              <button
-                type="button"
-                class="btn hero-cta-save"
-                [class.is-saved]="isBookmarked(d.id)"
-                [attr.aria-pressed]="isBookmarked(d.id)"
-                [attr.aria-label]="
-                  isBookmarked(d.id) ? ('card.removeBookmark' | transloco) : ('card.addBookmark' | transloco)
-                "
-                (click)="toggleBookmark(d)"
-              >
-                <span>{{ isBookmarked(d.id) ? '&#9733;' : '&#9734;' }}</span>
-                <span>{{
-                  isBookmarked(d.id) ? (isId() ? 'Tersimpan' : 'Saved') : isId() ? 'Simpan' : 'Save'
-                }}</span>
-              </button>
-            </div>
-          </div>
-
-        </div>
-      </article>
-    }
-  </div>
-
-  <div class="hero-controls-shell container">
-    <div class="slider-dots">
-      @for (d of featured(); track d.id; let i = $index) {
-        <button
-          class="slider-dot"
-          [class.active]="i === current()"
-          type="button"
-          [attr.aria-label]="'home.slide' | transloco: { n: i + 1 }"
-          [attr.aria-current]="i === current() ? 'true' : null"
-          (click)="go(i)"
-        ></button>
-      }
-    </div>
-
-    <div class="hero-nav-controls">
-      <span class="hero-slide-counter" aria-live="polite">{{ current() + 1 }} / {{ featured().length }}</span>
-      <button
-        class="hero-nav-btn"
-        type="button"
-        [attr.aria-label]="'home.prevSlide' | transloco"
-        (click)="step(-1)"
-      >
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M15 18l-6-6 6-6" />
-        </svg>
-      </button>
-      <button
-        class="hero-nav-btn"
-        type="button"
-        [attr.aria-label]="'home.nextSlide' | transloco"
-        (click)="step(1)"
-      >
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M9 18l6-6-6-6" />
-        </svg>
-      </button>
+      </div>
     </div>
   </div>
 </section>

@@ -258,6 +258,16 @@
                       <span class="drama-art">
                         <span class="drama-monogram aw-thumb-mono">{{ dramaMonogram(d) }}</span>
                       </span>
+                      @if (thumbSrc(d); as src) {
+                        <img
+                          [src]="src"
+                          [alt]="d.title"
+                          loading="lazy"
+                          class="aw-search-thumb-img"
+                          (error)="markThumbBroken(src)"
+                          (load)="onThumbLoad(src, $event)"
+                        />
+                      }
                     </span>
                     <span class="min-w-0 flex-1 flex flex-col gap-1">
                       <span class="flex items-center justify-between gap-2">

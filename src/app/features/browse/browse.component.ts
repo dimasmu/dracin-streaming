@@ -4,10 +4,13 @@ import {
   inject,
   OnInit,
   signal,
+  viewChildren,
 } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { SelectModule } from 'primeng/select';
+import { DatePicker, DatePickerModule } from 'primeng/datepicker';
+import { InputTextModule } from 'primeng/inputtext';
+import { MultiSelect, MultiSelectModule } from 'primeng/multiselect';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { PaginatorModule } from 'primeng/paginator';
 import { MessageService } from 'primeng/api';
@@ -17,7 +20,7 @@ import { DramaCardComponent } from '../../shared/components/drama-card/drama-car
 import { EmptyStateComponent } from '../../shared/components/empty-state/empty-state.component';
 import { I18nService } from '../../core/services/i18n.service';
 import type { Drama, DramaStatus } from '../../core/models/drama';
-import { monogram } from '../../core/utils/format';
+import { isPlaceholderImage, monogram, toIsoDate } from '../../core/utils/format';
 
 interface Option {
   label: string;
@@ -33,17 +36,26 @@ interface ActiveChip {
   remove: () => void;
 }
 
+function sameItems<T>(a: readonly T[], b: readonly T[]): boolean {
+  return a.length === b.length && a.every((v, idx) => v === b[idx]);
+}
+
 @Component({
   imports: [
     FormsModule,
     RouterLink,
-    SelectModule,
+    DatePickerModule,
+    InputTextModule,
+    MultiSelectModule,
     PaginatorModule,
     TranslocoPipe,
     DramaCardComponent,
     EmptyStateComponent,
   ],
   templateUrl: './browse.component.html',
+  host: {
+    '(window:scroll)': 'onWindowScroll()',
+  },
 })
 export class BrowseComponent implements OnInit {
   protected readonly catalog = inject(CatalogService);
@@ -53,6 +65,12 @@ export class BrowseComponent implements OnInit {
   private readonly router = inject(Router);
   protected readonly i18n = inject(I18nService);
 
+  private readonly multiSelects = viewChildren(MultiSelect);
+  private readonly datePickers = viewChildren(DatePicker);
+  private lastOverlayOpenedAt = 0;
+  private lastOverlayScrollY = 0;
+
+  // Applied filter state (only updated when clicking Apply Filter, Reset, or removing a chip)
   protected readonly selectedGenres = signal<string[]>([]);
   protected readonly selectedPlatforms = signal<string[]>([]);
   protected readonly selectedYears = signal<number[]>([]);
@@ -62,12 +80,24 @@ export class BrowseComponent implements OnInit {
   protected readonly dateFrom = signal('');
   protected readonly dateTo = signal('');
   protected readonly query = signal('');
+
+  // Draft sidebar filter state (edited freely without auto-filtering until "Filter" is clicked)
+  protected readonly draftGenres = signal<string[]>([]);
+  protected readonly draftPlatforms = signal<string[]>([]);
+  protected readonly draftYears = signal<number[]>([]);
+  protected readonly draftSubtitles = signal<string[]>([]);
+  protected readonly draftStatus = signal<StatusFilter>('all');
+  protected readonly draftDateFromObj = signal<Date | null>(null);
+  protected readonly draftDateToObj = signal<Date | null>(null);
+  protected readonly draftQuery = signal('');
+
   protected readonly sort = signal<SortKey>('popular');
   protected readonly viewMode = signal<BrowseViewMode>('grid');
 
   protected readonly rows = signal(10);
   protected readonly first = signal(0);
   protected readonly mobileFiltersOpen = signal(false);
+  private readonly brokenPosterUrls = signal<ReadonlySet<string>>(new Set());
 
   protected readonly alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
 
@@ -109,6 +139,18 @@ export class BrowseComponent implements OnInit {
     this.sortValues.map((v) => ({ label: this.i18n.t(this.sortKeys[v]), value: v })),
   );
 
+  protected readonly hasPendingChanges = computed(() => {
+    if (this.draftQuery().trim() !== this.query().trim()) return true;
+    if (this.draftStatus() !== this.statusFilter()) return true;
+    if (!sameItems(this.draftGenres(), this.selectedGenres())) return true;
+    if (!sameItems(this.draftPlatforms(), this.selectedPlatforms())) return true;
+    if (!sameItems(this.draftYears(), this.selectedYears())) return true;
+    if (!sameItems(this.draftSubtitles(), this.selectedSubtitles())) return true;
+    if (toIsoDate(this.draftDateFromObj()) !== this.dateFrom()) return true;
+    if (toIsoDate(this.draftDateToObj()) !== this.dateTo()) return true;
+    return false;
+  });
+
   protected readonly filtered = computed(() => {
     const base = this.catalog.filter({
       genres: this.selectedGenres(),
@@ -148,6 +190,7 @@ export class BrowseComponent implements OnInit {
         label: `"${this.query().trim()}"`,
         remove: () => {
           this.query.set('');
+          this.draftQuery.set('');
           this.first.set(0);
         },
       });
@@ -163,6 +206,7 @@ export class BrowseComponent implements OnInit {
             : 'Status: Ongoing',
         remove: () => {
           this.statusFilter.set('all');
+          this.draftStatus.set('all');
           this.first.set(0);
         },
       });
@@ -183,6 +227,7 @@ export class BrowseComponent implements OnInit {
         label: this.i18n.t(`genre.${g}`),
         remove: () => {
           this.selectedGenres.update((list) => list.filter((x) => x !== g));
+          this.draftGenres.update((list) => list.filter((x) => x !== g));
           this.first.set(0);
         },
       });
@@ -193,6 +238,7 @@ export class BrowseComponent implements OnInit {
         label: p,
         remove: () => {
           this.selectedPlatforms.update((list) => list.filter((x) => x !== p));
+          this.draftPlatforms.update((list) => list.filter((x) => x !== p));
           this.first.set(0);
         },
       });
@@ -203,6 +249,7 @@ export class BrowseComponent implements OnInit {
         label: String(y),
         remove: () => {
           this.selectedYears.update((list) => list.filter((x) => x !== y));
+          this.draftYears.update((list) => list.filter((x) => x !== y));
           this.first.set(0);
         },
       });
@@ -213,6 +260,7 @@ export class BrowseComponent implements OnInit {
         label: `SUB ${s.toUpperCase()}`,
         remove: () => {
           this.selectedSubtitles.update((list) => list.filter((x) => x !== s));
+          this.draftSubtitles.update((list) => list.filter((x) => x !== s));
           this.first.set(0);
         },
       });
@@ -222,6 +270,8 @@ export class BrowseComponent implements OnInit {
         key: 'date',
         label: `${this.dateFrom() || '…'} → ${this.dateTo() || '…'}`,
         remove: () => {
+          this.draftDateFromObj.set(null);
+          this.draftDateToObj.set(null);
           this.dateFrom.set('');
           this.dateTo.set('');
           this.first.set(0);
@@ -245,23 +295,43 @@ export class BrowseComponent implements OnInit {
   ngOnInit(): void {
     const params = this.route.snapshot.queryParamMap;
     const q = params.get('q');
-    if (q) this.query.set(q);
+    if (q) {
+      this.query.set(q);
+      this.draftQuery.set(q);
+    }
 
     const genre = params.get('genre');
-    if (genre) this.selectedGenres.set(genre.split(',').filter(Boolean));
+    if (genre) {
+      const list = genre.split(',').filter(Boolean);
+      this.selectedGenres.set(list);
+      this.draftGenres.set(list);
+    }
 
     const platform = params.get('platform');
-    if (platform) this.selectedPlatforms.set(platform.split(',').filter(Boolean));
+    if (platform) {
+      const list = platform.split(',').filter(Boolean);
+      this.selectedPlatforms.set(list);
+      this.draftPlatforms.set(list);
+    }
 
     const year = params.get('year');
-    if (year) this.selectedYears.set(year.split(',').map(Number).filter(Boolean));
+    if (year) {
+      const list = year.split(',').map(Number).filter(Boolean);
+      this.selectedYears.set(list);
+      this.draftYears.set(list);
+    }
 
     const sub = params.get('subtitle') ?? params.get('lang');
-    if (sub) this.selectedSubtitles.set(sub.split(',').filter(Boolean));
+    if (sub) {
+      const list = sub.split(',').filter(Boolean);
+      this.selectedSubtitles.set(list);
+      this.draftSubtitles.set(list);
+    }
 
     const status = params.get('status');
     if (status === 'completed' || status === 'ongoing') {
       this.statusFilter.set(status);
+      this.draftStatus.set(status);
     }
 
     const sortParam = params.get('sort');
@@ -269,16 +339,62 @@ export class BrowseComponent implements OnInit {
       this.sort.set(sortParam as SortKey);
   }
 
+  protected onOverlayShow(): void {
+    this.lastOverlayOpenedAt = Date.now();
+    this.lastOverlayScrollY = typeof window !== 'undefined' ? window.scrollY : 0;
+  }
+
+  protected onWindowScroll(): void {
+    if (typeof window === 'undefined') return;
+    const elapsed = Date.now() - this.lastOverlayOpenedAt;
+    const deltaY = Math.abs(window.scrollY - this.lastOverlayScrollY);
+    if (elapsed < 180 && deltaY < 24) return;
+    this.closeOpenOverlays();
+  }
+
+  protected closeOpenOverlays(): void {
+    for (const ms of this.multiSelects()) {
+      if (ms.overlayVisible()) ms.hide(false);
+    }
+    for (const dp of this.datePickers()) {
+      if (dp.overlayVisible()) dp.hideOverlay();
+    }
+  }
+
   protected dramaMonogram(d: Drama): string {
     return monogram(d.title);
   }
 
   protected platformTone(platformId: string): string {
-    return this.catalog.getPlatform(platformId)?.tone ?? 'var(--d-accent)';
+    return this.catalog.getPlatform(platformId)?.tone ?? '#16a34a';
   }
 
-  protected hasLang(d: Drama, lang: 'id' | 'en'): boolean {
-    return d.videoLanguages.includes(lang) || d.subtitleLanguages.includes(lang);
+  protected listPosterSrc(d: Drama): string | null {
+    const url = d.posterUrl?.trim();
+    return url && !this.brokenPosterUrls().has(url) ? url : null;
+  }
+
+  protected markPosterBroken(url: string): void {
+    this.brokenPosterUrls.update((prev) => {
+      if (prev.has(url)) return prev;
+      const next = new Set(prev);
+      next.add(url);
+      return next;
+    });
+  }
+
+  protected onListPosterLoad(url: string, event: Event): void {
+    if (isPlaceholderImage(event)) {
+      this.markPosterBroken(url);
+    }
+  }
+
+  protected onDraftDateFromChange(value: Date | null): void {
+    this.draftDateFromObj.set(value);
+  }
+
+  protected onDraftDateToChange(value: Date | null): void {
+    this.draftDateToObj.set(value);
   }
 
   protected isBookmarked(dramaId: string): boolean {
@@ -304,34 +420,43 @@ export class BrowseComponent implements OnInit {
     });
   }
 
-  protected onQuery(event: Event): void {
-    this.query.set((event.target as HTMLInputElement).value);
-    this.first.set(0);
+  protected onDraftQuery(event: Event): void {
+    this.draftQuery.set((event.target as HTMLInputElement).value);
   }
 
-  protected setGenres(value: unknown): void {
-    this.selectedGenres.set(Array.isArray(value) ? [...value] : []);
-    this.first.set(0);
+  protected setDraftGenres(value: unknown): void {
+    this.draftGenres.set(Array.isArray(value) ? [...value] : []);
   }
 
-  protected setPlatforms(value: unknown): void {
-    this.selectedPlatforms.set(Array.isArray(value) ? [...value] : []);
-    this.first.set(0);
+  protected setDraftPlatforms(value: unknown): void {
+    this.draftPlatforms.set(Array.isArray(value) ? [...value] : []);
   }
 
-  protected setYears(value: unknown): void {
-    this.selectedYears.set(Array.isArray(value) ? [...value] : []);
-    this.first.set(0);
+  protected setDraftYears(value: unknown): void {
+    this.draftYears.set(Array.isArray(value) ? [...value] : []);
   }
 
-  protected setSubtitles(value: unknown): void {
-    this.selectedSubtitles.set(Array.isArray(value) ? [...value] : []);
-    this.first.set(0);
+  protected setDraftSubtitles(value: unknown): void {
+    this.draftSubtitles.set(Array.isArray(value) ? [...value] : []);
   }
 
-  protected setStatus(status: StatusFilter): void {
-    this.statusFilter.set(status);
+  protected setDraftStatus(status: StatusFilter): void {
+    this.draftStatus.set(status);
+  }
+
+  protected applyFilters(event?: Event): void {
+    event?.preventDefault();
+    this.closeOpenOverlays();
+    this.query.set(this.draftQuery().trim());
+    this.statusFilter.set(this.draftStatus());
+    this.selectedGenres.set([...this.draftGenres()]);
+    this.selectedPlatforms.set([...this.draftPlatforms()]);
+    this.selectedYears.set([...this.draftYears()]);
+    this.selectedSubtitles.set([...this.draftSubtitles()]);
+    this.dateFrom.set(toIsoDate(this.draftDateFromObj()));
+    this.dateTo.set(toIsoDate(this.draftDateToObj()));
     this.first.set(0);
+    this.mobileFiltersOpen.set(false);
   }
 
   protected setLetter(letter: string): void {
@@ -354,6 +479,16 @@ export class BrowseComponent implements OnInit {
   }
 
   protected reset(): void {
+    this.closeOpenOverlays();
+    this.draftGenres.set([]);
+    this.draftPlatforms.set([]);
+    this.draftYears.set([]);
+    this.draftSubtitles.set([]);
+    this.draftStatus.set('all');
+    this.draftDateFromObj.set(null);
+    this.draftDateToObj.set(null);
+    this.draftQuery.set('');
+
     this.selectedGenres.set([]);
     this.selectedPlatforms.set([]);
     this.selectedYears.set([]);
@@ -365,6 +500,7 @@ export class BrowseComponent implements OnInit {
     this.query.set('');
     this.sort.set('popular');
     this.first.set(0);
+    this.mobileFiltersOpen.set(false);
     void this.router.navigate([], { queryParams: {}, replaceUrl: true });
   }
 }

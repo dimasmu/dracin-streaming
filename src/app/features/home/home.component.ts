@@ -13,6 +13,7 @@ import { MessageService } from 'primeng/api';
 import { type Drama } from '../../core/models/drama';
 import { BookmarkService } from '../../core/services/bookmark.service';
 import { CatalogService } from '../../core/services/catalog.service';
+import { CmsService } from '../../core/services/cms.service';
 import { DragScrollDirective } from '../../shared/directives/drag-scroll.directive';
 import { DramaCardComponent } from '../../shared/components/drama-card/drama-card.component';
 import { monogram, videoLangLabel } from '../../core/utils/format';
@@ -26,6 +27,7 @@ const AUTO_ROTATE_MS = 7000;
 })
 export class HomeComponent implements OnInit, OnDestroy {
   protected readonly catalog = inject(CatalogService);
+  private readonly cms = inject(CmsService);
   protected readonly monogram = monogram;
   protected readonly videoLangs = (langs: readonly string[]) => videoLangLabel(langs, ' · ');
   private readonly i18n = inject(I18nService);
@@ -36,6 +38,29 @@ export class HomeComponent implements OnInit, OnDestroy {
   protected readonly featured = computed(() => this.catalog.featured());
   protected readonly current = signal(0);
   protected readonly isId = computed(() => this.i18n.lang() === 'id');
+  protected readonly brokenBackdrops = signal<ReadonlySet<string>>(new Set());
+
+  protected isBackdropBroken(id: string): boolean {
+    return this.brokenBackdrops().has(id);
+  }
+
+  protected markBackdropBroken(id: string): void {
+    this.brokenBackdrops.update((prev) => {
+      if (prev.has(id)) return prev;
+      const next = new Set(prev);
+      next.add(id);
+      return next;
+    });
+  }
+
+  protected onBackdropLoad(id: string, event: Event): void {
+    const img = event.target as HTMLImageElement | null;
+    if (!img) return;
+    // YouTube returns a 120x90 grey "..." placeholder image on HTTP 404 without firing (error).
+    if (img.naturalWidth <= 160 && img.naturalHeight <= 120) {
+      this.markBackdropBroken(id);
+    }
+  }
 
   protected isBookmarked(id: string): boolean {
     return this.bookmarks.isBookmarked(id);
@@ -111,6 +136,36 @@ export class HomeComponent implements OnInit, OnDestroy {
   protected readonly schedulePreview = computed(() => {
     const now = new Date();
     const dayFmt = new Intl.DateTimeFormat(this.i18n.lang(), { weekday: 'short' });
+    const cmsSlots = this.cms.scheduleSlots().filter((s) => s.status !== 'Ditunda');
+    if (cmsSlots.length) {
+      const dayNumMap: Record<string, number> = {
+        Minggu: 0,
+        Senin: 1,
+        Selasa: 2,
+        Rabu: 3,
+        Kamis: 4,
+        Jumat: 5,
+        Sabtu: 6,
+      };
+      const todayNum = now.getDay();
+      return cmsSlots.slice(0, 6).map((slot) => {
+        const delta = ((dayNumMap[slot.day] ?? 1) - todayNum + 7) % 7;
+        const date = new Date(now);
+        date.setDate(now.getDate() + delta);
+        const drama =
+          this.catalog.dramas.find((d) => d.id === slot.dramaId || d.slug === slot.dramaSlug) ??
+          this.catalog.dramas[0];
+        return {
+          id: `slot-${slot.id}`,
+          dramaSlug: drama?.slug ?? slot.dramaSlug ?? slot.dramaId,
+          dramaTitle: drama?.title ?? slot.dramaId,
+          episodeNumber: slot.ep,
+          platformId: drama?.platformId ?? 'TiraiPlay',
+          dayLabel: dayFmt.format(date),
+          releaseTime: slot.time.includes('WIB') ? slot.time : `${slot.time} WIB`,
+        };
+      });
+    }
     return this.catalog.trending(6).map((d, i) => {
       const date = new Date(now);
       date.setDate(now.getDate() + ((i % 6) + 1));

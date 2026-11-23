@@ -9,13 +9,15 @@ import {
   signal,
   untracked,
   viewChild,
+  viewChildren,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import { TranslocoPipe } from '@jsverse/transloco';
-import { SelectModule } from 'primeng/select';
+import { Select, SelectModule } from 'primeng/select';
 import { CatalogService } from '../../core/services/catalog.service';
+import { CmsService } from '../../core/services/cms.service';
 import { BookmarkService } from '../../core/services/bookmark.service';
 import { I18nService } from '../../core/services/i18n.service';
 import { PreferencesService, VideoLang } from '../../core/services/preferences.service';
@@ -28,6 +30,26 @@ interface OwnComment {
   id: string;
   body: string;
   likes: number;
+}
+
+interface CommentReplyItem {
+  id: string;
+  author: string;
+  time: string;
+  body: string;
+  likes: number;
+  replyTo?: string;
+  isOwn?: boolean;
+}
+
+interface CommentViewItem {
+  id: string;
+  author: string;
+  time: string;
+  body: string;
+  likes: number;
+  isOwn: boolean;
+  replies: CommentReplyItem[];
 }
 
 interface EpisodeRange {
@@ -55,6 +77,7 @@ const PLAYBACK_SPEEDS = [1, 1.25, 1.5, 2] as const;
     '(document:fullscreenchange)': 'onFullscreenChange()',
     '(document:keydown)': 'onGlobalKeydown($event)',
     '(document:click)': 'onDocumentClick($event)',
+    '(window:scroll)': 'onWindowScroll()',
   },
 })
 export class WatchComponent {
@@ -64,6 +87,7 @@ export class WatchComponent {
   readonly v = input<string>();
 
   private readonly catalog = inject(CatalogService);
+  private readonly cms = inject(CmsService);
   private readonly bookmarks = inject(BookmarkService);
   private readonly prefs = inject(PreferencesService);
   private readonly messages = inject(MessageService);
@@ -71,6 +95,15 @@ export class WatchComponent {
   protected readonly i18n = inject(I18nService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly playerEl = viewChild<ElementRef<HTMLElement>>('player');
+  private readonly langSelects = viewChildren(Select);
+
+  protected onWindowScroll(): void {
+    for (const sel of this.langSelects()) {
+      if (sel.overlayVisible()) {
+        sel.hide(false);
+      }
+    }
+  }
 
   protected readonly monogram = monogram;
   protected readonly stars = [1, 2, 3, 4, 5];
@@ -205,6 +238,20 @@ export class WatchComponent {
   protected readonly episodesUnit = computed(() =>
     this.i18n.t(this.totalEpisodes() === 1 ? 'watch.unitOne' : 'watch.unitMany'),
   );
+  protected readonly currentEpisodeMeta = computed(() => {
+    const d = this.drama();
+    if (!d) return undefined;
+    return this.cms.getEpisodesForDrama(d).find((e) => e.number === this.episodeNumber());
+  });
+  protected readonly episodeTitleLabel = computed(() => {
+    const title = this.currentEpisodeMeta()?.title?.trim() ?? '';
+    const ep = this.episodeNumber();
+    return title && title !== `Episode ${ep}` ? title : '';
+  });
+  protected readonly subtitleLabel = computed(() => {
+    const subs = this.drama()?.subtitleLanguages ?? [];
+    return subs.length ? subs.map((s) => s.toUpperCase()).join(' / ') : '';
+  });
   protected readonly durationSeconds = computed(() => (this.drama()?.durationMinutes ?? 1) * 60);
   protected readonly duration = computed(() => this.formatTime(this.durationSeconds()));
   protected readonly elapsed = computed(() =>
@@ -213,17 +260,70 @@ export class WatchComponent {
 
   protected readonly commentSort = signal<'new' | 'top'>('new');
   private readonly ownComments = signal<OwnComment[]>([]);
+  private readonly ownReplies = signal<Record<string, Array<{ id: string; body: string; replyTo?: string; likes: number }>>>({});
   private readonly likedComments = signal<ReadonlySet<string>>(new Set());
+  protected readonly replyingTo = signal<{ rootId: string; author: string } | null>(null);
+  protected readonly replyDraft = signal('');
+  private readonly collapsedReplies = signal<ReadonlySet<string>>(new Set());
 
-  protected readonly comments = computed(() => {
-    const own = this.ownComments().map((c) => ({
+  protected readonly comments = computed<CommentViewItem[]>(() => {
+    const isId = this.i18n.lang() === 'id';
+    const liked = this.likedComments();
+    const userReplies = this.ownReplies();
+
+    const mapReplies = (
+      rootId: string,
+      presetReplies: Array<{ id: string; author: string; time: string; body: string; baseLikes: number; replyTo?: string }>,
+    ): CommentReplyItem[] => {
+      const seeded: CommentReplyItem[] = presetReplies.map((r) => ({
+        id: r.id,
+        author: r.author,
+        time: r.time,
+        body: r.body,
+        replyTo: r.replyTo,
+        likes: r.baseLikes + (liked.has(r.id) ? 1 : 0),
+      }));
+      const added: CommentReplyItem[] = (userReplies[rootId] ?? []).map((r) => ({
+        id: r.id,
+        author: this.i18n.t('watch.you'),
+        time: this.i18n.t('watch.justNow'),
+        body: r.body,
+        replyTo: r.replyTo,
+        isOwn: true,
+        likes: r.likes + (liked.has(r.id) ? 1 : 0),
+      }));
+      return [...seeded, ...added];
+    };
+
+    const own: CommentViewItem[] = this.ownComments().map((c) => ({
       id: c.id,
       author: this.i18n.t('watch.you'),
       time: this.i18n.t('watch.justNow'),
       body: c.body,
-      likes: c.likes + (this.likedComments().has(c.id) ? 1 : 0),
+      isOwn: true,
+      likes: c.likes + (liked.has(c.id) ? 1 : 0),
+      replies: mapReplies(c.id, []),
     }));
-    const presets = [
+
+    const presetSeedReplies: Record<
+      string,
+      Array<{ id: string; author: string; time: string; body: string; baseLikes: number; replyTo?: string }>
+    > = {
+      c1: [
+        {
+          id: 'c1-r1',
+          author: 'Dimas A.',
+          time: isId ? '1 jam lalu' : '1 hour ago',
+          body: isId
+            ? 'Setuju banget, adegan konfrontasinya terasa intens dari awal sampai akhir!'
+            : 'Totally agree, that confrontation scene felt intense from start to finish!',
+          baseLikes: 6,
+          replyTo: this.i18n.t('watch.c1Author'),
+        },
+      ],
+    };
+
+    const presets: CommentViewItem[] = [
       { id: 'c1', baseLikes: 24, n: 1 },
       { id: 'c2', baseLikes: 15, n: 2 },
       { id: 'c3', baseLikes: 9, n: 3 },
@@ -232,14 +332,21 @@ export class WatchComponent {
       author: this.i18n.t(`watch.c${p.n}Author`),
       time: this.i18n.t(`watch.c${p.n}Time`),
       body: this.i18n.t(`watch.c${p.n}Body`),
-      likes: p.baseLikes + (this.likedComments().has(p.id) ? 1 : 0),
+      isOwn: false,
+      likes: p.baseLikes + (liked.has(p.id) ? 1 : 0),
+      replies: mapReplies(p.id, presetSeedReplies[p.id] ?? []),
     }));
+
     const list = [...own, ...presets];
     if (this.commentSort() === 'top') {
       return [...list].sort((a, b) => b.likes - a.likes);
     }
     return list;
   });
+
+  protected readonly totalCommentCount = computed(() =>
+    this.comments().reduce((sum, c) => sum + 1 + c.replies.length, 0),
+  );
 
   protected readonly draft = signal('');
 
@@ -252,6 +359,8 @@ export class WatchComponent {
       untracked(() => {
         this.stop(true);
         this.selectedRangeIndex.set(Math.floor((ep - 1) / EP_CHUNK_SIZE));
+        this.replyingTo.set(null);
+        this.replyDraft.set('');
       });
     });
     this.destroyRef.onDestroy(() => {
@@ -506,6 +615,68 @@ export class WatchComponent {
       detail: body,
       life: 2500,
     });
+  }
+
+  protected openReply(rootId: string, author: string): void {
+    const active = this.replyingTo();
+    if (active && active.rootId === rootId && active.author === author) {
+      this.cancelReply();
+      return;
+    }
+    this.replyingTo.set({ rootId, author });
+    this.replyDraft.set('');
+    if (this.collapsedReplies().has(rootId)) {
+      this.toggleRepliesVisibility(rootId);
+    }
+  }
+
+  protected cancelReply(): void {
+    this.replyingTo.set(null);
+    this.replyDraft.set('');
+  }
+
+  protected onReplyDraft(event: Event): void {
+    this.replyDraft.set((event.target as HTMLInputElement | HTMLTextAreaElement).value);
+  }
+
+  protected submitReply(event: Event, rootId: string): void {
+    event.preventDefault();
+    const body = this.replyDraft().trim();
+    const target = this.replyingTo();
+    if (!body || !target || target.rootId !== rootId) return;
+
+    this.ownReplies.update((map) => ({
+      ...map,
+      [rootId]: [
+        ...(map[rootId] ?? []),
+        {
+          id: `reply-${Date.now()}`,
+          body,
+          replyTo: target.author,
+          likes: 0,
+        },
+      ],
+    }));
+
+    this.replyingTo.set(null);
+    this.replyDraft.set('');
+    this.messages.add({
+      severity: 'success',
+      summary: this.i18n.lang() === 'id' ? 'Balasan terkirim' : 'Reply posted',
+      detail: body,
+      life: 2500,
+    });
+  }
+
+  protected areRepliesExpanded(rootId: string): boolean {
+    return !this.collapsedReplies().has(rootId);
+  }
+
+  protected toggleRepliesVisibility(rootId: string): void {
+    const next = new Set(this.collapsedReplies());
+    if (next.has(rootId)) next.delete(rootId);
+    else next.add(rootId);
+    this.collapsedReplies.set(next);
   }
 
   private stop(reset: boolean): void {

@@ -4,13 +4,14 @@ import {
   computed,
   inject,
   input,
+  signal,
 } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import type { Drama } from '../../../core/models/drama';
 import { CatalogService } from '../../../core/services/catalog.service';
 import { DramaPreviewService } from '../../../core/services/drama-preview.service';
 import { I18nService } from '../../../core/services/i18n.service';
-import { monogram } from '../../../core/utils/format';
+import { isPlaceholderImage, monogram } from '../../../core/utils/format';
 
 @Component({
   selector: 'app-drama-card',
@@ -33,19 +34,31 @@ export class DramaCardComponent {
 
   protected readonly monogram = computed(() => monogram(this.drama().title));
 
+  private readonly brokenPosterUrls = signal<ReadonlySet<string>>(new Set());
+
+  protected readonly posterSrc = computed(() => {
+    const url = this.drama().posterUrl?.trim();
+    return url && !this.brokenPosterUrls().has(url) ? url : null;
+  });
+
+  protected onPosterError(url: string): void {
+    this.brokenPosterUrls.update((prev) => {
+      if (prev.has(url)) return prev;
+      const next = new Set(prev);
+      next.add(url);
+      return next;
+    });
+  }
+
+  protected onPosterLoad(url: string, event: Event): void {
+    if (isPlaceholderImage(event)) {
+      this.onPosterError(url);
+    }
+  }
+
   protected readonly platformTone = computed(
     () => this.catalog.getPlatform(this.drama().platformId)?.tone ?? this.drama().tone,
   );
-
-  protected readonly hasIdSub = computed(() => {
-    const d = this.drama();
-    return d.videoLanguages.includes('id') || d.subtitleLanguages.includes('id');
-  });
-
-  protected readonly hasEnSub = computed(() => {
-    const d = this.drama();
-    return d.videoLanguages.includes('en') || d.subtitleLanguages.includes('en');
-  });
 
   protected readonly genresLine = computed(() => {
     this.i18n.lang();

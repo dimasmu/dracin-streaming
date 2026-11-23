@@ -50,3 +50,29 @@ export function clamp(value: string | number, max: number): string {
 export function videoLangLabel(langs: readonly string[], sep = ' / '): string {
   return langs.map((l) => l.toUpperCase()).join(sep);
 }
+
+/** Detects tiny HTTP-404 placeholder thumbnails (e.g. YouTube 120x90 grey tiles). */
+export function isPlaceholderImage(event: Event): boolean {
+  const img = event.target as HTMLImageElement | null;
+  return Boolean(img && img.naturalWidth > 0 && img.naturalWidth <= 160 && img.naturalHeight <= 120);
+}
+
+/** Formats a local Date instance as YYYY-MM-DD without UTC timezone drift. */
+export function toIsoDate(date: Date | null | undefined): string {
+  if (!date || isNaN(date.getTime())) return '';
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
+/** Parses YYYY-MM-DD into a local Date instance, or null when empty/invalid. */
+export function parseIsoDate(value?: string | null): Date | null {
+  if (!value) return null;
+  const parts = String(value).trim().split('-');
+  if (parts.length !== 3) return null;
+  const [y, m, d] = parts.map(Number);
+  if (!y || !m || !d) return null;
+  const parsed = new Date(y, m - 1, d);
+  return isNaN(parsed.getTime()) ? null : parsed;
+}

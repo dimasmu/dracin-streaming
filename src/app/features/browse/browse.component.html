@@ -1,16 +1,14 @@
 <main class="container page catalog-page">
   <div class="catalog-head">
-    <div class="flex flex-wrap items-center gap-3">
-      <span class="editorial-accent-bar"></span>
-      <div>
-        <div class="flex flex-wrap items-center gap-2.5">
-          <h1 class="display catalog-title">{{ 'browse.title' | transloco }}</h1>
-          <span class="catalog-count-badge">
-            {{ 'common.dramasFound' | transloco: { count: filtered().length } }}
-          </span>
-        </div>
-        <p class="catalog-subtitle">{{ 'browse.intro' | transloco }}</p>
+    <div>
+      <div class="flex flex-wrap items-center gap-2.5">
+        <span class="editorial-accent-bar"></span>
+        <h1 class="display catalog-title">{{ 'browse.title' | transloco }}</h1>
+        <span class="catalog-count-badge">
+          {{ 'common.dramasFound' | transloco: { count: filtered().length } }}
+        </span>
       </div>
+      <p class="catalog-subtitle">{{ 'browse.intro' | transloco }}</p>
     </div>
 
     <div class="flex flex-wrap items-center gap-2">
@@ -24,7 +22,7 @@
       >
         <svg
           viewBox="0 0 24 24"
-          class="w-3.5 h-3.5"
+          class="w-4 h-4"
           fill="none"
           stroke="currentColor"
           stroke-width="2.2"
@@ -49,18 +47,19 @@
   </div>
 
   <div class="browse-layout catalog-layout">
-    <!-- Left Sticky Glass Filter Sidebar (Collapsible on mobile <= 820px) -->
+    <!-- Left Glass Filter Sidebar (Static flow on desktop, Collapsible on mobile <= 820px) -->
     <aside
       id="browse-filter-sidebar"
       class="browse-sidebar catalog-sidebar"
       [class.is-mobile-open]="mobileFiltersOpen()"
       [attr.aria-label]="'browse.filters' | transloco"
+      (scroll)="closeOpenOverlays()"
     >
       <div class="catalog-sidebar-head">
         <span class="catalog-sidebar-title">
           <svg
             viewBox="0 0 24 24"
-            class="w-3.5 h-3.5"
+            class="w-4 h-4"
             fill="none"
             stroke="currentColor"
             stroke-width="2.2"
@@ -77,130 +76,189 @@
         }
       </div>
 
-      <div class="filter-group">
-        <label class="filter-label" for="browse-sidebar-q">
-          {{ i18n.lang() === 'id' ? 'Kata Kunci' : 'Keyword' }}
-        </label>
-        <div class="catalog-sidebar-search">
-          <input
-            id="browse-sidebar-q"
-            class="search catalog-q-input"
-            type="search"
-            [placeholder]="'browse.searchPlaceholder' | transloco"
-            [value]="query()"
-            (input)="onQuery($event)"
-            [attr.aria-label]="'browse.searchLabel' | transloco"
+      <form class="flex flex-col gap-3.5" (submit)="applyFilters($event)">
+        <div class="filter-group">
+          <label class="filter-label" for="browse-sidebar-q">
+            {{ i18n.lang() === 'id' ? 'Kata Kunci' : 'Keyword' }}
+          </label>
+          <div class="catalog-sidebar-search">
+            <input
+              id="browse-sidebar-q"
+              class="search catalog-q-input"
+              type="search"
+              [placeholder]="'browse.searchPlaceholder' | transloco"
+              [value]="draftQuery()"
+              (input)="onDraftQuery($event)"
+              [attr.aria-label]="'browse.searchLabel' | transloco"
+            />
+            @if (draftQuery()) {
+              <button
+                type="button"
+                class="catalog-q-clear"
+                (click)="draftQuery.set('')"
+                [attr.aria-label]="i18n.lang() === 'id' ? 'Hapus kata kunci' : 'Clear keyword'"
+              >
+                &#10005;
+              </button>
+            }
+          </div>
+        </div>
+
+        <div class="filter-group">
+          <span class="filter-label">{{ i18n.lang() === 'id' ? 'Status Tayang' : 'Status' }}</span>
+          <div class="catalog-status-pills" role="group">
+            @for (st of statusOptions(); track st.value) {
+              <button
+                type="button"
+                class="catalog-status-pill"
+                [class.is-active]="draftStatus() === st.value"
+                (click)="setDraftStatus(st.value)"
+              >
+                {{ st.label }}
+              </button>
+            }
+          </div>
+        </div>
+
+        <div class="filter-group">
+          <span class="filter-label">{{ 'browse.genre' | transloco }}</span>
+          <p-multiselect
+            [options]="genreOptions()"
+            optionLabel="label"
+            optionValue="value"
+            display="chip"
+            [maxSelectedLabels]="2"
+            [ngModel]="draftGenres()"
+            (ngModelChange)="setDraftGenres($event)"
+            [ngModelOptions]="{ standalone: true }"
+            [placeholder]="'browse.allGenres' | transloco"
+            [showClear]="true"
+            [fluid]="true"
+            appendTo="body"
+            (onPanelShow)="onOverlayShow()"
           />
-          @if (query()) {
-            <button
-              type="button"
-              class="catalog-q-clear"
-              (click)="query.set(''); first.set(0)"
-              [attr.aria-label]="i18n.lang() === 'id' ? 'Hapus kata kunci' : 'Clear keyword'"
-            >
-              &#10005;
-            </button>
+        </div>
+
+        <div class="filter-group">
+          <span class="filter-label">{{ 'browse.platform' | transloco }}</span>
+          <p-multiselect
+            [options]="platformOptions"
+            optionLabel="label"
+            optionValue="value"
+            display="chip"
+            [maxSelectedLabels]="2"
+            [ngModel]="draftPlatforms()"
+            (ngModelChange)="setDraftPlatforms($event)"
+            [ngModelOptions]="{ standalone: true }"
+            [placeholder]="'browse.allPlatforms' | transloco"
+            [showClear]="true"
+            [fluid]="true"
+            appendTo="body"
+            (onPanelShow)="onOverlayShow()"
+          />
+        </div>
+
+        <div class="filter-group">
+          <span class="filter-label">{{ 'browse.year' | transloco }}</span>
+          <p-multiselect
+            [options]="yearOptions"
+            optionLabel="label"
+            optionValue="value"
+            display="chip"
+            [maxSelectedLabels]="2"
+            [ngModel]="draftYears()"
+            (ngModelChange)="setDraftYears($event)"
+            [ngModelOptions]="{ standalone: true }"
+            [placeholder]="'browse.allYears' | transloco"
+            [showClear]="true"
+            [fluid]="true"
+            appendTo="body"
+            (onPanelShow)="onOverlayShow()"
+          />
+        </div>
+
+        <div class="filter-group">
+          <span class="filter-label">{{ 'browse.subtitle' | transloco }}</span>
+          <p-multiselect
+            [options]="subtitleOptions()"
+            optionLabel="label"
+            optionValue="value"
+            display="chip"
+            [maxSelectedLabels]="2"
+            [ngModel]="draftSubtitles()"
+            (ngModelChange)="setDraftSubtitles($event)"
+            [ngModelOptions]="{ standalone: true }"
+            [placeholder]="'browse.allSubtitles' | transloco"
+            [showClear]="true"
+            [fluid]="true"
+            appendTo="body"
+            (onPanelShow)="onOverlayShow()"
+          />
+        </div>
+
+        <div class="filter-group">
+          <span class="filter-label">{{ 'browse.releaseDate' | transloco }}</span>
+          <div class="grid grid-cols-1 gap-2">
+            <p-datepicker
+              [ngModel]="draftDateFromObj()"
+              (ngModelChange)="onDraftDateFromChange($event)"
+              [ngModelOptions]="{ standalone: true }"
+              dateFormat="yy-mm-dd"
+              [showIcon]="true"
+              [showClear]="true"
+              [showButtonBar]="true"
+              [placeholder]="'browse.fromDate' | transloco"
+              [fluid]="true"
+              appendTo="body"
+              (onShow)="onOverlayShow()"
+            />
+            <p-datepicker
+              [ngModel]="draftDateToObj()"
+              (ngModelChange)="onDraftDateToChange($event)"
+              [ngModelOptions]="{ standalone: true }"
+              dateFormat="yy-mm-dd"
+              [showIcon]="true"
+              [showClear]="true"
+              [showButtonBar]="true"
+              [placeholder]="'browse.toDate' | transloco"
+              [fluid]="true"
+              appendTo="body"
+              (onShow)="onOverlayShow()"
+            />
+          </div>
+        </div>
+
+        <div class="catalog-sidebar-actions">
+          @if (hasPendingChanges()) {
+            <p class="catalog-pending-hint">
+              {{ 'browse.pendingChanges' | transloco }}
+            </p>
           }
-        </div>
-      </div>
-
-      <div class="filter-group">
-        <span class="filter-label">{{ i18n.lang() === 'id' ? 'Status Tayang' : 'Status' }}</span>
-        <div class="catalog-status-pills" role="group">
-          @for (st of statusOptions(); track st.value) {
-            <button
-              type="button"
-              class="catalog-status-pill"
-              [class.is-active]="statusFilter() === st.value"
-              (click)="setStatus(st.value)"
+          <button
+            class="btn btn-primary catalog-apply-btn"
+            [class.has-pending]="hasPendingChanges()"
+            type="submit"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              class="w-4 h-4 shrink-0"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
             >
-              {{ st.label }}
-            </button>
-          }
+              <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+            </svg>
+            <span>{{ 'browse.applyFilters' | transloco }}</span>
+          </button>
+
+          <button class="facet-clear catalog-sidebar-reset" type="button" (click)="reset()">
+            {{ 'browse.resetAll' | transloco }}
+          </button>
         </div>
-      </div>
-
-      <div class="filter-group">
-        <span class="filter-label">{{ 'browse.genre' | transloco }}</span>
-        <p-select
-          [options]="genreOptions()"
-          optionLabel="label"
-          optionValue="value"
-          [multiple]="true"
-          [ngModel]="selectedGenres()"
-          (ngModelChange)="setGenres($event)"
-          [placeholder]="'browse.allGenres' | transloco"
-          [showClear]="true"
-          [style]="{ width: '100%' }"
-        />
-      </div>
-
-      <div class="filter-group">
-        <span class="filter-label">{{ 'browse.platform' | transloco }}</span>
-        <p-select
-          [options]="platformOptions"
-          optionLabel="label"
-          optionValue="value"
-          [multiple]="true"
-          [ngModel]="selectedPlatforms()"
-          (ngModelChange)="setPlatforms($event)"
-          [placeholder]="'browse.allPlatforms' | transloco"
-          [showClear]="true"
-          [style]="{ width: '100%' }"
-        />
-      </div>
-
-      <div class="filter-group">
-        <span class="filter-label">{{ 'browse.year' | transloco }}</span>
-        <p-select
-          [options]="yearOptions"
-          optionLabel="label"
-          optionValue="value"
-          [multiple]="true"
-          [ngModel]="selectedYears()"
-          (ngModelChange)="setYears($event)"
-          [placeholder]="'browse.allYears' | transloco"
-          [showClear]="true"
-          [style]="{ width: '100%' }"
-        />
-      </div>
-
-      <div class="filter-group">
-        <span class="filter-label">{{ 'browse.subtitle' | transloco }}</span>
-        <p-select
-          [options]="subtitleOptions()"
-          optionLabel="label"
-          optionValue="value"
-          [multiple]="true"
-          [ngModel]="selectedSubtitles()"
-          (ngModelChange)="setSubtitles($event)"
-          [placeholder]="'browse.allSubtitles' | transloco"
-          [showClear]="true"
-          [style]="{ width: '100%' }"
-        />
-      </div>
-
-      <div class="filter-group">
-        <span class="filter-label">{{ 'browse.releaseDate' | transloco }}</span>
-        <div class="grid grid-cols-2 gap-2">
-          <input
-            type="date"
-            class="date-input"
-            [(ngModel)]="dateFrom"
-            [attr.aria-label]="'browse.fromDate' | transloco"
-          />
-          <input
-            type="date"
-            class="date-input"
-            [(ngModel)]="dateTo"
-            [attr.aria-label]="'browse.toDate' | transloco"
-          />
-        </div>
-      </div>
-
-      <button class="facet-clear catalog-sidebar-reset" type="button" (click)="reset()">
-        {{ 'browse.resetAll' | transloco }}
-      </button>
+      </form>
     </aside>
 
     <!-- Main Catalog Content -->
@@ -238,7 +296,7 @@
               [attr.title]="i18n.lang() === 'id' ? 'Grid Besar (4 kolom)' : 'Large Grid (4 cols)'"
               (click)="setViewMode('grid')"
             >
-              <svg viewBox="0 0 24 24" class="w-3.5 h-3.5" fill="currentColor" aria-hidden="true">
+              <svg viewBox="0 0 24 24" class="w-4 h-4" fill="currentColor" aria-hidden="true">
                 <rect x="3" y="3" width="8" height="8" rx="1.5" />
                 <rect x="13" y="3" width="8" height="8" rx="1.5" />
                 <rect x="3" y="13" width="8" height="8" rx="1.5" />
@@ -253,7 +311,7 @@
               [attr.title]="i18n.lang() === 'id' ? 'Grid Padat (5 kolom)' : 'Compact Grid (5 cols)'"
               (click)="setViewMode('compact')"
             >
-              <svg viewBox="0 0 24 24" class="w-3.5 h-3.5" fill="currentColor" aria-hidden="true">
+              <svg viewBox="0 0 24 24" class="w-4 h-4" fill="currentColor" aria-hidden="true">
                 <rect x="3" y="3" width="5" height="5" rx="1" />
                 <rect x="9.5" y="3" width="5" height="5" rx="1" />
                 <rect x="16" y="3" width="5" height="5" rx="1" />
@@ -275,7 +333,7 @@
             >
               <svg
                 viewBox="0 0 24 24"
-                class="w-3.5 h-3.5"
+                class="w-4 h-4"
                 fill="none"
                 stroke="currentColor"
                 stroke-width="2.2"
@@ -348,6 +406,16 @@
                   <div class="drama-art">
                     <span class="drama-monogram catalog-list-mono">{{ dramaMonogram(d) }}</span>
                   </div>
+                  @if (listPosterSrc(d); as src) {
+                    <img
+                      [src]="src"
+                      [alt]="d.title"
+                      loading="lazy"
+                      class="catalog-list-thumb-img"
+                      (error)="markPosterBroken(src)"
+                      (load)="onListPosterLoad(src, $event)"
+                    />
+                  }
                 </a>
 
                 <div class="catalog-list-body">
@@ -379,9 +447,22 @@
                         class="poster-bm-btn catalog-list-bm"
                         [class.is-saved]="isBookmarked(d.id)"
                         [attr.aria-pressed]="isBookmarked(d.id)"
+                        [attr.aria-label]="(isBookmarked(d.id) ? 'card.removeBookmark' : 'card.addBookmark') | transloco"
+                        [attr.title]="(isBookmarked(d.id) ? 'card.removeBookmark' : 'card.addBookmark') | transloco"
                         (click)="toggleBookmark(d, $event)"
                       >
-                        {{ isBookmarked(d.id) ? '&#9733;' : '&#9734;' }}
+                        <svg
+                          viewBox="0 0 24 24"
+                          width="15"
+                          height="15"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linejoin="round"
+                          [attr.fill]="isBookmarked(d.id) ? 'currentColor' : 'none'"
+                          aria-hidden="true"
+                        >
+                          <path d="M6 4.5A2.5 2.5 0 0 1 8.5 2h7A2.5 2.5 0 0 1 18 4.5V21l-6-3.5L6 21z" />
+                        </svg>
                       </button>
                       <a
                         class="btn btn-primary btn-compact"
@@ -392,7 +473,7 @@
                     </div>
                   </div>
 
-                  <div class="flex flex-wrap items-center gap-y-1.5">
+                  <div class="flex flex-wrap items-center gap-x-2.5 gap-y-1.5 catalog-list-meta">
                     <span class="aw-dot">
                       <span
                         class="poster-platform-dot"
@@ -410,12 +491,6 @@
                       <span class="aw-dot">{{ d.releaseYear }}</span>
                     }
                     <span class="aw-dot">{{ d.durationMinutes ?? 2 }}m/ep</span>
-                    @if (hasLang(d, 'id')) {
-                      <span class="aw-dot"><span class="tick-pill tick-sub">SUB ID</span></span>
-                    }
-                    @if (hasLang(d, 'en')) {
-                      <span class="aw-dot"><span class="tick-pill tick-dub">SUB EN</span></span>
-                    }
                   </div>
 
                   <p class="catalog-list-synopsis">{{ d.synopsis }}</p>

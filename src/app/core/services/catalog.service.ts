@@ -113,7 +113,7 @@ export class CatalogService {
     );
   }
 
-  addPlatform(name: string, tone = 'oklch(68% .16 155)'): boolean {
+  addPlatform(name: string, tone = 'oklch(68% .16 155)', description?: string): boolean {
     const clean = name.trim();
     if (!clean || this.platforms.some((p) => p.name.toLowerCase() === clean.toLowerCase())) return false;
     const id = clean
@@ -122,12 +122,52 @@ export class CatalogService {
       .replace(/\s+/g, '-');
     this.platformsState.update((list) => [
       ...list,
-      { id: id || `plat-${Date.now()}`, name: clean, description: `${clean} short drama source.`, tone },
+      {
+        id: id || `plat-${Date.now()}`,
+        name: clean,
+        description: description?.trim() || `${clean} short drama source.`,
+        tone,
+      },
     ]);
     return true;
   }
 
-  addGenre(name: string, tone = 'oklch(68% .16 155)'): boolean {
+  updatePlatform(id: string, patch: { name: string; description: string; tone: string }): boolean {
+    const clean = patch.name.trim();
+    if (!clean) return false;
+    const existing = this.platforms.find((p) => p.id === id);
+    if (!existing) return false;
+    if (this.platforms.some((p) => p.id !== id && p.name.toLowerCase() === clean.toLowerCase())) {
+      return false;
+    }
+    const oldName = existing.name;
+    this.platformsState.update((list) =>
+      list.map((p) =>
+        p.id === id
+          ? {
+              ...p,
+              name: clean,
+              description: patch.description.trim() || `${clean} short drama source.`,
+              tone: patch.tone || p.tone,
+            }
+          : p,
+      ),
+    );
+    if (oldName !== clean) {
+      this.dramasState.update((list) =>
+        list.map((d) => (d.platformId === oldName ? { ...d, platformId: clean } : d)),
+      );
+    }
+    return true;
+  }
+
+  deletePlatform(id: string): boolean {
+    if (!this.platforms.some((p) => p.id === id)) return false;
+    this.platformsState.update((list) => list.filter((p) => p.id !== id));
+    return true;
+  }
+
+  addGenre(name: string, tone = 'oklch(68% .16 155)', description?: string): boolean {
     const clean = name.trim();
     if (!clean || this.genres.some((g) => g.name.toLowerCase() === clean.toLowerCase())) return false;
     const id = clean
@@ -136,8 +176,52 @@ export class CatalogService {
       .replace(/\s+/g, '-');
     this.genresState.update((list) => [
       ...list,
-      { id: id || `genre-${Date.now()}`, name: clean, description: `${clean} short dramas.`, tone },
+      {
+        id: id || `genre-${Date.now()}`,
+        name: clean,
+        description: description?.trim() || `${clean} short dramas.`,
+        tone,
+      },
     ]);
+    return true;
+  }
+
+  updateGenre(id: string, patch: { name: string; description: string; tone: string }): boolean {
+    const clean = patch.name.trim();
+    if (!clean) return false;
+    const existing = this.genres.find((g) => g.id === id);
+    if (!existing) return false;
+    if (this.genres.some((g) => g.id !== id && g.name.toLowerCase() === clean.toLowerCase())) {
+      return false;
+    }
+    const oldName = existing.name;
+    this.genresState.update((list) =>
+      list.map((g) =>
+        g.id === id
+          ? {
+              ...g,
+              name: clean,
+              description: patch.description.trim() || `${clean} short dramas.`,
+              tone: patch.tone || g.tone,
+            }
+          : g,
+      ),
+    );
+    if (oldName !== clean) {
+      this.dramasState.update((list) =>
+        list.map((d) =>
+          d.genres.includes(oldName)
+            ? { ...d, genres: d.genres.map((g) => (g === oldName ? clean : g)) }
+            : d,
+        ),
+      );
+    }
+    return true;
+  }
+
+  deleteGenre(id: string): boolean {
+    if (!this.genres.some((g) => g.id === id)) return false;
+    this.genresState.update((list) => list.filter((g) => g.id !== id));
     return true;
   }
 
@@ -178,15 +262,31 @@ export class CatalogService {
     return scored.slice(0, limit).map((s) => s.d);
   }
 
+  private matchesQuery(d: Drama, q: string): boolean {
+    const needle = q.trim().toLowerCase();
+    if (!needle) return true;
+    const hay = [
+      d.title,
+      d.originalTitle ?? '',
+      (d.alternateTitles ?? []).join(' '),
+      d.platformId,
+      d.genres.join(' '),
+      (d.tags ?? []).join(' '),
+      (d.cast ?? []).join(' '),
+      d.director ?? '',
+      d.synopsis,
+      d.country ?? '',
+      d.productionStudio ?? '',
+    ]
+      .join(' ')
+      .toLowerCase();
+    return hay.includes(needle);
+  }
+
   search(query: string, limit = 6): Drama[] {
     const q = query.trim().toLowerCase();
     if (!q) return [];
-    return this.dramas
-      .filter((d) => {
-        const hay = [d.title, d.genres.join(' '), d.platformId, d.synopsis].join(' ').toLowerCase();
-        return hay.includes(q);
-      })
-      .slice(0, limit);
+    return this.dramas.filter((d) => this.matchesQuery(d, q)).slice(0, limit);
   }
 
   filter(filters: DramaFilters = {}): Drama[] {
@@ -199,10 +299,7 @@ export class CatalogService {
       if (subtitleLanguages.length && !subtitleLanguages.some((s) => d.subtitleLanguages.includes(s))) return false;
       if (dateFrom && d.releaseDate && d.releaseDate < dateFrom) return false;
       if (dateTo && d.releaseDate && d.releaseDate > dateTo) return false;
-      if (query) {
-        const hay = [d.title, d.platformId, d.genres.join(' ')].join(' ').toLowerCase();
-        if (!hay.includes(query.toLowerCase())) return false;
-      }
+      if (query && !this.matchesQuery(d, query)) return false;
       return true;
     });
 

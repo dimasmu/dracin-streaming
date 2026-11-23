@@ -23,7 +23,7 @@ import { PreferencesService } from '../../../core/services/preferences.service';
 import { PwaService } from '../../../core/services/pwa.service';
 import { I18nService, SiteLang } from '../../../core/services/i18n.service';
 import type { Drama } from '../../../core/models/drama';
-import { monogram, videoLangLabel } from '../../../core/utils/format';
+import { isPlaceholderImage, monogram, videoLangLabel } from '../../../core/utils/format';
 
 export type SearchQuickTab = 'all' | 'id' | 'en' | 'completed';
 
@@ -57,6 +57,27 @@ export class AppHeaderComponent {
   protected readonly searchTab = signal<SearchQuickTab>('all');
   protected readonly activeResultIndex = signal(-1);
   protected readonly rawResults = signal<Drama[]>([]);
+  private readonly brokenThumbUrls = signal<ReadonlySet<string>>(new Set());
+
+  protected thumbSrc(d: Drama): string | null {
+    const url = d.posterUrl?.trim();
+    return url && !this.brokenThumbUrls().has(url) ? url : null;
+  }
+
+  protected markThumbBroken(url: string): void {
+    this.brokenThumbUrls.update((prev) => {
+      if (prev.has(url)) return prev;
+      const next = new Set(prev);
+      next.add(url);
+      return next;
+    });
+  }
+
+  protected onThumbLoad(url: string, event: Event): void {
+    if (isPlaceholderImage(event)) {
+      this.markThumbBroken(url);
+    }
+  }
 
   protected readonly navItems = computed(() => [
     { path: '/', labelKey: 'nav.home' },

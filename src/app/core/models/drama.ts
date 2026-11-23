@@ -5,6 +5,9 @@ export interface DramaEpisode {
   title?: string;
   airDate?: string;
   durationMinutes?: number;
+  streamUrl?: string;
+  subtitleUrl?: string;
+  status?: 'Tayang' | 'Draft';
 }
 
 export interface Drama {
@@ -33,6 +36,9 @@ export interface Drama {
   ratingIsDemo: boolean;
   durationMinutes?: number;
   country?: string;
+  productionStudio?: string;
+  ageRating?: 'SU' | '13+' | '17+' | '21+' | string;
+  trailerUrl?: string;
   cast?: string[];
   director?: string;
   tags?: string[];

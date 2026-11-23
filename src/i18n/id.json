@@ -194,6 +194,8 @@
     "releaseDate": "Tanggal Rilis",
     "fromDate": "Dari tanggal",
     "toDate": "Sampai tanggal",
+    "applyFilters": "Terapkan Filter",
+    "pendingChanges": "Belum diterapkan",
     "resetAll": "Atur ulang semua filter",
     "searchPlaceholder": "Cari judul, genre, platform",
     "searchLabel": "Cari di katalog",

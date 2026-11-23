@@ -194,6 +194,8 @@
     "releaseDate": "Release Date",
     "fromDate": "From date",
     "toDate": "To date",
+    "applyFilters": "Apply Filter",
+    "pendingChanges": "Not yet applied",
     "resetAll": "Reset all filters",
     "searchPlaceholder": "Search title, genre, platform",
     "searchLabel": "Search the catalogue",

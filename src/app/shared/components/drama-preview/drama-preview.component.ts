@@ -1,4 +1,4 @@
-import { Component, ElementRef, computed, inject } from '@angular/core';
+import { Component, ElementRef, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { OverlayModule, ScrollStrategyOptions } from '@angular/cdk/overlay';
 import { MessageService } from 'primeng/api';
@@ -7,7 +7,13 @@ import { SkeletonModule } from 'primeng/skeleton';
 import { BookmarkService } from '../../../core/services/bookmark.service';
 import { DramaPreviewService } from '../../../core/services/drama-preview.service';
 import { I18nService } from '../../../core/services/i18n.service';
-import { monogram, ratingStars } from '../../../core/utils/format';
+import {
+  formatAired,
+  isPlaceholderImage,
+  monogram,
+  ratingStars,
+  videoLangLabel,
+} from '../../../core/utils/format';
 
 /**
  * The single, app-root-mounted drama preview.
@@ -76,6 +82,15 @@ export class DramaPreviewComponent {
   protected readonly viewportMargin = 12;
 
   protected readonly ratingFilled = computed(() => ratingStars(this.preview.state()?.drama.rating));
+  protected readonly aired = computed(() =>
+    formatAired(
+      this.preview.state()?.drama.releaseDate,
+      this.preview.state()?.drama.releaseYear,
+      this.i18n.lang(),
+      this.i18n.t('common.tba'),
+    ),
+  );
+  protected readonly videoLangs = (langs: readonly string[]) => videoLangLabel(langs);
   protected readonly watchEpisode = computed(() => {
     const d = this.preview.state()?.drama;
     return Math.max(1, d?.latestEpisode ?? d?.totalEpisodes ?? 1);
@@ -84,6 +99,29 @@ export class DramaPreviewComponent {
     const d = this.preview.state()?.drama;
     return d ? this.bookmarks.isBookmarked(d.id) : false;
   });
+
+  private readonly brokenArtUrls = signal<ReadonlySet<string>>(new Set());
+
+  protected readonly previewArtSrc = computed(() => {
+    const d = this.preview.state()?.drama;
+    const url = (d?.backdropUrl || d?.posterUrl)?.trim();
+    return url && !this.brokenArtUrls().has(url) ? url : null;
+  });
+
+  protected markArtBroken(url: string): void {
+    this.brokenArtUrls.update((prev) => {
+      if (prev.has(url)) return prev;
+      const next = new Set(prev);
+      next.add(url);
+      return next;
+    });
+  }
+
+  protected onArtLoad(url: string, event: Event): void {
+    if (isPlaceholderImage(event)) {
+      this.markArtBroken(url);
+    }
+  }
 
   /** Hide the preview once the hovered card scrolls out of the viewport. */
   protected readonly panelClasses = 'drama-preview-panel';
