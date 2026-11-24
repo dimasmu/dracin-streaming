@@ -18,6 +18,8 @@ import { DrawerModule } from 'primeng/drawer';
 import { SkeletonModule } from 'primeng/skeleton';
 import { MessageService } from 'primeng/api';
 import { CatalogService } from '../../../core/services/catalog.service';
+import { AuthService } from '../../../core/services/auth.service';
+import { BillingService } from '../../../core/services/billing.service';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { PreferencesService } from '../../../core/services/preferences.service';
 import { PwaService } from '../../../core/services/pwa.service';
@@ -39,6 +41,8 @@ export type SearchQuickTab = 'all' | 'id' | 'en' | 'completed';
 export class AppHeaderComponent {
   protected readonly router = inject(Router);
   private readonly catalog = inject(CatalogService);
+  protected readonly auth = inject(AuthService);
+  protected readonly billing = inject(BillingService);
   protected readonly prefs = inject(PreferencesService);
   protected readonly pwa = inject(PwaService);
   protected readonly i18n = inject(I18nService);
@@ -295,6 +299,30 @@ export class AppHeaderComponent {
       summary: this.i18n.t('common.prototype'),
       detail: this.i18n.t(detailKey),
       life: 3000,
+    });
+  }
+
+  protected openAuth(mode: 'login' | 'register' = 'login'): void {
+    this.accountOpen.set(false);
+    this.drawerVisible.set(false);
+    this.auth.openAuthModal(mode);
+  }
+
+  protected openVipUpgrade(): void {
+    this.accountOpen.set(false);
+    this.drawerVisible.set(false);
+    void this.billing.openVipModal(this.auth.quota());
+  }
+
+  protected async handleSignOut(): Promise<void> {
+    this.accountOpen.set(false);
+    this.drawerVisible.set(false);
+    await this.auth.signOut();
+    this.messages.add({
+      severity: 'info',
+      summary: this.i18n.t('nav.signedOut'),
+      detail: this.i18n.t('nav.signedOutDetail'),
+      life: 2500,
     });
   }
 }

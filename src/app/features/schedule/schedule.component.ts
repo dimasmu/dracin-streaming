@@ -1,12 +1,29 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
+import { firstValueFrom } from 'rxjs';
 import { CatalogService } from '../../core/services/catalog.service';
 import { CmsService } from '../../core/services/cms.service';
 import { I18nService } from '../../core/services/i18n.service';
 import { EmptyStateComponent } from '../../shared/components/empty-state/empty-state.component';
 import { buildScheduleItems, SCHEDULE_SLOTS } from '../../data/schedule';
 import type { ReleaseScheduleItem } from '../../core/models/schedule';
+
+interface ApiScheduleSlot {
+  id: string;
+  dramaId: string;
+  dramaSlug: string;
+  dramaTitle: string;
+  platformId: string;
+  dayOfWeek: number;
+  dayName: string;
+  timeWib: string;
+  episodeNumber: number;
+  note: string | null;
+  status: string;
+  isDemo: boolean;
+}
 
 const DAY_NAME_TO_NUM: Record<string, number> = {
   Minggu: 0,
@@ -22,12 +39,29 @@ const DAY_NAME_TO_NUM: Record<string, number> = {
   imports: [RouterLink, TranslocoPipe, EmptyStateComponent],
   templateUrl: './schedule.component.html',
 })
-export class ScheduleComponent {
+export class ScheduleComponent implements OnInit {
+  private readonly http = inject(HttpClient);
   protected readonly catalog = inject(CatalogService);
   private readonly cms = inject(CmsService);
   private readonly i18n = inject(I18nService);
 
+  private readonly apiSlots = signal<ApiScheduleSlot[]>([]);
   protected readonly selectedIso = signal(this.todayIso());
+
+  ngOnInit(): void {
+    void this.loadFromApi();
+  }
+
+  private async loadFromApi(): Promise<void> {
+    try {
+      const rows = await firstValueFrom(this.http.get<ApiScheduleSlot[]>('/api/schedule'));
+      if (Array.isArray(rows) && rows.length > 0) {
+        this.apiSlots.set(rows);
+      }
+    } catch {
+      /* fallback to local CMS/demo schedule */
+    }
+  }
 
   protected readonly days = computed(() => {
     const now = new Date();
@@ -45,6 +79,35 @@ export class ScheduleComponent {
   });
 
   protected readonly items = computed<ReleaseScheduleItem[]>(() => {
+    const remoteSlots = this.apiSlots();
+    if (remoteSlots.length) {
+      const now = new Date();
+      const todayNum = now.getDay();
+      const built: ReleaseScheduleItem[] = [];
+      for (const slot of remoteSlots) {
+        if (slot.status === 'Ditunda') continue;
+        const delta = (slot.dayOfWeek - todayNum + 7) % 7;
+        for (const offsetDays of delta === 0 ? [0, 7] : [delta]) {
+          const date = new Date(now);
+          date.setDate(now.getDate() + offsetDays);
+          const iso = date.toISOString().slice(0, 10);
+          built.push({
+            id: `${slot.id}-${iso}`,
+            dramaSlug: slot.dramaSlug,
+            dramaTitle: slot.dramaTitle,
+            platformId: slot.platformId,
+            episodeNumber: slot.episodeNumber,
+            releaseDate: iso,
+            releaseTime: slot.timeWib.includes('WIB') ? slot.timeWib : `${slot.timeWib} WIB`,
+            isDemo: slot.isDemo,
+          });
+        }
+      }
+      return built.sort((a, b) =>
+        (a.releaseDate + (a.releaseTime ?? '')).localeCompare(b.releaseDate + (b.releaseTime ?? '')),
+      );
+    }
+
     const cmsSlots = this.cms.scheduleSlots();
     if (cmsSlots.length) {
       const now = new Date();

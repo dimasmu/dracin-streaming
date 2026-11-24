@@ -1,10 +1,25 @@
-import { Injectable, signal } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Injectable, inject, signal } from '@angular/core';
+import { firstValueFrom } from 'rxjs';
+import type { EpisodePublicMeta } from '@tiraiplay/shared';
 import { DRAMAS } from '../../data/dramas';
 import { GENRES } from '../../data/genres';
 import { PLATFORMS } from '../../data/platforms';
 import type { Drama } from '../models/drama';
 import type { DramaGenre } from '../models/genre';
 import type { DramaPlatform } from '../models/platform';
+import { AuthService } from './auth.service';
+
+export interface DramaDetailApiResponse {
+  drama: Drama;
+  episodes: EpisodePublicMeta[];
+  related: Drama[];
+  viewerState: {
+    bookmarked: boolean;
+    vote: 'like' | 'dislike' | null;
+    userScore: number | null;
+  };
+}
 
 export type SortKey = 'popular' | 'new' | 'rating' | 'az' | 'full';
 
@@ -21,9 +36,54 @@ export interface DramaFilters {
 
 @Injectable({ providedIn: 'root' })
 export class CatalogService {
+  private readonly http = inject(HttpClient);
+  private readonly auth = inject(AuthService);
   private readonly dramasState = signal<Drama[]>(DRAMAS);
   private readonly genresState = signal<DramaGenre[]>(GENRES);
   private readonly platformsState = signal<DramaPlatform[]>(PLATFORMS);
+  readonly fromApi = signal(false);
+
+  private initPromise: Promise<void> | null = null;
+
+  init(): Promise<void> {
+    if (!this.initPromise) {
+      this.initPromise = this.refreshFromApi();
+    }
+    return this.initPromise;
+  }
+
+  async refreshFromApi(): Promise<void> {
+    try {
+      const [dramasRes, genresRes, platformsRes] = await Promise.all([
+        firstValueFrom(this.http.get<{ items: Drama[] }>('/api/dramas?limit=100')),
+        firstValueFrom(this.http.get<DramaGenre[]>('/api/genres')),
+        firstValueFrom(this.http.get<DramaPlatform[]>('/api/platforms')),
+      ]);
+      if (Array.isArray(dramasRes?.items) && dramasRes.items.length > 0) {
+        this.dramasState.set(dramasRes.items);
+        this.fromApi.set(true);
+      }
+      if (Array.isArray(genresRes) && genresRes.length > 0) {
+        this.genresState.set(genresRes);
+      }
+      if (Array.isArray(platformsRes) && platformsRes.length > 0) {
+        this.platformsState.set(platformsRes);
+      }
+    } catch {
+      // Keep local fixture catalog when API server is offline.
+      this.fromApi.set(false);
+    }
+  }
+
+  async fetchDramaDetail(slug: string): Promise<DramaDetailApiResponse | null> {
+    try {
+      return await firstValueFrom(
+        this.http.get<DramaDetailApiResponse>(`/api/dramas/${encodeURIComponent(slug)}`),
+      );
+    } catch {
+      return null;
+    }
+  }
 
   get dramas(): Drama[] {
     return this.dramasState();
@@ -70,7 +130,8 @@ export class CatalogService {
     return [...picked, ...fill];
   }
 
-  upsertDrama(drama: Drama): void {
+  upsertDrama(drama: Drama, isEdit?: boolean): void {
+    const existsLocally = isEdit ?? this.dramas.some((item) => item.id === drama.id);
     this.dramasState.update((list) => {
       const idx = list.findIndex((item) => item.id === drama.id);
       if (idx >= 0) {
@@ -80,10 +141,58 @@ export class CatalogService {
       }
       return [drama, ...list];
     });
+
+    if (this.auth.apiReachable() && this.auth.isAuthenticated()) {
+      const payload = {
+        slug: drama.slug,
+        title: drama.title,
+        originalTitle: drama.originalTitle ?? null,
+        alternateTitles: drama.alternateTitles ?? [],
+        synopsis: drama.synopsis,
+        description: drama.description ?? null,
+        posterUrl: drama.posterUrl ?? null,
+        backdropUrl: drama.backdropUrl ?? null,
+        genres: drama.genres,
+        platformId: drama.platformId,
+        releaseYear: drama.releaseYear ?? null,
+        releaseDate: drama.releaseDate ?? null,
+        totalEpisodes: drama.totalEpisodes ?? 1,
+        latestEpisode: drama.latestEpisode ?? 1,
+        status: drama.status,
+        subtitleLanguages: drama.subtitleLanguages,
+        videoLanguages: drama.videoLanguages,
+        rating: drama.rating ?? 8.0,
+        durationMinutes: drama.durationMinutes ?? 1,
+        country: drama.country ?? 'China',
+        productionStudio: drama.productionStudio ?? null,
+        ageRating: drama.ageRating ?? '13+',
+        trailerUrl: drama.trailerUrl ?? null,
+        cast: drama.cast ?? [],
+        director: drama.director ?? null,
+        tags: drama.tags ?? [],
+        featured: drama.featured,
+        trendingScore: drama.trendingScore ?? 0,
+        tone: drama.tone,
+      };
+      const req = existsLocally
+        ? this.http.put<Drama>(`/api/admin/dramas/${drama.id}`, payload)
+        : this.http.post<Drama>('/api/admin/dramas', payload);
+      void firstValueFrom(req)
+        .then((saved) => {
+          if (!saved?.id) return;
+          this.dramasState.update((list) =>
+            list.map((d) => (d.id === drama.id || d.slug === saved.slug ? saved : d)),
+          );
+        })
+        .catch(() => undefined);
+    }
   }
 
   deleteDrama(id: string): void {
     this.dramasState.update((list) => list.filter((d) => d.id !== id));
+    if (this.auth.apiReachable() && this.auth.isAuthenticated()) {
+      void firstValueFrom(this.http.delete(`/api/admin/dramas/${id}`)).catch(() => undefined);
+    }
   }
 
   toggleFeatured(id: string): Drama | undefined {
@@ -95,6 +204,11 @@ export class CatalogService {
         return updated;
       }),
     );
+    if (this.auth.apiReachable() && this.auth.isAuthenticated()) {
+      void firstValueFrom(this.http.patch(`/api/admin/dramas/${id}/featured`, {})).catch(
+        () => undefined,
+      );
+    }
     return updated;
   }
 
@@ -102,15 +216,20 @@ export class CatalogService {
     if (!ids.size) return;
     if (action === 'delete') {
       this.dramasState.update((list) => list.filter((d) => !ids.has(d.id)));
-      return;
+    } else {
+      this.dramasState.update((list) =>
+        list.map((d) => {
+          if (!ids.has(d.id)) return d;
+          if (action === 'featured') return { ...d, featured: true };
+          return { ...d, status: 'completed' };
+        }),
+      );
     }
-    this.dramasState.update((list) =>
-      list.map((d) => {
-        if (!ids.has(d.id)) return d;
-        if (action === 'featured') return { ...d, featured: true };
-        return { ...d, status: 'completed' };
-      }),
-    );
+    if (this.auth.apiReachable() && this.auth.isAuthenticated()) {
+      void firstValueFrom(
+        this.http.post('/api/admin/dramas/bulk', { ids: [...ids], action }),
+      ).catch(() => undefined);
+    }
   }
 
   addPlatform(name: string, tone = 'oklch(68% .16 155)', description?: string): boolean {
@@ -120,15 +239,21 @@ export class CatalogService {
       .toLowerCase()
       .replace(/[^a-z0-9\s-]/g, '')
       .replace(/\s+/g, '-');
+    const desc = description?.trim() || `${clean} short drama source.`;
     this.platformsState.update((list) => [
       ...list,
       {
         id: id || `plat-${Date.now()}`,
         name: clean,
-        description: description?.trim() || `${clean} short drama source.`,
+        description: desc,
         tone,
       },
     ]);
+    if (this.auth.apiReachable() && this.auth.isAuthenticated()) {
+      void firstValueFrom(
+        this.http.post<DramaPlatform>('/api/admin/platforms', { name: clean, description: desc, tone }),
+      ).catch(() => undefined);
+    }
     return true;
   }
 
@@ -141,22 +266,24 @@ export class CatalogService {
       return false;
     }
     const oldName = existing.name;
+    const desc = patch.description.trim() || `${clean} short drama source.`;
+    const tone = patch.tone || existing.tone;
     this.platformsState.update((list) =>
-      list.map((p) =>
-        p.id === id
-          ? {
-              ...p,
-              name: clean,
-              description: patch.description.trim() || `${clean} short drama source.`,
-              tone: patch.tone || p.tone,
-            }
-          : p,
-      ),
+      list.map((p) => (p.id === id ? { ...p, name: clean, description: desc, tone } : p)),
     );
     if (oldName !== clean) {
       this.dramasState.update((list) =>
         list.map((d) => (d.platformId === oldName ? { ...d, platformId: clean } : d)),
       );
+    }
+    if (this.auth.apiReachable() && this.auth.isAuthenticated()) {
+      void firstValueFrom(
+        this.http.put(`/api/admin/platforms/${encodeURIComponent(id)}`, {
+          name: clean,
+          description: desc,
+          tone,
+        }),
+      ).catch(() => undefined);
     }
     return true;
   }
@@ -164,6 +291,11 @@ export class CatalogService {
   deletePlatform(id: string): boolean {
     if (!this.platforms.some((p) => p.id === id)) return false;
     this.platformsState.update((list) => list.filter((p) => p.id !== id));
+    if (this.auth.apiReachable() && this.auth.isAuthenticated()) {
+      void firstValueFrom(
+        this.http.delete(`/api/admin/platforms/${encodeURIComponent(id)}`),
+      ).catch(() => undefined);
+    }
     return true;
   }
 
@@ -174,15 +306,21 @@ export class CatalogService {
       .toLowerCase()
       .replace(/[^a-z0-9\s-]/g, '')
       .replace(/\s+/g, '-');
+    const desc = description?.trim() || `${clean} short dramas.`;
     this.genresState.update((list) => [
       ...list,
       {
         id: id || `genre-${Date.now()}`,
         name: clean,
-        description: description?.trim() || `${clean} short dramas.`,
+        description: desc,
         tone,
       },
     ]);
+    if (this.auth.apiReachable() && this.auth.isAuthenticated()) {
+      void firstValueFrom(
+        this.http.post<DramaGenre>('/api/admin/genres', { name: clean, description: desc, tone }),
+      ).catch(() => undefined);
+    }
     return true;
   }
 
@@ -195,17 +333,10 @@ export class CatalogService {
       return false;
     }
     const oldName = existing.name;
+    const desc = patch.description.trim() || `${clean} short dramas.`;
+    const tone = patch.tone || existing.tone;
     this.genresState.update((list) =>
-      list.map((g) =>
-        g.id === id
-          ? {
-              ...g,
-              name: clean,
-              description: patch.description.trim() || `${clean} short dramas.`,
-              tone: patch.tone || g.tone,
-            }
-          : g,
-      ),
+      list.map((g) => (g.id === id ? { ...g, name: clean, description: desc, tone } : g)),
     );
     if (oldName !== clean) {
       this.dramasState.update((list) =>
@@ -216,12 +347,26 @@ export class CatalogService {
         ),
       );
     }
+    if (this.auth.apiReachable() && this.auth.isAuthenticated()) {
+      void firstValueFrom(
+        this.http.put(`/api/admin/genres/${encodeURIComponent(id)}`, {
+          name: clean,
+          description: desc,
+          tone,
+        }),
+      ).catch(() => undefined);
+    }
     return true;
   }
 
   deleteGenre(id: string): boolean {
     if (!this.genres.some((g) => g.id === id)) return false;
     this.genresState.update((list) => list.filter((g) => g.id !== id));
+    if (this.auth.apiReachable() && this.auth.isAuthenticated()) {
+      void firstValueFrom(
+        this.http.delete(`/api/admin/genres/${encodeURIComponent(id)}`),
+      ).catch(() => undefined);
+    }
     return true;
   }
 

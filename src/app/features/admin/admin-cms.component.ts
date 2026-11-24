@@ -1,3 +1,4 @@
+import { HttpClient } from '@angular/common/http';
 import { Component, computed, effect, inject, input, signal, untracked, viewChildren } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import {
@@ -26,10 +27,11 @@ import { TableModule } from 'primeng/table';
 import { TabsModule } from 'primeng/tabs';
 import { TextareaModule } from 'primeng/textarea';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
-import { startWith } from 'rxjs';
+import { firstValueFrom, startWith } from 'rxjs';
 import type { Drama, DramaStatus } from '../../core/models/drama';
 import type { DramaGenre } from '../../core/models/genre';
 import type { DramaPlatform } from '../../core/models/platform';
+import { AuthService } from '../../core/services/auth.service';
 import { CatalogService } from '../../core/services/catalog.service';
 import {
   CMS_DEPARTMENTS,
@@ -135,6 +137,8 @@ export class AdminCmsComponent {
     }
   }
 
+  private readonly http = inject(HttpClient);
+  protected readonly auth = inject(AuthService);
   protected readonly catalog = inject(CatalogService);
   protected readonly cms = inject(CmsService);
   private readonly fb = inject(NonNullableFormBuilder);
@@ -658,7 +662,7 @@ export class AdminCmsComponent {
   protected readonly scheduleFilterDay = signal('');
 
   protected readonly slotDialogOpen = signal(false);
-  protected readonly editingSlotId = signal<number | null>(null);
+  protected readonly editingSlotId = signal<string | number | null>(null);
   protected readonly editSlotDramaId = signal('');
   protected readonly editSlotDay = signal('Senin');
   protected readonly editSlotTime = signal('19.30');
@@ -701,7 +705,7 @@ export class AdminCmsComponent {
   protected readonly ticketFilterPriority = signal<'' | 'Tinggi' | 'Normal' | 'Rendah'>('');
 
   protected readonly reqDialogOpen = signal(false);
-  protected readonly editingReqId = signal<number | null>(null);
+  protected readonly editingReqId = signal<string | number | null>(null);
   protected readonly reqFormTitle = signal('');
   protected readonly reqFormPlatform = signal('DramaBox');
   protected readonly reqFormLang = signal<'ID' | 'EN'>('ID');
@@ -712,7 +716,7 @@ export class AdminCmsComponent {
   protected readonly reqFormNote = signal('');
 
   protected readonly commentDialogOpen = signal(false);
-  protected readonly editingCommentId = signal<number | null>(null);
+  protected readonly editingCommentId = signal<string | number | null>(null);
   protected readonly commentFormAuthor = signal('');
   protected readonly commentFormDrama = signal('');
   protected readonly commentFormBody = signal('');
@@ -785,7 +789,7 @@ export class AdminCmsComponent {
   protected readonly userFilterDepartment = signal('');
 
   protected readonly userDialogOpen = signal(false);
-  protected readonly editingUserId = signal<number | null>(null);
+  protected readonly editingUserId = signal<string | number | null>(null);
   protected readonly pendingDeleteUser = signal<CmsUserAccount | null>(null);
   protected readonly userFormName = signal('');
   protected readonly userFormUsername = signal('');
@@ -827,6 +831,19 @@ export class AdminCmsComponent {
   );
 
   constructor() {
+    if (this.auth.apiReachable() && this.auth.isAuthenticated()) {
+      void this.cms.loadAdminData();
+    }
+
+    effect(() => {
+      const epDrama = this.selectedEpDrama();
+      untracked(() => {
+        if (epDrama && this.auth.apiReachable() && this.auth.isAuthenticated()) {
+          void this.cms.loadEpisodesFromApi(epDrama.id);
+        }
+      });
+    });
+
     effect(() => {
       const active = this.activeTab();
       const s = this.slug();
@@ -994,7 +1011,10 @@ export class AdminCmsComponent {
     this.handleImageFileUpload(event, 'backdrop');
   }
 
-  private handleImageFileUpload(event: FileUploadHandlerEvent, kind: 'poster' | 'backdrop'): void {
+  private async handleImageFileUpload(
+    event: FileUploadHandlerEvent,
+    kind: 'poster' | 'backdrop',
+  ): Promise<void> {
     const file = event.files?.[0];
     if (!file) return;
     if (!file.type.startsWith('image/')) {
@@ -1005,6 +1025,41 @@ export class AdminCmsComponent {
       this.toast('warn', 'Ukuran Terlalu Besar', 'Maksimal ukuran file gambar 3 MB.');
       return;
     }
+
+    if (this.auth.apiReachable() && this.auth.isAuthenticated()) {
+      try {
+        const presigned = await firstValueFrom(
+          this.http.post<{ uploadUrl: string; publicUrl: string }>('/api/admin/uploads/presign', {
+            kind,
+            filename: file.name,
+            contentType: file.type,
+          }),
+        );
+        const putRes = await fetch(presigned.uploadUrl, {
+          method: 'PUT',
+          headers: { 'Content-Type': file.type },
+          body: file,
+        });
+        if (putRes.ok) {
+          if (kind === 'poster') {
+            this.editorForm.controls.posterUrl.setValue(presigned.publicUrl);
+            this.posterUploadName.set(file.name);
+          } else {
+            this.editorForm.controls.backdropUrl.setValue(presigned.publicUrl);
+            this.backdropUploadName.set(file.name);
+          }
+          this.toast(
+            'success',
+            kind === 'poster' ? 'Poster Diunggah ke R2' : 'Background Carousel Diunggah ke R2',
+            file.name,
+          );
+          return;
+        }
+      } catch {
+        /* fallback to DataURL preview if R2 is not configured yet */
+      }
+    }
+
     const reader = new FileReader();
     reader.onload = () => {
       const dataUrl = typeof reader.result === 'string' ? reader.result : '';
@@ -1205,7 +1260,7 @@ export class AdminCmsComponent {
       episodes: syncedEpisodes,
     };
 
-    this.catalog.upsertDrama(dramaPayload);
+    this.catalog.upsertDrama(dramaPayload, Boolean(existing));
 
     if (v.scheduleDay) {
       this.cms.addScheduleSlot({
@@ -1720,22 +1775,36 @@ export class AdminCmsComponent {
   // ── Settings & Formatting Helpers ───────────────────────────────────────
   protected async copyCatalogJson(): Promise<void> {
     try {
-      await navigator.clipboard.writeText(JSON.stringify(this.catalog.dramas, null, 2));
-      this.toast('success', 'JSON Disalin', `${this.catalog.dramas.length} judul berhasil disalin.`);
+      const remoteBundle = await this.cms.exportCatalogFromApi();
+      const dataToCopy = remoteBundle ?? this.catalog.dramas;
+      await navigator.clipboard.writeText(JSON.stringify(dataToCopy, null, 2));
+      this.toast(
+        'success',
+        'JSON Disalin',
+        `${this.catalog.dramas.length} judul berhasil disalin.`,
+      );
     } catch {
       this.toast('warn', 'Gagal Menyalin', 'Browser menolak akses clipboard.');
     }
   }
 
-  protected saveAnnouncement(value: string): void {
+  protected async saveAnnouncement(value: string): Promise<void> {
     this.cms.siteAnnouncement.set(value.trim());
+    await this.cms.saveSettingsToApi();
     this.cms.logActivity('Memperbarui banner pengumuman beranda');
     this.toast('success', 'Pengaturan Disimpan', 'Banner pengumuman beranda diperbarui.');
   }
 
-  protected savePlatformSettings(): void {
+  protected async savePlatformSettings(): Promise<void> {
+    const ok = await this.cms.saveSettingsToApi();
     this.cms.logActivity('Menyimpan konfigurasi sistem & pemutar TiraiPlay');
-    this.toast('success', 'Konfigurasi Disimpan', 'Pengaturan sistem, CDN & moderasi aktif.');
+    this.toast(
+      ok ? 'success' : 'warn',
+      ok ? 'Konfigurasi Disimpan' : 'Tersimpan Lokal',
+      ok
+        ? 'Pengaturan sistem, CDN & moderasi aktif.'
+        : 'Gagal menyinkronkan ke server, perubahan aktif secara lokal.',
+    );
   }
 
   protected inputVal(event: Event): string {

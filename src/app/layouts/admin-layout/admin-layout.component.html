@@ -441,7 +441,21 @@
       >
         Kelola Pengguna &amp; Role →
       </a>
-      <button pButton type="button" size="small" (click)="roleDialogOpen.set(false)">Tutup</button>
+      <div class="flex items-center gap-2">
+        @if (auth.isAuthenticated()) {
+          <button
+            pButton
+            type="button"
+            size="small"
+            severity="danger"
+            [outlined]="true"
+            (click)="signOutFromAdmin()"
+          >
+            Keluar
+          </button>
+        }
+        <button pButton type="button" size="small" (click)="roleDialogOpen.set(false)">Tutup</button>
+      </div>
     </div>
   </div>
 </p-dialog>

@@ -10,6 +10,7 @@ import { SelectModule } from 'primeng/select';
 import { TagModule } from 'primeng/tag';
 import { filter, map } from 'rxjs';
 import { CatalogService } from '../../core/services/catalog.service';
+import { AuthService } from '../../core/services/auth.service';
 import {
   CMS_PERMISSION_META,
   CmsRole,
@@ -72,6 +73,7 @@ const MENU_KEYWORD_MAP: Record<string, string> = {
 })
 export class AdminLayoutComponent {
   protected readonly cms = inject(CmsService);
+  protected readonly auth = inject(AuthService);
   protected readonly catalog = inject(CatalogService);
   protected readonly prefs = inject(PreferencesService);
   private readonly router = inject(Router);
@@ -225,8 +227,29 @@ export class AdminLayoutComponent {
     return items;
   });
 
-  protected readonly currentMeta = computed(() => ROLE_META[this.cms.role()]);
-  protected readonly activePermissions = computed(() => this.cms.rolePermissions()[this.cms.role()]);
+  protected readonly currentMeta = computed(() => {
+    const authUser = this.auth.user();
+    if (authUser) {
+      const roleMeta = ROLE_META[authUser.role] ?? ROLE_META.user;
+      return {
+        ...roleMeta,
+        name: authUser.name,
+        email: authUser.email,
+      };
+    }
+    return ROLE_META[this.cms.role()];
+  });
+  protected readonly activePermissions = computed(() =>
+    this.auth.isAuthenticated()
+      ? this.auth.permissions()
+      : this.cms.rolePermissions()[this.cms.role()],
+  );
+
+  protected async signOutFromAdmin(): Promise<void> {
+    this.roleDialogOpen.set(false);
+    await this.auth.signOut();
+    void this.router.navigateByUrl('/');
+  }
 
   protected isActive(route: string): boolean {
     const url = this.currentUrl();

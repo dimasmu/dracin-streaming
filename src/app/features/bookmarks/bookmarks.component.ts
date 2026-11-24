@@ -21,7 +21,7 @@ export class BookmarksComponent {
   protected readonly dramas = computed(() =>
     this.bookmarks
       .list()
-      .map((b) => this.catalog.getBySlug(b.dramaId))
+      .map((b) => this.catalog.dramas.find((d) => d.id === b.dramaId || d.slug === b.dramaId))
       .filter((d): d is NonNullable<typeof d> => Boolean(d)),
   );
 

@@ -1,0 +1,34 @@
+{
+  "name": "@tiraiplay/api",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "esbuild src/index.ts --bundle --platform=node --format=esm --packages=external --outfile=dist/index.js",
+    "start": "node dist/index.js",
+    "seed:admin": "tsx src/scripts/seed-admin.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.758.0",
+    "@aws-sdk/s3-request-presigner": "^3.758.0",
+    "@hono/node-server": "^1.13.8",
+    "@hono/zod-openapi": "^0.19.3",
+    "@scalar/hono-api-reference": "^0.8.2",
+    "@tiraiplay/db": "*",
+    "@tiraiplay/shared": "*",
+    "better-auth": "^1.2.5",
+    "drizzle-orm": "^0.45.2",
+    "hono": "^4.7.4",
+    "ioredis": "^5.6.0",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.10",
+    "tsx": "^4.19.3",
+    "typescript": "~6.0.3",
+    "vitest": "^4.1.12"
+  }
+}

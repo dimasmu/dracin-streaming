@@ -1,5 +1,8 @@
-import { Service, signal } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Service, inject, signal } from '@angular/core';
+import { firstValueFrom } from 'rxjs';
 import type { Drama } from '../models/drama';
+import { AuthService } from './auth.service';
 
 export type CmsRole = 'admin' | 'editor' | 'user';
 
@@ -41,7 +44,7 @@ export interface CmsEpisodeItem {
 }
 
 export interface CmsScheduleSlot {
-  id: number;
+  id: string | number;
   day: string;
   time: string;
   dramaId: string;
@@ -52,7 +55,7 @@ export interface CmsScheduleSlot {
 }
 
 export interface CmsDramaRequest {
-  id: number;
+  id: string | number;
   title: string;
   platform: string;
   lang: 'ID' | 'EN';
@@ -66,7 +69,7 @@ export interface CmsDramaRequest {
 }
 
 export interface CmsCommentItem {
-  id: number;
+  id: string | number;
   drama: string;
   ep: number;
   author: string;
@@ -93,7 +96,7 @@ export interface CmsDmcaTicket {
 export type CmsUserStatus = 'Aktif' | 'Ditangguhkan' | 'Menunggu Verifikasi';
 
 export interface CmsUserAccount {
-  id: number;
+  id: string | number;
   name: string;
   username: string;
   email: string;
@@ -114,7 +117,7 @@ export interface CmsActivityEntry {
 }
 
 export interface CmsEditorPrefill {
-  reqId?: number;
+  reqId?: string | number;
   title?: string;
   platform?: string;
   lang?: 'ID' | 'EN';
@@ -224,6 +227,9 @@ export const CMS_PERMISSION_META: readonly { key: CmsPermission; label: string; 
 
 @Service()
 export class CmsService {
+  private readonly http = inject(HttpClient);
+  private readonly auth = inject(AuthService);
+
   readonly role = signal<CmsRole>('admin');
   readonly rolePermissions = signal<Record<CmsRole, CmsRolePermissions>>(
     structuredClone(ROLE_PERMISSIONS),
@@ -244,6 +250,8 @@ export class CmsService {
   readonly supportEmail = signal('support@tiraiplay.example');
   readonly dmcaEmail = signal('legal@tiraiplay.example');
   readonly cdnBaseUrl = signal('https://cdn.tiraiplay.example/streams');
+  readonly freeDailyEpisodeLimit = signal(10);
+  readonly guestDailyEpisodeLimit = signal(3);
 
   readonly navGroups: readonly CmsNavGroup[] = [
     {
@@ -767,8 +775,344 @@ export class CmsService {
     { time: 'Kemarin', actor: 'Sinta (Editor)', action: 'Mengubah status request Dokter Jenius di Tahun 1990 menjadi Terjadwal' },
   ]);
 
+  private get isRemote(): boolean {
+    return this.auth.apiReachable() && this.auth.isAuthenticated();
+  }
+
   can(perm: CmsPermission): boolean {
+    if (this.isRemote) {
+      return this.auth.permissions()[perm];
+    }
     return this.rolePermissions()[this.role()][perm];
+  }
+
+  async loadAdminData(): Promise<void> {
+    if (!this.isRemote || !this.can('viewAdmin')) return;
+
+    const tasks: Array<Promise<void>> = [
+      firstValueFrom(
+        this.http.get<{
+          activityLog: Array<{ time: string; actor: string; action: string }>;
+        }>('/api/admin/dashboard'),
+      )
+        .then((res) => {
+          if (Array.isArray(res?.activityLog) && res.activityLog.length) {
+            this.activityLog.set(
+              res.activityLog.map((l) => ({
+                time: l.time.slice(11, 16) || l.time,
+                actor: l.actor,
+                action: l.action,
+              })),
+            );
+          }
+        })
+        .catch(() => undefined),
+
+      firstValueFrom(
+        this.http.get<
+          Array<{
+            id: string;
+            dramaId: string;
+            dramaSlug: string;
+            dayName: string;
+            timeWib: string;
+            episodeNumber: number;
+            note: string | null;
+            status: 'Terjadwal' | 'Tayang' | 'Ditunda';
+          }>
+        >('/api/schedule'),
+      )
+        .then((rows) => {
+          if (Array.isArray(rows)) {
+            this.scheduleSlots.set(
+              rows.map((r) => ({
+                id: r.id,
+                day: r.dayName,
+                time: r.timeWib,
+                dramaId: r.dramaId,
+                dramaSlug: r.dramaSlug,
+                ep: r.episodeNumber,
+                note: r.note ?? undefined,
+                status: r.status,
+              })),
+            );
+          }
+        })
+        .catch(() => undefined),
+
+      firstValueFrom(
+        this.http.get<
+          Array<{
+            id: string;
+            title: string;
+            platformName: string;
+            lang: 'ID' | 'EN';
+            requesterEmail: string;
+            priority: 'Tinggi' | 'Normal' | 'Rendah';
+            episodeCount: number | null;
+            note: string;
+            status: 'Ditinjau' | 'Terjadwal' | 'Tersedia' | 'Ditolak';
+            votesCount: number;
+            createdAt: string;
+          }>
+        >('/api/requests'),
+      )
+        .then((rows) => {
+          if (Array.isArray(rows)) {
+            this.requests.set(
+              rows.map((r) => ({
+                id: r.id,
+                title: r.title,
+                platform: r.platformName,
+                lang: r.lang,
+                requester: r.requesterEmail,
+                priority: r.priority,
+                episodeCount: r.episodeCount ?? undefined,
+                note: r.note,
+                status: r.status,
+                votes: r.votesCount,
+                date: r.createdAt.slice(0, 10),
+              })),
+            );
+          }
+        })
+        .catch(() => undefined),
+    ];
+
+    if (this.can('moderateRequests')) {
+      tasks.push(
+        firstValueFrom(
+          this.http.get<
+            Array<{
+              id: string;
+              dramaId: string;
+              episodeNumber: number;
+              authorName: string;
+              body: string;
+              flagReason: CmsCommentItem['flagReason'];
+              likesCount: number;
+              adminReply: string | null;
+              status: CmsCommentItem['status'];
+              createdAt: string;
+            }>
+          >('/api/admin/comments'),
+        )
+          .then((rows) => {
+            if (Array.isArray(rows)) {
+              this.comments.set(
+                rows.map((c) => ({
+                  id: c.id,
+                  drama: c.dramaId,
+                  ep: c.episodeNumber,
+                  author: c.authorName,
+                  body: c.body,
+                  flagReason: c.flagReason,
+                  likes: c.likesCount,
+                  adminReply: c.adminReply ?? undefined,
+                  status: c.status,
+                  time: c.createdAt.slice(0, 10),
+                })),
+              );
+            }
+          })
+          .catch(() => undefined),
+
+        firstValueFrom(
+          this.http.get<
+            Array<{
+              id: string;
+              ticketCode: string;
+              target: string;
+              senderEmail: string;
+              type: string;
+              priority: 'Tinggi' | 'Normal' | 'Rendah';
+              evidenceUrl: string | null;
+              resolutionNote: string | null;
+              status: CmsDmcaTicket['status'];
+              createdAt: string;
+            }>
+          >('/api/admin/tickets'),
+        )
+          .then((rows) => {
+            if (Array.isArray(rows)) {
+              this.dmcaTickets.set(
+                rows.map((t) => ({
+                  id: t.id,
+                  target: t.target,
+                  sender: t.senderEmail,
+                  type: t.type,
+                  priority: t.priority,
+                  evidenceUrl: t.evidenceUrl ?? undefined,
+                  resolutionNote: t.resolutionNote ?? undefined,
+                  status: t.status,
+                  date: t.createdAt.slice(0, 10),
+                })),
+              );
+            }
+          })
+          .catch(() => undefined),
+      );
+    }
+
+    if (this.can('manageUsers')) {
+      tasks.push(
+        firstValueFrom(
+          this.http.get<
+            Array<{
+              id: string;
+              name: string;
+              username: string;
+              email: string;
+              role: CmsRole;
+              department: string;
+              phone: string | null;
+              twoFactorEnabled: boolean;
+              createdAt: string;
+              status: CmsUserStatus;
+              lastActiveAt: string | null;
+              notes: string | null;
+            }>
+          >('/api/admin/users'),
+        )
+          .then((rows) => {
+            if (Array.isArray(rows)) {
+              this.users.set(
+                rows.map((u) => ({
+                  id: u.id,
+                  name: u.name,
+                  username: u.username || u.email.split('@')[0],
+                  email: u.email,
+                  role: u.role,
+                  department: u.department,
+                  phone: u.phone ?? undefined,
+                  twoFactorEnabled: u.twoFactorEnabled,
+                  joinedAt: u.createdAt.slice(0, 10),
+                  status: u.status,
+                  lastActive: u.lastActiveAt ? u.lastActiveAt.slice(0, 10) : 'Baru',
+                  notes: u.notes ?? undefined,
+                })),
+              );
+            }
+          })
+          .catch(() => undefined),
+
+        firstValueFrom(this.http.get<Record<CmsRole, CmsRolePermissions>>('/api/admin/rbac'))
+          .then((matrix) => {
+            if (matrix?.admin) this.rolePermissions.set(matrix);
+          })
+          .catch(() => undefined),
+      );
+    }
+
+    if (this.can('manageSettings')) {
+      tasks.push(
+        firstValueFrom(
+          this.http.get<{
+            siteAnnouncement: string;
+            maintenanceMode: boolean;
+            defaultVideoLang: 'id' | 'en';
+            defaultQuality: '1080p' | '720p';
+            autoModerateComments: boolean;
+            playerWatermark: boolean;
+            supportEmail: string;
+            dmcaEmail: string;
+            cdnBaseUrl: string;
+            freeDailyEpisodeLimit: number;
+            guestDailyEpisodeLimit: number;
+          }>('/api/admin/settings'),
+        )
+          .then((s) => {
+            if (!s) return;
+            this.siteAnnouncement.set(s.siteAnnouncement);
+            this.maintenanceMode.set(s.maintenanceMode);
+            this.defaultVideoLang.set(s.defaultVideoLang);
+            this.defaultQuality.set(s.defaultQuality);
+            this.autoModerateComments.set(s.autoModerateComments);
+            this.playerWatermark.set(s.playerWatermark);
+            this.supportEmail.set(s.supportEmail);
+            this.dmcaEmail.set(s.dmcaEmail);
+            this.cdnBaseUrl.set(s.cdnBaseUrl);
+            this.freeDailyEpisodeLimit.set(s.freeDailyEpisodeLimit);
+            this.guestDailyEpisodeLimit.set(s.guestDailyEpisodeLimit);
+          })
+          .catch(() => undefined),
+      );
+    }
+
+    await Promise.all(tasks);
+  }
+
+  async loadEpisodesFromApi(dramaId: string): Promise<void> {
+    if (!this.isRemote || !this.can('editEpisodes')) return;
+    try {
+      const rows = await firstValueFrom(
+        this.http.get<
+          Array<{
+            number: number;
+            title: string;
+            durationMinutes: number;
+            airDate: string | null;
+            status: 'Tayang' | 'Draft';
+            streams: Array<{
+              videoLang: 'id' | 'en';
+              streamUrl: string;
+              subtitleUrl: string | null;
+            }>;
+          }>
+        >(`/api/admin/dramas/${dramaId}/episodes`),
+      );
+      if (Array.isArray(rows) && rows.length > 0) {
+        const mapped: CmsEpisodeItem[] = rows.map((ep) => {
+          const stream = ep.streams[0];
+          return {
+            number: ep.number,
+            title: ep.title,
+            durationMinutes: ep.durationMinutes,
+            airDate: ep.airDate ?? '',
+            streamUrl: stream?.streamUrl ?? '',
+            subtitleUrl: stream?.subtitleUrl ?? undefined,
+            videoLang: stream?.videoLang ?? 'id',
+            status: ep.status,
+          };
+        });
+        this.episodesByDrama.update((map) => ({ ...map, [dramaId]: mapped }));
+      }
+    } catch {
+      /* fallback to local episode builder */
+    }
+  }
+
+  async saveSettingsToApi(): Promise<boolean> {
+    if (!this.isRemote || !this.can('manageSettings')) return true;
+    try {
+      await firstValueFrom(
+        this.http.put('/api/admin/settings', {
+          siteAnnouncement: this.siteAnnouncement(),
+          maintenanceMode: this.maintenanceMode(),
+          defaultVideoLang: this.defaultVideoLang(),
+          defaultQuality: this.defaultQuality(),
+          autoModerateComments: this.autoModerateComments(),
+          playerWatermark: this.playerWatermark(),
+          supportEmail: this.supportEmail(),
+          dmcaEmail: this.dmcaEmail(),
+          cdnBaseUrl: this.cdnBaseUrl(),
+          freeDailyEpisodeLimit: this.freeDailyEpisodeLimit(),
+          guestDailyEpisodeLimit: this.guestDailyEpisodeLimit(),
+        }),
+      );
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  async exportCatalogFromApi(): Promise<unknown | null> {
+    if (!this.isRemote || !this.can('manageSettings')) return null;
+    try {
+      return await firstValueFrom(this.http.get('/api/admin/catalog/export'));
+    } catch {
+      return null;
+    }
   }
 
   roleMeta(r: CmsRole = this.role()) {
@@ -784,10 +1128,22 @@ export class CmsService {
       ...map,
       [role]: { ...map[role], [perm]: value },
     }));
+    if (this.isRemote && this.can('manageUsers')) {
+      void firstValueFrom(
+        this.http.put('/api/admin/rbac', { matrix: this.rolePermissions() }),
+      )
+        .then(() => this.auth.refreshSession())
+        .catch(() => undefined);
+    }
   }
 
   resetRolePermissions(): void {
     this.rolePermissions.set(structuredClone(ROLE_PERMISSIONS));
+    if (this.isRemote && this.can('manageUsers')) {
+      void firstValueFrom(this.http.put('/api/admin/rbac', { resetDefault: true }))
+        .then(() => this.auth.refreshSession())
+        .catch(() => undefined);
+    }
   }
 
   toggleSidebarCollapsed(): void {
@@ -891,6 +1247,21 @@ export class CmsService {
       (a, b) => b.number - a.number,
     );
     this.episodesByDrama.update((map) => ({ ...map, [dramaId]: next }));
+
+    if (this.isRemote && this.can('editEpisodes')) {
+      void firstValueFrom(
+        this.http.post(`/api/admin/dramas/${dramaId}/episodes`, {
+          number: item.number,
+          title: item.title,
+          durationMinutes: item.durationMinutes,
+          airDate: item.airDate || null,
+          videoLang: item.videoLang ?? 'id',
+          streamUrl: item.streamUrl,
+          subtitleUrl: item.subtitleUrl ?? null,
+          status: item.status,
+        }),
+      ).catch(() => undefined);
+    }
   }
 
   updateEpisode(drama: Drama, oldNumber: number, item: CmsEpisodeItem): void {
@@ -901,11 +1272,31 @@ export class CmsService {
       ...map,
       [drama.id]: [item, ...current].sort((a, b) => b.number - a.number),
     }));
+
+    if (this.isRemote && this.can('editEpisodes')) {
+      void firstValueFrom(
+        this.http.post(`/api/admin/dramas/${drama.id}/episodes`, {
+          number: item.number,
+          title: item.title,
+          durationMinutes: item.durationMinutes,
+          airDate: item.airDate || null,
+          videoLang: item.videoLang ?? 'id',
+          streamUrl: item.streamUrl,
+          subtitleUrl: item.subtitleUrl ?? null,
+          status: item.status,
+        }),
+      ).catch(() => undefined);
+    }
   }
 
   deleteEpisode(drama: Drama, epNumber: number): void {
     const next = this.getEpisodesForDrama(drama).filter((e) => e.number !== epNumber);
     this.episodesByDrama.update((map) => ({ ...map, [drama.id]: next }));
+    if (this.isRemote && this.can('editEpisodes')) {
+      void firstValueFrom(
+        this.http.delete(`/api/admin/dramas/${drama.id}/episodes/${epNumber}`),
+      ).catch(() => undefined);
+    }
   }
 
   toggleEpisodeStatus(drama: Drama, epNumber: number): void {
@@ -913,59 +1304,156 @@ export class CmsService {
       e.number === epNumber ? { ...e, status: e.status === 'Tayang' ? ('Draft' as const) : ('Tayang' as const) } : e,
     );
     this.episodesByDrama.update((map) => ({ ...map, [drama.id]: list }));
+    if (this.isRemote && this.can('editEpisodes')) {
+      void firstValueFrom(
+        this.http.patch(`/api/admin/dramas/${drama.id}/episodes/${epNumber}/status`, {}),
+      ).catch(() => undefined);
+    }
+  }
+
+  private dayToNumber(day: string): number {
+    const idx = SCHEDULE_DAYS.indexOf(day as (typeof SCHEDULE_DAYS)[number]);
+    // SCHEDULE_DAYS starts at Senin (1) .. Minggu (0)
+    return idx === -1 ? 1 : (idx + 1) % 7;
   }
 
   addScheduleSlot(slot: Omit<CmsScheduleSlot, 'id'>): void {
-    this.scheduleSlots.update((list) => [{ id: Date.now(), status: 'Terjadwal', ...slot }, ...list]);
+    const tempId = Date.now();
+    this.scheduleSlots.update((list) => [{ id: tempId, status: 'Terjadwal', ...slot }, ...list]);
+    if (this.isRemote && this.can('editTaxonomy')) {
+      void firstValueFrom(
+        this.http.post<{ id: string }>('/api/admin/schedule', {
+          dramaId: slot.dramaId,
+          dayOfWeek: this.dayToNumber(slot.day),
+          timeWib: slot.time,
+          episodeNumber: slot.ep,
+          note: slot.note ?? null,
+          status: slot.status ?? 'Terjadwal',
+        }),
+      )
+        .then((created) => {
+          if (created?.id) {
+            this.scheduleSlots.update((list) =>
+              list.map((s) => (s.id === tempId ? { ...s, id: created.id } : s)),
+            );
+          }
+        })
+        .catch(() => undefined);
+    }
   }
 
-  updateScheduleSlot(id: number, patch: Partial<Omit<CmsScheduleSlot, 'id'>>): void {
+  updateScheduleSlot(id: string | number, patch: Partial<Omit<CmsScheduleSlot, 'id'>>): void {
     this.scheduleSlots.update((list) => list.map((x) => (x.id === id ? { ...x, ...patch } : x)));
+    if (this.isRemote && this.can('editTaxonomy') && typeof id === 'string') {
+      const current = this.scheduleSlots().find((s) => s.id === id);
+      if (!current) return;
+      void firstValueFrom(
+        this.http.put(`/api/admin/schedule/${id}`, {
+          dramaId: current.dramaId,
+          dayOfWeek: this.dayToNumber(current.day),
+          timeWib: current.time,
+          episodeNumber: current.ep,
+          note: current.note ?? null,
+          status: current.status ?? 'Terjadwal',
+        }),
+      ).catch(() => undefined);
+    }
   }
 
-  removeScheduleSlot(id: number): void {
+  removeScheduleSlot(id: string | number): void {
     this.scheduleSlots.update((list) => list.filter((x) => x.id !== id));
+    if (this.isRemote && this.can('editTaxonomy') && typeof id === 'string') {
+      void firstValueFrom(this.http.delete(`/api/admin/schedule/${id}`)).catch(() => undefined);
+    }
   }
 
   addRequest(
     req: Omit<CmsDramaRequest, 'id' | 'date'> & { date?: string },
   ): void {
+    const tempId = Date.now();
     this.requests.update((list) => [
       {
-        id: Date.now(),
+        id: tempId,
         date: req.date ?? new Date().toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }),
         ...req,
       },
       ...list,
     ]);
+    if (this.isRemote) {
+      void firstValueFrom(
+        this.http.post<{ id: string }>('/api/requests', {
+          title: req.title,
+          platformName: req.platform,
+          lang: req.lang,
+          episodeCount: req.episodeCount,
+          note: req.note,
+        }),
+      )
+        .then((created) => {
+          if (created?.id) {
+            this.requests.update((list) =>
+              list.map((r) => (r.id === tempId ? { ...r, id: created.id } : r)),
+            );
+          }
+        })
+        .catch(() => undefined);
+    }
   }
 
-  updateRequest(id: number, patch: Partial<Omit<CmsDramaRequest, 'id'>>): void {
+  updateRequest(id: string | number, patch: Partial<Omit<CmsDramaRequest, 'id'>>): void {
     this.requests.update((list) => list.map((r) => (r.id === id ? { ...r, ...patch } : r)));
+    if (this.isRemote && this.can('moderateRequests') && typeof id === 'string') {
+      void firstValueFrom(
+        this.http.patch(`/api/admin/requests/${id}`, {
+          title: patch.title,
+          platformName: patch.platform,
+          lang: patch.lang,
+          priority: patch.priority,
+          status: patch.status,
+          episodeCount: patch.episodeCount,
+          note: patch.note,
+        }),
+      ).catch(() => undefined);
+    }
   }
 
-  updateRequestStatus(id: number, status: CmsDramaRequest['status']): void {
+  updateRequestStatus(id: string | number, status: CmsDramaRequest['status']): void {
     this.updateRequest(id, { status });
   }
 
-  deleteRequest(id: number): void {
+  deleteRequest(id: string | number): void {
     this.requests.update((list) => list.filter((r) => r.id !== id));
+    if (this.isRemote && this.can('moderateRequests') && typeof id === 'string') {
+      void firstValueFrom(this.http.delete(`/api/admin/requests/${id}`)).catch(() => undefined);
+    }
   }
 
-  updateComment(id: number, patch: Partial<Omit<CmsCommentItem, 'id'>>): void {
+  updateComment(id: string | number, patch: Partial<Omit<CmsCommentItem, 'id'>>): void {
     this.comments.update((list) => list.map((c) => (c.id === id ? { ...c, ...patch } : c)));
+    if (this.isRemote && this.can('moderateRequests') && typeof id === 'string') {
+      void firstValueFrom(
+        this.http.patch(`/api/admin/comments/${id}`, {
+          body: patch.body,
+          status: patch.status,
+          flagReason: patch.flagReason,
+          adminReply: patch.adminReply ?? null,
+        }),
+      ).catch(() => undefined);
+    }
   }
 
-  toggleCommentVisibility(id: number): void {
-    this.comments.update((list) =>
-      list.map((c) =>
-        c.id === id ? { ...c, status: c.status === 'Tampil' ? 'Disembunyikan' : 'Tampil' } : c,
-      ),
-    );
+  toggleCommentVisibility(id: string | number): void {
+    const current = this.comments().find((c) => c.id === id);
+    if (!current) return;
+    const nextStatus = current.status === 'Tampil' ? ('Disembunyikan' as const) : ('Tampil' as const);
+    this.updateComment(id, { status: nextStatus });
   }
 
-  deleteComment(id: number): void {
+  deleteComment(id: string | number): void {
     this.comments.update((list) => list.filter((c) => c.id !== id));
+    if (this.isRemote && this.can('moderateRequests') && typeof id === 'string') {
+      void firstValueFrom(this.http.delete(`/api/admin/comments/${id}`)).catch(() => undefined);
+    }
   }
 
   addTicket(ticket: Omit<CmsDmcaTicket, 'id' | 'date'> & { id?: string; date?: string }): void {
@@ -973,10 +1461,44 @@ export class CmsService {
     const date =
       ticket.date ?? new Date().toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
     this.dmcaTickets.update((list) => [{ ...ticket, id: code, date }, ...list]);
+    if (this.isRemote && this.can('moderateRequests')) {
+      void firstValueFrom(
+        this.http.post<{ id: string }>('/api/admin/tickets', {
+          target: ticket.target,
+          senderEmail: ticket.sender,
+          type: ticket.type,
+          priority: ticket.priority,
+          status: ticket.status,
+          evidenceUrl: ticket.evidenceUrl ?? null,
+          resolutionNote: ticket.resolutionNote ?? null,
+        }),
+      )
+        .then((created) => {
+          if (created?.id) {
+            this.dmcaTickets.update((list) =>
+              list.map((t) => (t.id === code ? { ...t, id: created.id } : t)),
+            );
+          }
+        })
+        .catch(() => undefined);
+    }
   }
 
   updateTicket(id: string, patch: Partial<Omit<CmsDmcaTicket, 'id'>>): void {
     this.dmcaTickets.update((list) => list.map((t) => (t.id === id ? { ...t, ...patch } : t)));
+    if (this.isRemote && this.can('moderateRequests')) {
+      void firstValueFrom(
+        this.http.patch(`/api/admin/tickets/${id}`, {
+          target: patch.target,
+          senderEmail: patch.sender,
+          type: patch.type,
+          priority: patch.priority,
+          status: patch.status,
+          evidenceUrl: patch.evidenceUrl ?? null,
+          resolutionNote: patch.resolutionNote ?? null,
+        }),
+      ).catch(() => undefined);
+    }
   }
 
   updateTicketStatus(id: string, status: CmsDmcaTicket['status']): void {
@@ -985,6 +1507,9 @@ export class CmsService {
 
   deleteTicket(id: string): void {
     this.dmcaTickets.update((list) => list.filter((t) => t.id !== id));
+    if (this.isRemote && this.can('moderateRequests')) {
+      void firstValueFrom(this.http.delete(`/api/admin/tickets/${id}`)).catch(() => undefined);
+    }
   }
 
   addUser(payload: {
@@ -1003,9 +1528,10 @@ export class CmsService {
       payload.username?.trim() ||
       payload.email.split('@')[0]?.replace(/[^a-z0-9._-]/gi, '').toLowerCase() ||
       'user';
+    const tempId = Date.now();
     this.users.update((list) => [
       {
-        id: Date.now(),
+        id: tempId,
         name: payload.name.trim(),
         username,
         email: payload.email.trim(),
@@ -1020,23 +1546,64 @@ export class CmsService {
       },
       ...list,
     ]);
+    if (this.isRemote) {
+      void firstValueFrom(
+        this.http.post<{ id: string }>('/api/admin/users', {
+          name: payload.name.trim(),
+          username,
+          email: payload.email.trim(),
+          role: payload.role,
+          department: payload.department?.trim() || 'Tim Editorial & Sub',
+          phone: payload.phone?.trim() || null,
+          twoFactorEnabled: Boolean(payload.twoFactorEnabled),
+          status: payload.status ?? 'Aktif',
+          notes: payload.notes?.trim() || null,
+        }),
+      )
+        .then((created) => {
+          if (created?.id) {
+            this.users.update((list) =>
+              list.map((u) => (u.id === tempId ? { ...u, id: created.id } : u)),
+            );
+          }
+        })
+        .catch(() => undefined);
+    }
   }
 
-  updateUser(id: number, patch: Partial<Omit<CmsUserAccount, 'id'>>): void {
+  updateUser(id: string | number, patch: Partial<Omit<CmsUserAccount, 'id'>>): void {
     if (!this.can('manageUsers')) return;
     this.users.update((list) => list.map((u) => (u.id === id ? { ...u, ...patch } : u)));
+    if (this.isRemote && typeof id === 'string') {
+      void firstValueFrom(
+        this.http.patch(`/api/admin/users/${id}`, {
+          name: patch.name,
+          username: patch.username,
+          email: patch.email,
+          role: patch.role,
+          department: patch.department,
+          phone: patch.phone ?? null,
+          twoFactorEnabled: patch.twoFactorEnabled,
+          status: patch.status,
+          notes: patch.notes ?? null,
+        }),
+      ).catch(() => undefined);
+    }
   }
 
-  deleteUser(id: number): void {
+  deleteUser(id: string | number): void {
     if (!this.can('manageUsers')) return;
     this.users.update((list) => list.filter((u) => u.id !== id));
+    if (this.isRemote && typeof id === 'string') {
+      void firstValueFrom(this.http.delete(`/api/admin/users/${id}`)).catch(() => undefined);
+    }
   }
 
-  changeUserRole(id: number, role: CmsRole): void {
+  changeUserRole(id: string | number, role: CmsRole): void {
     this.updateUser(id, { role });
   }
 
-  toggleUserStatus(id: number): void {
+  toggleUserStatus(id: string | number): void {
     const target = this.users().find((u) => u.id === id);
     if (!target) return;
     this.updateUser(id, { status: target.status === 'Aktif' ? 'Ditangguhkan' : 'Aktif' });

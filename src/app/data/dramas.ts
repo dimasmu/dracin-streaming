@@ -5,6 +5,8 @@ import type { Drama } from '../core/models/drama';
 export const DRAMAS: Drama[] = [
   {
     id: 'singgasana-bayangan-sulih-suara',
+    posterUrl: 'https://img.youtube.com/vi/of8qMK3JuoE/sddefault.jpg',
+    backdropUrl: 'https://img.youtube.com/vi/of8qMK3JuoE/sddefault.jpg',
     slug: 'singgasana-bayangan-sulih-suara',
     title: 'Singgasana Bayangan',
     synopsis: 'Kisah perebutan tahta kerajaan yang dipenuhi pengkhianatan, di mana seorang pewaris tersembunyi harus mengungkap identitas aslinya demi menyelamatkan keluarganya.',
@@ -32,6 +34,8 @@ export const DRAMAS: Drama[] = [
   },
   {
     id: 'sulih-suara-paman-sopir-taksi-online-jagoan',
+    posterUrl: 'https://img.youtube.com/vi/VjiG3NetGrQ/maxresdefault.jpg',
+    backdropUrl: 'https://img.youtube.com/vi/VjiG3NetGrQ/maxresdefault.jpg',
     slug: 'sulih-suara-paman-sopir-taksi-online-jagoan',
     title: 'Paman Sopir Taksi Online Jagoan',
     synopsis: 'Seorang sopir taksi online paruh baya menyembunyikan masa lalu sebagai mantan atlet bela diri, hingga kejahatan kota memaksanya kembali bertarung.',
@@ -59,6 +63,8 @@ export const DRAMAS: Drama[] = [
   },
   {
     id: 'dulu-diremehkan-kini-berjaya',
+    posterUrl: 'https://img.youtube.com/vi/GiwX57zM_U0/maxresdefault.jpg',
+    backdropUrl: 'https://img.youtube.com/vi/GiwX57zM_U0/maxresdefault.jpg',
     slug: 'dulu-diremehkan-kini-berjaya',
     title: 'Dulu Diremehkan Kini Berjaya',
     synopsis: 'Diusir dari keluarga konglomerat karena dianggap lemah, ia kembali bertahun-tahun kemudian dengan kekuatan dan kekayaan yang tak terduga untuk menuntut balas.',
@@ -86,6 +92,8 @@ export const DRAMAS: Drama[] = [
   },
   {
     id: 'suami-nikah-kilatku-memanjakanku',
+    posterUrl: 'https://img.youtube.com/vi/cFFjVu3WD_I/maxresdefault.jpg',
+    backdropUrl: 'https://img.youtube.com/vi/cFFjVu3WD_I/maxresdefault.jpg',
     slug: 'suami-nikah-kilatku-memanjakanku',
     title: 'Suami Nikah Kilatku Memanjakanku',
     synopsis: 'Pernikahan kontrak dengan pria asing berubah menjadi kisah cinta sejati ketika sang suami ternyata adalah pewaris perusahaan terbesar di negeri itu.',
@@ -142,6 +150,8 @@ export const DRAMAS: Drama[] = [
   },
   {
     id: 'ayahku-bukan-kurir-biasa',
+    posterUrl: 'https://img.youtube.com/vi/xe4Ips0sODo/maxresdefault.jpg',
+    backdropUrl: 'https://img.youtube.com/vi/xe4Ips0sODo/maxresdefault.jpg',
     slug: 'ayahku-bukan-kurir-biasa',
     title: 'Ayahku Bukan Kurir Biasa',
     synopsis: 'Anak perempuan yang selalu malu dengan pekerjaan ayahnya sebagai kurir akhirnya mengetahui bahwa sang ayah adalah mantan agen rahasia yang melindungi keluarganya dari ancaman lama.',
@@ -169,6 +179,8 @@ export const DRAMAS: Drama[] = [
   },
   {
     id: 'sulih-suara-pacarku-dominan-dan-liar',
+    posterUrl: 'https://img.youtube.com/vi/UV12AIhQtoo/maxresdefault.jpg',
+    backdropUrl: 'https://img.youtube.com/vi/UV12AIhQtoo/maxresdefault.jpg',
     slug: 'sulih-suara-pacarku-dominan-dan-liar',
     title: 'Pacarku Dominan Dan Liar',
     synopsis: 'Hubungan penuh gejolak antara mahasiswi pemalu dan pewaris muda yang arogan, di mana cinta dan ego saling bertabrakan di setiap babak.',
@@ -196,6 +208,8 @@ export const DRAMAS: Drama[] = [
   },
   {
     id: 'cinta-di-balik-luka-lama',
+    posterUrl: 'https://img.youtube.com/vi/oWbenseUp9I/maxresdefault.jpg',
+    backdropUrl: 'https://img.youtube.com/vi/oWbenseUp9I/maxresdefault.jpg',
     slug: 'cinta-di-balik-luka-lama',
     title: 'Cinta Di Balik Luka Lama',
     synopsis: 'Dua mantan kekasih yang terpisah oleh tragedi masa lalu dipertemukan kembali, namun luka lama dan rahasia kelam menghalangi jalan mereka untuk bersatu.',
@@ -223,6 +237,8 @@ export const DRAMAS: Drama[] = [
   },
   {
     id: 'kembalinya-sang-putra-pewaris-sulih-suara',
+    posterUrl: 'https://img.youtube.com/vi/XokPlJ8KpGY/hqdefault.jpg',
+    backdropUrl: 'https://img.youtube.com/vi/XokPlJ8KpGY/hqdefault.jpg',
     slug: 'kembalinya-sang-putra-pewaris-sulih-suara',
     title: 'Kembalinya Sang Putra Pewaris',
     synopsis: 'Putra sulung yang diasingkan kembali ke mansion keluarga setelah kematian sang patriarch, memicu perang saudara memperebutkan warisan miliaran.',
@@ -250,6 +266,8 @@ export const DRAMAS: Drama[] = [
   },
   {
     id: 'saat-kau-pergi-aku-baru-tahu-sulih-suara',
+    posterUrl: 'https://img.youtube.com/vi/898Kt6IbzdU/maxresdefault.jpg',
+    backdropUrl: 'https://img.youtube.com/vi/898Kt6IbzdU/maxresdefault.jpg',
     slug: 'saat-kau-pergi-aku-baru-tahu-sulih-suara',
     title: 'Saat Kau Pergi Aku Baru Tahu',
     synopsis: 'Setelah perceraian, seorang pria baru menyadari betapa berharganya sang mantan istri ketika ia melihatnya bangkit menjadi pengusaha sukses tanpa dirinya.',
@@ -277,6 +295,8 @@ export const DRAMAS: Drama[] = [
   },
   {
     id: 'berhenti-jadi-budak-cinta',
+    posterUrl: 'https://img.youtube.com/vi/bNt3Q4NLyKc/maxresdefault.jpg',
+    backdropUrl: 'https://img.youtube.com/vi/bNt3Q4NLyKc/maxresdefault.jpg',
     slug: 'berhenti-jadi-budak-cinta',
     title: 'Berhenti Jadi Budak Cinta',
     synopsis: 'Wanita yang selalu dimanfaatkan oleh kekasihnya akhirnya bangkit, meninggalkan hubungan toxic dan membalas semua orang yang pernah menginjak harga dirinya.',
@@ -304,6 +324,8 @@ export const DRAMAS: Drama[] = [
   },
   {
     id: 'legenda-tak-terkalahkan-sulih-suara',
+    posterUrl: 'https://img.youtube.com/vi/ufhWOJLptPE/sddefault.jpg',
+    backdropUrl: 'https://img.youtube.com/vi/ufhWOJLptPE/sddefault.jpg',
     slug: 'legenda-tak-terkalahkan-sulih-suara',
     title: 'Legenda Tak Terkalahkan',
     synopsis: 'Petarung jalanan yang tak pernah kalah menarik perhatian organisasi bawah tanah berbahaya, memaksanya melindungi orang-orang yang ia cintai sambil menghadapi musuh terkuat.',
@@ -331,6 +353,8 @@ export const DRAMAS: Drama[] = [
   },
   {
     id: 'rahasia-di-balik-orang-tua-sederhana-sulih-suara',
+    posterUrl: 'https://img.youtube.com/vi/QZ0EJuIlNxw/maxresdefault.jpg',
+    backdropUrl: 'https://img.youtube.com/vi/QZ0EJuIlNxw/maxresdefault.jpg',
     slug: 'rahasia-di-balik-orang-tua-sederhana-sulih-suara',
     title: 'Rahasia Di Balik Orang Tua Sederhana',
     synopsis: 'Sepasang orang tua yang hidup sederhana di desa ternyata menyimpan rahasia identitas yang mengejutkan — mereka adalah pensiunan militer elit dengan kekayaan tersembunyi.',
@@ -358,6 +382,8 @@ export const DRAMAS: Drama[] = [
   },
   {
     id: 'istriku-aku-memang-dewa-sulih-suara',
+    posterUrl: 'https://img.youtube.com/vi/-ngyJ9b5BT0/sddefault.jpg',
+    backdropUrl: 'https://img.youtube.com/vi/-ngyJ9b5BT0/sddefault.jpg',
     slug: 'istriku-aku-memang-dewa-sulih-suara',
     title: 'Istriku Aku Memang Dewa',
     synopsis: 'Pria biasa yang tiba-tiba mendapat kekuatan supernatural harus menyeimbangkan kehidupan rumah tangga dengan tanggung jawab melindungi dunia dari ancaman gaib.',
@@ -385,6 +411,8 @@ export const DRAMAS: Drama[] = [
   },
   {
     id: 'guru-surgawi-penakluk-dunia-sulih-suara',
+    posterUrl: 'https://img.youtube.com/vi/h61updzBm8g/maxresdefault.jpg',
+    backdropUrl: 'https://img.youtube.com/vi/h61updzBm8g/maxresdefault.jpg',
     slug: 'guru-surgawi-penakluk-dunia-sulih-suara',
     title: 'Guru Surgawi Penakluk Dunia',
     synopsis: 'Seorang guru spiritual yang turun dari gunung suci memasuki dunia modern, menggunakan ilmu kuno untuk mengatasi konspirasi global yang mengancam umat manusia.',
@@ -412,6 +440,8 @@ export const DRAMAS: Drama[] = [
   },
   {
     id: 'bayangmu-di-tengah-badai',
+    posterUrl: 'https://img.youtube.com/vi/kLBROxTqhyo/maxresdefault.jpg',
+    backdropUrl: 'https://img.youtube.com/vi/kLBROxTqhyo/maxresdefault.jpg',
     slug: 'bayangmu-di-tengah-badai',
     title: 'Bayangmu Di Tengah Badai',
     synopsis: 'Di tengah krisis keuangan keluarga, seorang ibu muda berjuang sendirian membesarkan anaknya sambil dihantui kenangan mantan suami yang menghilang tanpa jejak.',
@@ -439,6 +469,8 @@ export const DRAMAS: Drama[] = [
   },
   {
     id: 'sulih-suara-hidup-kedua-tanpa-dirimu',
+    posterUrl: 'https://img.youtube.com/vi/c7e78VXh7C0/hqdefault.jpg',
+    backdropUrl: 'https://img.youtube.com/vi/c7e78VXh7C0/hqdefault.jpg',
     slug: 'sulih-suara-hidup-kedua-tanpa-dirimu',
     title: 'Hidup Kedua Tanpa Dirimu',
     synopsis: 'Setelah kecelakaan fatal, seorang wanita terbangun di kehidupan baru tanpa ingatan, membangun identitas baru dan cinta baru yang terancam oleh masa lalunya.',
@@ -466,6 +498,8 @@ export const DRAMAS: Drama[] = [
   },
   {
     id: 'topeng-pemboros-2',
+    posterUrl: 'https://img.youtube.com/vi/n1XxFjJQTvM/maxresdefault.jpg',
+    backdropUrl: 'https://img.youtube.com/vi/n1XxFjJQTvM/maxresdefault.jpg',
     slug: 'topeng-pemboros-2',
     title: 'Topeng Pemboros 2',
     synopsis: 'Kelanjutan kisah pewaris muda yang berpura-pura boros untuk menyembunyikan misi rahasia mengungkap korupsi di perusahaan keluarganya sendiri.',
@@ -493,6 +527,8 @@ export const DRAMAS: Drama[] = [
   },
   {
     id: 'jenderal-istrimu-kabur-lagi-sulih-suara',
+    posterUrl: 'https://img.youtube.com/vi/y3CtenSlqP8/sddefault.jpg',
+    backdropUrl: 'https://img.youtube.com/vi/y3CtenSlqP8/sddefault.jpg',
     slug: 'jenderal-istrimu-kabur-lagi-sulih-suara',
     title: 'Jenderal Istrimu Kabur Lagi',
     synopsis: 'Seorang jenderal perang yang ditakuti ternyata tidak mampu mengendalikan istrinya yang keras kepala dan selalu kabur dari rumah untuk menjalani petualangannya sendiri.',
@@ -520,6 +556,8 @@ export const DRAMAS: Drama[] = [
   },
   {
     id: 'sulih-suara-luka-di-balik-gardenia',
+    posterUrl: 'https://img.youtube.com/vi/P4WBrwcZULE/sddefault.jpg',
+    backdropUrl: 'https://img.youtube.com/vi/P4WBrwcZULE/sddefault.jpg',
     slug: 'sulih-suara-luka-di-balik-gardenia',
     title: 'Luka Di Balik Gardenia',
     synopsis: 'Bunga gardenia menjadi saksi bisu kisah cinta tragis antara putri bangsawan dan pelayan istana yang terpisah oleh perbedaan kasta dan intrik politik.',
@@ -547,6 +585,8 @@ export const DRAMAS: Drama[] = [
   },
   {
     id: 'pengakuan-yang-tertunda',
+    posterUrl: 'https://img.youtube.com/vi/4F26Bn5jLqU/maxresdefault.jpg',
+    backdropUrl: 'https://img.youtube.com/vi/4F26Bn5jLqU/maxresdefault.jpg',
     slug: 'pengakuan-yang-tertunda',
     title: 'Pengakuan Yang Tertunda',
     synopsis: 'Detektif muda menyelidiki kasus pembunuhan berantai yang ternyata berkaitan dengan rahasia keluarganya sendiri yang telah disembunyikan selama dua dekade.',
@@ -603,6 +643,8 @@ export const DRAMAS: Drama[] = [
   },
   {
     id: 'jenderal-wanita-jadi-istri-ceo',
+    posterUrl: 'https://img.youtube.com/vi/c8uSHflRSJg/maxresdefault.jpg',
+    backdropUrl: 'https://img.youtube.com/vi/c8uSHflRSJg/maxresdefault.jpg',
     slug: 'jenderal-wanita-jadi-istri-ceo',
     title: 'Jenderal Wanita Jadi Istri Ceo',
     synopsis: 'Mantan jenderal wanita yang pensiun dipaksa menikah kontrak dengan CEO dingin, menciptakan dinamika rumah tangga penuh konflik antara dua kepribadian dominan.',
@@ -630,6 +672,8 @@ export const DRAMAS: Drama[] = [
   },
   {
     id: 'terjebak-dalam-kontrak-cinta',
+    posterUrl: 'https://img.youtube.com/vi/U_O329P_QfI/maxresdefault.jpg',
+    backdropUrl: 'https://img.youtube.com/vi/U_O329P_QfI/maxresdefault.jpg',
     slug: 'terjebak-dalam-kontrak-cinta',
     title: 'Terjebak Dalam Kontrak Cinta',
     synopsis: 'Perjanjian bisnis yang mengharuskan dua orang asing tinggal bersama selama setahun berubah menjadi kisah cinta rumit penuh kesalahpahaman dan perasaan terpendam.',
@@ -657,6 +701,8 @@ export const DRAMAS: Drama[] = [
   },
   {
     id: 'pertemuan-indah-setelah-badai',
+    posterUrl: 'https://img.youtube.com/vi/-eT6d66ubmk/sddefault.jpg',
+    backdropUrl: 'https://img.youtube.com/vi/-eT6d66ubmk/sddefault.jpg',
     slug: 'pertemuan-indah-setelah-badai',
     title: 'Pertemuan Indah Setelah Badai',
     synopsis: 'Dua jiwa yang hancur oleh kehilangan bertemu di kota kecil tepi pantai, perlahan menyembuhkan satu sama lain melalui ketulusan dan kesabaran.',
@@ -684,6 +730,8 @@ export const DRAMAS: Drama[] = [
   },
   {
     id: 'anak-pembawa-rezeki-datang-sulih-suara',
+    posterUrl: 'https://img.youtube.com/vi/duRiXxuhueg/maxresdefault.jpg',
+    backdropUrl: 'https://img.youtube.com/vi/duRiXxuhueg/maxresdefault.jpg',
     slug: 'anak-pembawa-rezeki-datang-sulih-suara',
     title: 'Anak Pembawa Rezeki Datang',
     synopsis: 'Kemunculan anak misterius di depan pintu rumah mengubah nasib keluarga miskin, membawa keberuntungan tak terduga sekaligus mengungkap koneksi keluarga yang hilang.',
@@ -711,6 +759,8 @@ export const DRAMAS: Drama[] = [
   },
   {
     id: 'dituduh-membunuh-anakku-sendiri',
+    posterUrl: 'https://img.youtube.com/vi/kxwccua6HHo/maxresdefault.jpg',
+    backdropUrl: 'https://img.youtube.com/vi/kxwccua6HHo/maxresdefault.jpg',
     slug: 'dituduh-membunuh-anakku-sendiri',
     title: 'Dituduh Membunuh Anakku Sendiri',
     synopsis: 'Seorang ayah dituduh membunuh putrinya sendiri dan harus membuktikan ketidakbersalahannya sambil mengungkap pelaku sebenarnya yang bersembunyi di lingkaran terdekatnya.',
@@ -738,6 +788,8 @@ export const DRAMAS: Drama[] = [
   },
   {
     id: 'kembali-bersatu',
+    posterUrl: 'https://img.youtube.com/vi/exkrL4Zqpdg/maxresdefault.jpg',
+    backdropUrl: 'https://img.youtube.com/vi/exkrL4Zqpdg/maxresdefault.jpg',
     slug: 'kembali-bersatu',
     title: 'Kembali Bersatu',
     synopsis: 'Keluarga yang tercerai-berai oleh kesalahpahaman dan ego masing-masing perlahan menemukan jalan pulang, belajar memaafkan dan saling menerima kembali.',
@@ -765,6 +817,8 @@ export const DRAMAS: Drama[] = [
   },
   {
     id: 'nikah-kilat-untung-selangit',
+    posterUrl: 'https://img.youtube.com/vi/v_W2bnI5uhM/maxresdefault.jpg',
+    backdropUrl: 'https://img.youtube.com/vi/v_W2bnI5uhM/maxresdefault.jpg',
     slug: 'nikah-kilat-untung-selangit',
     title: 'Nikah Kilat Untung Selangit',
     synopsis: 'Pernikahan dadakan di Las Vegas mengubah hidup dua orang asing menjadi petualangan bisnis dan cinta yang tak terduga penuh humor dan kejutan.',
@@ -792,6 +846,8 @@ export const DRAMAS: Drama[] = [
   },
   {
     id: 'sulih-suara-ketika-istri-gemuk-bersinar',
+    posterUrl: 'https://img.youtube.com/vi/SgeNM6OGNjI/maxresdefault.jpg',
+    backdropUrl: 'https://img.youtube.com/vi/SgeNM6OGNjI/maxresdefault.jpg',
     slug: 'sulih-suara-ketika-istri-gemuk-bersinar',
     title: 'Ketika Istri Gemuk Bersinar',
     synopsis: 'Wanita yang selalu diejek karena bentuk tubuhnya menemukan kepercayaan diri dan cinta sejati setelah ia membuktikan bahwa kecantikan bukan soal penampilan fisik.',
@@ -819,6 +875,8 @@ export const DRAMAS: Drama[] = [
   },
   {
     id: 'pesona-istri-manis-sang-ceo-sulih-suara',
+    posterUrl: 'https://img.youtube.com/vi/bbCTE-EwsVs/hqdefault.jpg',
+    backdropUrl: 'https://img.youtube.com/vi/bbCTE-EwsVs/hqdefault.jpg',
     slug: 'pesona-istri-manis-sang-ceo-sulih-suara',
     title: 'Pesona Istri Manis Sang Ceo',
     synopsis: 'Istri sederhana CEO arogan perlahan menaklukkan hatinya dengan ketulusan, sementara musuh bisnis mencoba menghancurkan hubungan mereka dari dalam.',
@@ -846,6 +904,8 @@ export const DRAMAS: Drama[] = [
   },
   {
     id: 'takdir-yang-direbut-kembali-sulih-suara',
+    posterUrl: 'https://img.youtube.com/vi/sqOQTcQZTtE/hqdefault.jpg',
+    backdropUrl: 'https://img.youtube.com/vi/sqOQTcQZTtE/hqdefault.jpg',
     slug: 'takdir-yang-direbut-kembali-sulih-suara',
     title: 'Takdir Yang Direbut Kembali',
     synopsis: 'Pahlawan yang kehilangan kekuatan supernaturalnya harus merebut kembali takdirnya dari entitas jahat yang mencuri identitas dan kekuatannya.',
@@ -873,6 +933,8 @@ export const DRAMAS: Drama[] = [
   },
   {
     id: 'versi-dubsaat-aku-pergi-hidupnya-runtuh',
+    posterUrl: 'https://img.youtube.com/vi/aaZqg3t9Xt0/maxresdefault.jpg',
+    backdropUrl: 'https://img.youtube.com/vi/aaZqg3t9Xt0/maxresdefault.jpg',
     slug: 'versi-dubsaat-aku-pergi-hidupnya-runtuh',
     title: 'Aku Pergi Hidupnya Runtuh',
     synopsis: 'Setelah ia pergi, kehidupan orang-orang yang pernah meremehkannya runtuh satu per satu — membuktikan bahwa kehadirannya selama ini adalah fondasi segalanya.',
@@ -900,6 +962,8 @@ export const DRAMAS: Drama[] = [
   },
   {
     id: 'ayahku-bukan-manusia-biasa',
+    posterUrl: 'https://img.youtube.com/vi/M3mLhFGiUoM/maxresdefault.jpg',
+    backdropUrl: 'https://img.youtube.com/vi/M3mLhFGiUoM/maxresdefault.jpg',
     slug: 'ayahku-bukan-manusia-biasa',
     title: 'Ayahku Bukan Manusia Biasa',
     synopsis: 'Anak laki-laki yang mengira ayahnya hanyalah tukang kebun sekolah mengetahui bahwa sang ayah adalah master seni bela diri legendaris yang bersembunyi.',
@@ -927,6 +991,8 @@ export const DRAMAS: Drama[] = [
   },
   {
     id: 'versi-dub-menikah-dengan-miliarder-bersama-bayiku',
+    posterUrl: 'https://img.youtube.com/vi/WrgWUxevjU4/maxresdefault.jpg',
+    backdropUrl: 'https://img.youtube.com/vi/WrgWUxevjU4/maxresdefault.jpg',
     slug: 'versi-dub-menikah-dengan-miliarder-bersama-bayiku',
     title: 'Menikah Dengan Miliarder Bersama Bayiku',
     synopsis: 'Ibu tunggal yang hampir putus asa bertemu miliarder misterius yang bersedia menikahi dan menerima bayinya, namun pernikahan ini menyimpan motif tersembunyi.',
@@ -954,6 +1020,8 @@ export const DRAMAS: Drama[] = [
   },
   {
     id: 'cinta-sang-mafia',
+    posterUrl: 'https://img.youtube.com/vi/_GLG5J7Tv_0/maxresdefault.jpg',
+    backdropUrl: 'https://img.youtube.com/vi/_GLG5J7Tv_0/maxresdefault.jpg',
     slug: 'cinta-sang-mafia',
     title: 'Cinta Sang Mafia',
     synopsis: 'Putri polos seorang profesor jatuh cinta pada pemimpin mafia paling berbahaya di kota, menyeret dirinya ke dunia gelap penuh bahaya dan pengorbanan.',
@@ -1010,6 +1078,8 @@ export const DRAMAS: Drama[] = [
   },
   {
     id: 'awassang-naga-kembali-sulih-suara',
+    posterUrl: 'https://img.youtube.com/vi/9Dj6oKCJWeE/maxresdefault.jpg',
+    backdropUrl: 'https://img.youtube.com/vi/9Dj6oKCJWeE/maxresdefault.jpg',
     slug: 'awassang-naga-kembali-sulih-suara',
     title: 'Awassang Naga Kembali',
     synopsis: 'Legenda kuno menjadi nyata ketika jiwa naga purba bangkit dalam tubuh pemuda biasa, memberinya kekuatan luar biasa untuk menghadapi ancaman dunia lain.',
@@ -1037,6 +1107,8 @@ export const DRAMAS: Drama[] = [
   },
   {
     id: 'putriku-ternyata-ceo',
+    posterUrl: 'https://img.youtube.com/vi/_gmWzNWae3w/maxresdefault.jpg',
+    backdropUrl: 'https://img.youtube.com/vi/_gmWzNWae3w/maxresdefault.jpg',
     slug: 'putriku-ternyata-ceo',
     title: 'Putriku Ternyata Ceo',
     synopsis: 'Ayah miskin yang selalu merasa gagal mengetahui bahwa putrinya yang ia besarkan sendirian telah diam-diam menjadi CEO perusahaan teknologi terbesar di Asia.',
@@ -1064,6 +1136,8 @@ export const DRAMAS: Drama[] = [
   },
   {
     id: 'takdir-di-balik-perjodohan',
+    posterUrl: 'https://img.youtube.com/vi/BwTfqvgAcQM/maxresdefault.jpg',
+    backdropUrl: 'https://img.youtube.com/vi/BwTfqvgAcQM/maxresdefault.jpg',
     slug: 'takdir-di-balik-perjodohan',
     title: 'Takdir Di Balik Perjodohan',
     synopsis: 'Perjodohan yang awalnya dipaksakan keluarga berubah menjadi cinta sejati ketika dua orang asing menemukan kesamaan luka dan impian mereka.',
@@ -1091,6 +1165,8 @@ export const DRAMAS: Drama[] = [
   },
   {
     id: 'topeng-sang-dewi',
+    posterUrl: 'https://img.youtube.com/vi/Z3to-wLWczk/maxresdefault.jpg',
+    backdropUrl: 'https://img.youtube.com/vi/Z3to-wLWczk/maxresdefault.jpg',
     slug: 'topeng-sang-dewi',
     title: 'Topeng Sang Dewi',
     synopsis: 'Aktris terkenal menyembunyikan identitas aslinya sebagai anak yatim piatu dari panti asuhan, hingga masa lalunya mengancam karier dan kehidupan pribadinya.',
@@ -1118,6 +1194,8 @@ export const DRAMAS: Drama[] = [
   },
   {
     id: 'wanita-pujaan-tanpa-ingatan',
+    posterUrl: 'https://img.youtube.com/vi/ebYNalXx12Y/maxresdefault.jpg',
+    backdropUrl: 'https://img.youtube.com/vi/ebYNalXx12Y/maxresdefault.jpg',
     slug: 'wanita-pujaan-tanpa-ingatan',
     title: 'Wanita Pujaan Tanpa Ingatan',
     synopsis: 'Wanita cantik yang ditemukan tanpa ingatan di tepi sungai menjadi rebutan dua keluarga kaya yang mengklaim dirinya sebagai putri mereka yang hilang.',
@@ -1145,6 +1223,8 @@ export const DRAMAS: Drama[] = [
   },
   {
     id: 'abadi-dalam-waktu',
+    posterUrl: 'https://img.youtube.com/vi/l71T5XmYXcc/sddefault.jpg',
+    backdropUrl: 'https://img.youtube.com/vi/l71T5XmYXcc/sddefault.jpg',
     slug: 'abadi-dalam-waktu',
     title: 'Abadi Dalam Waktu',
     synopsis: 'Pria yang terjebak dalam lingkaran waktu yang sama harus memecahkan misteri kematian wanita yang dicintainya untuk membebaskan diri dari kutukan abadi.',
@@ -1172,6 +1252,8 @@ export const DRAMAS: Drama[] = [
   },
   {
     id: 'sulih-suara-topeng-pemboros',
+    posterUrl: 'https://img.youtube.com/vi/0_Wh_AfBueQ/hqdefault.jpg',
+    backdropUrl: 'https://img.youtube.com/vi/0_Wh_AfBueQ/hqdefault.jpg',
     slug: 'sulih-suara-topeng-pemboros',
     title: 'Topeng Pemboros',
     synopsis: 'Pewaris muda berpura-pura hidup boros dan tak berguna untuk menyembunyikan investigasi rahasianya terhadap korupsi besar di perusahaan keluarga.',
@@ -1199,6 +1281,8 @@ export const DRAMAS: Drama[] = [
   },
   {
     id: 'dewa-perang-dan-tujuh-kakak-cantik',
+    posterUrl: 'https://img.youtube.com/vi/0c6S7cdRj2A/maxresdefault.jpg',
+    backdropUrl: 'https://img.youtube.com/vi/0c6S7cdRj2A/maxresdefault.jpg',
     slug: 'dewa-perang-dan-tujuh-kakak-cantik',
     title: 'Dewa Perang Dan Tujuh Kakak Cantik',
     synopsis: 'Dewa perang yang turun ke dunia manusia tinggal bersama tujuh saudari angkat cantik yang masing-masing memiliki kekuatan unik dan kepribadian berbeda.',
@@ -1226,6 +1310,8 @@ export const DRAMAS: Drama[] = [
   },
   {
     id: 'sembuhkan-papa-bawa-keberuntungan-sulih-suara',
+    posterUrl: 'https://img.youtube.com/vi/ucFbN2TxXaY/sddefault.jpg',
+    backdropUrl: 'https://img.youtube.com/vi/ucFbN2TxXaY/sddefault.jpg',
     slug: 'sembuhkan-papa-bawa-keberuntungan-sulih-suara',
     title: 'Sembuhkan Papa Bawa Keberuntungan',
     synopsis: 'Anak kecil dengan kemampuan penyembuhan misterius berusaha menyembuhkan ayahnya yang sakit parah, sambil tanpa sadar membawa keberuntungan bagi semua orang di sekitarnya.',
@@ -1253,6 +1339,8 @@ export const DRAMAS: Drama[] = [
   },
   {
     id: 'dewa-judi-sulih-suara',
+    posterUrl: 'https://img.youtube.com/vi/VC7TS4JFLRM/maxresdefault.jpg',
+    backdropUrl: 'https://img.youtube.com/vi/VC7TS4JFLRM/maxresdefault.jpg',
     slug: 'dewa-judi-sulih-suara',
     title: 'Dewa Judi',
     synopsis: 'Pemuda biasa yang mendapat kemampuan supranatural untuk membaca probabilitas menjadi pemain judi tak terkalahkan, namun kekuatannya datang dengan harga yang mengerikan.',
@@ -1280,6 +1368,8 @@ export const DRAMAS: Drama[] = [
   },
   {
     id: 'istriku-tiga-takdirku-gila-sulih-suara',
+    posterUrl: 'https://img.youtube.com/vi/i-oXf8oDv7s/maxresdefault.jpg',
+    backdropUrl: 'https://img.youtube.com/vi/i-oXf8oDv7s/maxresdefault.jpg',
     slug: 'istriku-tiga-takdirku-gila-sulih-suara',
     title: 'Istriku Tiga Takdirku Gila',
     synopsis: 'Komedi romantis tentang pria yang secara tak sengaja terikat perjanjian nikah dengan tiga wanita berbeda kepribadian, menciptakan kekacauan rumah tangga yang absurd.',
@@ -1307,6 +1397,8 @@ export const DRAMAS: Drama[] = [
   },
   {
     id: 'sulih-suara-harga-kebebasanmu',
+    posterUrl: 'https://img.youtube.com/vi/O5SdZgSRHV8/maxresdefault.jpg',
+    backdropUrl: 'https://img.youtube.com/vi/O5SdZgSRHV8/maxresdefault.jpg',
     slug: 'sulih-suara-harga-kebebasanmu',
     title: 'Harga Kebebasanmu',
     synopsis: 'Tahanan yang lolos dari penjara berusaha membuktikan dirinya tidak bersalah sambil menghindari kejaran polisi dan dalang sebenarnya di balik kejahatan yang ia tuduhkan.',
@@ -1334,6 +1426,8 @@ export const DRAMAS: Drama[] = [
   },
   {
     id: 'asalku-dari-zaman-kuno-sulih-suara',
+    posterUrl: 'https://img.youtube.com/vi/DmV2RMy9Sis/maxresdefault.jpg',
+    backdropUrl: 'https://img.youtube.com/vi/DmV2RMy9Sis/maxresdefault.jpg',
     slug: 'asalku-dari-zaman-kuno-sulih-suara',
     title: 'Asalku Dari Zaman Kuno',
     synopsis: 'Ksatria dari dinasti kuno terjebak di era modern setelah ritual gagal, harus beradaptasi dengan teknologi sambil mencari cara pulang ke zamannya.',
@@ -1361,6 +1455,8 @@ export const DRAMAS: Drama[] = [
   },
   {
     id: 'duka-dibalik-senyuman',
+    posterUrl: 'https://img.youtube.com/vi/PGxyvhIOUwk/maxresdefault.jpg',
+    backdropUrl: 'https://img.youtube.com/vi/PGxyvhIOUwk/maxresdefault.jpg',
     slug: 'duka-dibalik-senyuman',
     title: 'Duka Dibalik Senyuman',
     synopsis: 'Di balik senyum ceria gadis populer di kampus tersimpan rahasia kelam keluarganya yang perlahan terungkap dan mengancam menghancurkan seluruh hidupnya.',
@@ -1388,6 +1484,8 @@ export const DRAMAS: Drama[] = [
   },
   {
     id: 'kepergian-yang-disesali-sulih-suara',
+    posterUrl: 'https://img.youtube.com/vi/3lXwH4Ftkdc/maxresdefault.jpg',
+    backdropUrl: 'https://img.youtube.com/vi/3lXwH4Ftkdc/maxresdefault.jpg',
     slug: 'kepergian-yang-disesali-sulih-suara',
     title: 'Kepergian Yang Disesali',
     synopsis: 'Setelah kehilangan orang tercinta, seorang pria menyadari semua kesalahan yang ia buat dan berjuang menebus penyesalannya meski waktu tak bisa diputar ulang.',
@@ -1415,6 +1513,8 @@ export const DRAMAS: Drama[] = [
   },
   {
     id: 'pecandu-judi-kepincut-istri-cantik',
+    posterUrl: 'https://img.youtube.com/vi/btNs81f06ng/maxresdefault.jpg',
+    backdropUrl: 'https://img.youtube.com/vi/btNs81f06ng/maxresdefault.jpg',
     slug: 'pecandu-judi-kepincut-istri-cantik',
     title: 'Pecandu Judi Kepincut Istri Cantik',
     synopsis: 'Penjudi kronis yang hampir kehilangan segalanya bertemu wanita yang mengubah hidupnya, namun masa lalu gelapnya terus mengejar dan mengancam kebahagiaan barunya.',
@@ -1442,6 +1542,8 @@ export const DRAMAS: Drama[] = [
   },
   {
     id: 'murka-putri-dunia-bawah',
+    posterUrl: 'https://img.youtube.com/vi/tbwy9XErI8E/maxresdefault.jpg',
+    backdropUrl: 'https://img.youtube.com/vi/tbwy9XErI8E/maxresdefault.jpg',
     slug: 'murka-putri-dunia-bawah',
     title: 'Murka Putri Dunia Bawah',
     synopsis: 'Putri penguasa dunia bawah tanah naik ke permukaan untuk membalas dendam pada manusia yang mengkhianati ayahnya, namun jatuh cinta pada targetnya.',
@@ -1469,6 +1571,8 @@ export const DRAMAS: Drama[] = [
   },
   {
     id: 'hati-sang-pahlawan-sulih-suara',
+    posterUrl: 'https://img.youtube.com/vi/4VtBK-AGOnE/maxresdefault.jpg',
+    backdropUrl: 'https://img.youtube.com/vi/4VtBK-AGOnE/maxresdefault.jpg',
     slug: 'hati-sang-pahlawan-sulih-suara',
     title: 'Hati Sang Pahlawan',
     synopsis: 'Veteran perang yang menyimpan trauma kembali ke kampung halamannya dan menemukan cinta yang menyembuhkan lukanya pada guru sekolah desa yang tulus.',
@@ -1496,6 +1600,8 @@ export const DRAMAS: Drama[] = [
   },
   {
     id: 'kembalinya-sang-petinju-sulih-suara',
+    posterUrl: 'https://img.youtube.com/vi/d5zRDC3_3Zk/maxresdefault.jpg',
+    backdropUrl: 'https://img.youtube.com/vi/d5zRDC3_3Zk/maxresdefault.jpg',
     slug: 'kembalinya-sang-petinju-sulih-suara',
     title: 'Kembalinya Sang Petinju',
     synopsis: 'Mantan juara tinju yang dipaksa pensiun karena cedera bangkit kembali ke ring demi membiayai operasi putrinya, menghadapi lawan yang jauh lebih muda dan kuat.',

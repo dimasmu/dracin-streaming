@@ -78,10 +78,40 @@
               [class.reel-slide-down]="reelTransition() === 'down'"
               [style.transform]="swipeOffsetY() ? 'translateY(' + swipeOffsetY() * 0.45 + 'px)' : null"
             >
-              <div class="drama-art watch-scene-art" aria-hidden="true">
+              <div class="drama-art watch-scene-art" [class.hidden]="!!liveStreamUrl()" aria-hidden="true">
                 <span class="drama-monogram watch-scene-mono">{{ monogram(d.title) }}</span>
               </div>
+              <video
+                #videoEl
+                class="absolute inset-0 w-full h-full object-contain bg-black z-[1]"
+                [class.hidden]="!liveStreamUrl()"
+                [muted]="muted()"
+                playsinline
+                (timeupdate)="onVideoTimeUpdate()"
+                (loadedmetadata)="onVideoMetadata()"
+                (ended)="onVideoEnded()"
+                (play)="playing.set(true)"
+                (pause)="playing.set(false)"
+                (error)="onVideoError()"
+              >
+                @if (subtitleProxyUrl(); as subSrc) {
+                  <track kind="subtitles" [src]="subSrc" [label]="videoLang() ? videoLang().toUpperCase() : 'ID'" default />
+                }
+              </video>
               <div class="watch-stage-vignette" aria-hidden="true"></div>
+
+              @if (auth.quota(); as q) {
+                <div
+                  class="absolute top-3 left-3 z-[4] px-2.5 py-1 rounded-full text-[11px] font-bold backdrop-blur-md border pointer-events-none"
+                  style="background: rgba(5, 12, 8, 0.72); border-color: rgba(255,255,255,0.14); color: #e2f5ea;"
+                >
+                  @if (q.unlimited) {
+                    <span>★ VIP Unlimited</span>
+                  } @else {
+                    <span>{{ q.remainingToday ?? 0 }}/{{ q.dailyLimit ?? 10 }} Ep</span>
+                  }
+                </div>
+              }
 
               @if (swipeFeedback()) {
                 <div class="watch-swipe-badge" aria-live="polite">{{ swipeFeedback() }}</div>

@@ -1,3 +1,4 @@
+import { HttpClient } from '@angular/common/http';
 import {
   Component,
   DestroyRef,
@@ -13,10 +14,15 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import Hls from 'hls.js';
 import { MessageService } from 'primeng/api';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { Select, SelectModule } from 'primeng/select';
-import { CatalogService } from '../../core/services/catalog.service';
+import { firstValueFrom } from 'rxjs';
+import type { PlayEpisodeResponse, QuotaInfo } from '@tiraiplay/shared';
+import { AuthService } from '../../core/services/auth.service';
+import { BillingService } from '../../core/services/billing.service';
+import { CatalogService, type DramaDetailApiResponse } from '../../core/services/catalog.service';
 import { CmsService } from '../../core/services/cms.service';
 import { BookmarkService } from '../../core/services/bookmark.service';
 import { I18nService } from '../../core/services/i18n.service';
@@ -86,7 +92,10 @@ export class WatchComponent {
   /** Video version from the ?v=id|en query param. */
   readonly v = input<string>();
 
+  private readonly http = inject(HttpClient);
   private readonly catalog = inject(CatalogService);
+  protected readonly auth = inject(AuthService);
+  private readonly billing = inject(BillingService);
   private readonly cms = inject(CmsService);
   private readonly bookmarks = inject(BookmarkService);
   private readonly prefs = inject(PreferencesService);
@@ -95,6 +104,7 @@ export class WatchComponent {
   protected readonly i18n = inject(I18nService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly playerEl = viewChild<ElementRef<HTMLElement>>('player');
+  private readonly videoEl = viewChild<ElementRef<HTMLVideoElement>>('videoEl');
   private readonly langSelects = viewChildren(Select);
 
   protected onWindowScroll(): void {
@@ -108,8 +118,8 @@ export class WatchComponent {
   protected readonly monogram = monogram;
   protected readonly stars = [1, 2, 3, 4, 5];
 
-  protected readonly drama = computed(() =>
-    this.slug() ? this.catalog.getBySlug(this.slug()!) : undefined,
+  protected readonly drama = computed(
+    () => this.detailData()?.drama ?? (this.slug() ? this.catalog.getBySlug(this.slug()!) : undefined),
   );
 
   protected readonly totalEpisodes = computed(() => Math.max(1, this.drama()?.totalEpisodes ?? 1));
@@ -186,7 +196,17 @@ export class WatchComponent {
       : '';
   });
 
-  // Demo-player state
+  // Player state (real HLS stream when backend active, demo timer fallback offline)
+  protected readonly detailData = signal<DramaDetailApiResponse | null>(null);
+  protected readonly liveStreamUrl = signal<string | null>(null);
+  protected readonly subtitleProxyUrl = signal<string | null>(null);
+  protected readonly streamLoading = signal(false);
+  private readonly loadedStreamKey = signal<string | null>(null);
+  private readonly videoDurationSec = signal(0);
+  private readonly videoCurrentSec = signal(0);
+  private hls: Hls | null = null;
+  private lastViewReportAt = 0;
+
   protected readonly playing = signal(false);
   protected readonly progress = signal(18);
   protected readonly muted = signal(false);
@@ -252,13 +272,18 @@ export class WatchComponent {
     const subs = this.drama()?.subtitleLanguages ?? [];
     return subs.length ? subs.map((s) => s.toUpperCase()).join(' / ') : '';
   });
-  protected readonly durationSeconds = computed(() => (this.drama()?.durationMinutes ?? 1) * 60);
+  protected readonly durationSeconds = computed(() =>
+    this.videoDurationSec() > 0 ? this.videoDurationSec() : (this.drama()?.durationMinutes ?? 1) * 60,
+  );
   protected readonly duration = computed(() => this.formatTime(this.durationSeconds()));
   protected readonly elapsed = computed(() =>
-    this.formatTime(Math.floor((this.progress() / 100) * this.durationSeconds())),
+    this.videoDurationSec() > 0
+      ? this.formatTime(this.videoCurrentSec())
+      : this.formatTime(Math.floor((this.progress() / 100) * this.durationSeconds())),
   );
 
   protected readonly commentSort = signal<'new' | 'top'>('new');
+  private readonly apiComments = signal<CommentViewItem[] | null>(null);
   private readonly ownComments = signal<OwnComment[]>([]);
   private readonly ownReplies = signal<Record<string, Array<{ id: string; body: string; replyTo?: string; likes: number }>>>({});
   private readonly likedComments = signal<ReadonlySet<string>>(new Set());
@@ -267,6 +292,13 @@ export class WatchComponent {
   private readonly collapsedReplies = signal<ReadonlySet<string>>(new Set());
 
   protected readonly comments = computed<CommentViewItem[]>(() => {
+    const remote = this.apiComments();
+    if (remote !== null) {
+      return this.commentSort() === 'top'
+        ? [...remote].sort((a, b) => b.likes - a.likes)
+        : remote;
+    }
+
     const isId = this.i18n.lang() === 'id';
     const liked = this.likedComments();
     const userReplies = this.ownReplies();
@@ -354,17 +386,37 @@ export class WatchComponent {
 
   constructor() {
     effect(() => {
+      const s = this.slug();
+      untracked(() => {
+        if (s && this.auth.apiReachable()) {
+          void this.loadDramaDetail(s);
+        } else {
+          this.detailData.set(null);
+        }
+      });
+    });
+
+    effect(() => {
       this.slug();
       const ep = this.episodeNumber();
+      const dId = this.detailData()?.drama.id;
+      const sort = this.commentSort();
       untracked(() => {
         this.stop(true);
         this.selectedRangeIndex.set(Math.floor((ep - 1) / EP_CHUNK_SIZE));
         this.replyingTo.set(null);
         this.replyDraft.set('');
+        if (dId && this.auth.apiReachable()) {
+          void this.loadCommentsFromApi(dId, ep, sort);
+        } else {
+          this.apiComments.set(null);
+        }
       });
     });
+
     this.destroyRef.onDestroy(() => {
       this.stop(false);
+      this.destroyHls();
       if (this.swipeFeedbackTimer) clearTimeout(this.swipeFeedbackTimer);
       if (this.reelTransitionTimer) clearTimeout(this.reelTransitionTimer);
       if (this.reelsHintTimer) clearTimeout(this.reelsHintTimer);
@@ -501,10 +553,45 @@ export class WatchComponent {
     if (next.has(id)) next.delete(id);
     else next.add(id);
     this.likedComments.set(next);
+
+    if (this.auth.apiReachable() && this.apiComments() !== null) {
+      if (!this.auth.isAuthenticated()) {
+        this.auth.openAuthModal('login');
+        return;
+      }
+      void firstValueFrom(
+        this.http.post<{ liked: boolean; likes: number }>(`/api/comments/${id}/like`, {}),
+      )
+        .then((res) => {
+          this.apiComments.update((list) =>
+            list
+              ? list.map((c) =>
+                  c.id === id
+                    ? { ...c, likes: res.likes }
+                    : {
+                        ...c,
+                        replies: c.replies.map((r) => (r.id === id ? { ...r, likes: res.likes } : r)),
+                      },
+                )
+              : null,
+          );
+        })
+        .catch(() => undefined);
+    }
   }
 
   protected rateDrama(score: number): void {
+    const d = this.drama();
+    if (this.auth.apiReachable() && this.detailData() && !this.auth.isAuthenticated()) {
+      this.auth.openAuthModal('login');
+      return;
+    }
     this.userScore.set(score);
+    if (d && this.auth.apiReachable() && this.detailData()) {
+      void firstValueFrom(
+        this.http.put(`/api/dramas/${d.id}/vote`, { score }),
+      ).catch(() => undefined);
+    }
     this.messages.add({
       severity: 'success',
       summary: this.i18n.lang() === 'id' ? 'Penilaian disimpan' : 'Rating saved',
@@ -518,6 +605,14 @@ export class WatchComponent {
       this.stop(false);
       return;
     }
+
+    const epMeta = this.detailData()?.episodes.find((e) => e.number === this.episodeNumber());
+    if (epMeta && this.auth.apiReachable()) {
+      void this.requestAndPlayEpisode(epMeta.id);
+      return;
+    }
+
+    // Offline / local fixture fallback
     this.playing.set(true);
     this.timer = setInterval(() => {
       this.progress.update((p) => (p >= 100 ? 0 : p + 1));
@@ -528,11 +623,21 @@ export class WatchComponent {
     const el = event.currentTarget as HTMLElement;
     const rect = el.getBoundingClientRect();
     if (!rect.width) return;
-    this.progress.set(Math.min(100, Math.max(0, ((event.clientX - rect.left) / rect.width) * 100)));
+    const pct = Math.min(100, Math.max(0, ((event.clientX - rect.left) / rect.width) * 100));
+    this.progress.set(pct);
+
+    const video = this.videoEl()?.nativeElement;
+    if (video && this.liveStreamUrl() && Number.isFinite(video.duration) && video.duration > 0) {
+      video.currentTime = (pct / 100) * video.duration;
+    }
   }
 
   protected cycleSpeed(): void {
     this.speedIndex.update((i) => (i + 1) % PLAYBACK_SPEEDS.length);
+    const video = this.videoEl()?.nativeElement;
+    if (video) {
+      video.playbackRate = PLAYBACK_SPEEDS[this.speedIndex()];
+    }
   }
 
   protected toggleQuality(): void {
@@ -552,16 +657,35 @@ export class WatchComponent {
 
   protected setVideoLang(lang: VideoLang | null): void {
     if (!lang || lang === this.videoLang()) return;
+    const wasPlaying = this.playing();
+    this.loadedStreamKey.set(null);
     this.prefs.setVideoLang(lang);
     void this.router.navigate([], {
       queryParams: { v: lang },
       queryParamsHandling: 'merge',
       replaceUrl: true,
     });
+    if (wasPlaying) {
+      const epMeta = this.detailData()?.episodes.find((e) => e.number === this.episodeNumber());
+      if (epMeta && this.auth.apiReachable()) {
+        void this.requestAndPlayEpisode(epMeta.id, lang);
+      }
+    }
   }
 
   protected choose(value: 'like' | 'dislike'): void {
-    this.vote.set(this.vote() === value ? '' : value);
+    if (this.auth.apiReachable() && this.detailData() && !this.auth.isAuthenticated()) {
+      this.auth.openAuthModal('login');
+      return;
+    }
+    const nextVote = this.vote() === value ? '' : value;
+    this.vote.set(nextVote);
+    const d = this.drama();
+    if (d && this.auth.apiReachable() && this.detailData()) {
+      void firstValueFrom(
+        this.http.put(`/api/dramas/${d.id}/vote`, { vote: nextVote || null }),
+      ).catch(() => undefined);
+    }
   }
 
   protected toggleBookmark(): void {
@@ -603,10 +727,42 @@ export class WatchComponent {
     this.draft.set((event.target as HTMLInputElement | HTMLTextAreaElement).value);
   }
 
-  protected submitComment(event?: Event): void {
+  protected async submitComment(event?: Event): Promise<void> {
     event?.preventDefault();
     const body = this.draft().trim();
     if (!body) return;
+
+    const d = this.drama();
+    if (d && this.auth.apiReachable() && this.detailData()) {
+      if (!this.auth.isAuthenticated()) {
+        this.auth.openAuthModal('login');
+        return;
+      }
+      try {
+        await firstValueFrom(
+          this.http.post(`/api/dramas/${d.id}/episodes/${this.episodeNumber()}/comments`, {
+            body,
+          }),
+        );
+        this.draft.set('');
+        await this.loadCommentsFromApi(d.id, this.episodeNumber(), this.commentSort());
+        this.messages.add({
+          severity: 'success',
+          summary: this.i18n.t('watch.commentPosted'),
+          detail: body,
+          life: 2500,
+        });
+      } catch {
+        this.messages.add({
+          severity: 'error',
+          summary: this.i18n.lang() === 'id' ? 'Gagal mengirim komentar' : 'Failed to post comment',
+          detail: body,
+          life: 2500,
+        });
+      }
+      return;
+    }
+
     this.ownComments.update((c) => [{ id: `own-${Date.now()}`, body, likes: 0 }, ...c]);
     this.draft.set('');
     this.messages.add({
@@ -639,11 +795,45 @@ export class WatchComponent {
     this.replyDraft.set((event.target as HTMLInputElement | HTMLTextAreaElement).value);
   }
 
-  protected submitReply(event: Event, rootId: string): void {
+  protected async submitReply(event: Event, rootId: string): Promise<void> {
     event.preventDefault();
     const body = this.replyDraft().trim();
     const target = this.replyingTo();
     if (!body || !target || target.rootId !== rootId) return;
+
+    const d = this.drama();
+    if (d && this.auth.apiReachable() && this.detailData()) {
+      if (!this.auth.isAuthenticated()) {
+        this.auth.openAuthModal('login');
+        return;
+      }
+      try {
+        await firstValueFrom(
+          this.http.post(`/api/dramas/${d.id}/episodes/${this.episodeNumber()}/comments`, {
+            body,
+            parentId: rootId,
+            replyToAuthor: target.author,
+          }),
+        );
+        this.replyingTo.set(null);
+        this.replyDraft.set('');
+        await this.loadCommentsFromApi(d.id, this.episodeNumber(), this.commentSort());
+        this.messages.add({
+          severity: 'success',
+          summary: this.i18n.lang() === 'id' ? 'Balasan terkirim' : 'Reply posted',
+          detail: body,
+          life: 2500,
+        });
+      } catch {
+        this.messages.add({
+          severity: 'error',
+          summary: this.i18n.lang() === 'id' ? 'Gagal mengirim balasan' : 'Failed to post reply',
+          detail: body,
+          life: 2500,
+        });
+      }
+      return;
+    }
 
     this.ownReplies.update((map) => ({
       ...map,
@@ -679,11 +869,241 @@ export class WatchComponent {
     this.collapsedReplies.set(next);
   }
 
+  protected onVideoMetadata(): void {
+    const video = this.videoEl()?.nativeElement;
+    if (video && Number.isFinite(video.duration)) {
+      this.videoDurationSec.set(Math.floor(video.duration));
+      video.playbackRate = PLAYBACK_SPEEDS[this.speedIndex()];
+    }
+  }
+
+  protected onVideoTimeUpdate(): void {
+    const video = this.videoEl()?.nativeElement;
+    if (!video || !Number.isFinite(video.duration) || video.duration <= 0) return;
+    this.videoCurrentSec.set(Math.floor(video.currentTime));
+    this.progress.set((video.currentTime / video.duration) * 100);
+
+    const now = Date.now();
+    if (now - this.lastViewReportAt >= 15000) {
+      this.lastViewReportAt = now;
+      this.reportViewEvent(Math.floor(video.currentTime), false);
+    }
+  }
+
+  protected onVideoEnded(): void {
+    this.playing.set(false);
+    const video = this.videoEl()?.nativeElement;
+    this.reportViewEvent(Math.floor(video?.duration ?? 0), true);
+    if (this.autoNext() && this.hasNext()) {
+      this.stepEpisode(1);
+    }
+  }
+
+  protected onVideoError(): void {
+    this.playing.set(false);
+    this.messages.add({
+      severity: 'warn',
+      summary: this.i18n.lang() === 'id' ? 'Stream tidak dapat dimuat' : 'Stream unavailable',
+      detail:
+        this.i18n.lang() === 'id'
+          ? 'URL video sumber (.m3u8) belum tersedia atau sedang gangguan.'
+          : 'The source video (.m3u8) URL is unavailable or unreachable.',
+      life: 3200,
+    });
+  }
+
+  private async loadDramaDetail(slug: string): Promise<void> {
+    const detail = await this.catalog.fetchDramaDetail(slug);
+    if (!detail || this.slug() !== slug) return;
+    this.detailData.set(detail);
+    this.vote.set(detail.viewerState.vote ?? '');
+    this.userScore.set(detail.viewerState.userScore ?? 0);
+    await this.loadCommentsFromApi(detail.drama.id, this.episodeNumber(), this.commentSort());
+  }
+
+  private async loadCommentsFromApi(
+    dramaId: string,
+    epNumber: number,
+    sort: 'new' | 'top',
+  ): Promise<void> {
+    try {
+      const rows = await firstValueFrom(
+        this.http.get<
+          Array<{
+            id: string;
+            author: string;
+            time: string;
+            body: string;
+            likes: number;
+            likedByMe?: boolean;
+            isOwn: boolean;
+            replies: Array<{
+              id: string;
+              author: string;
+              time: string;
+              body: string;
+              likes: number;
+              likedByMe?: boolean;
+              replyTo?: string | null;
+              isOwn?: boolean;
+            }>;
+          }>
+        >(`/api/dramas/${dramaId}/episodes/${epNumber}/comments?sort=${sort}`),
+      );
+      if (Array.isArray(rows)) {
+        const liked = new Set<string>();
+        const mapped: CommentViewItem[] = rows.map((r) => {
+          if (r.likedByMe) liked.add(r.id);
+          return {
+            id: r.id,
+            author: r.author,
+            time: this.formatCommentDate(r.time),
+            body: r.body,
+            likes: r.likes,
+            isOwn: r.isOwn,
+            replies: r.replies.map((rep) => {
+              if (rep.likedByMe) liked.add(rep.id);
+              return {
+                id: rep.id,
+                author: rep.author,
+                time: this.formatCommentDate(rep.time),
+                body: rep.body,
+                likes: rep.likes,
+                replyTo: rep.replyTo ?? undefined,
+                isOwn: rep.isOwn,
+              };
+            }),
+          };
+        });
+        this.likedComments.set(liked);
+        this.apiComments.set(mapped);
+      }
+    } catch {
+      this.apiComments.set(null);
+    }
+  }
+
+  private async requestAndPlayEpisode(
+    episodeId: string,
+    overrideLang?: VideoLang,
+  ): Promise<void> {
+    const lang = overrideLang ?? (this.videoLang() || 'id');
+    const key = `${episodeId}:${lang}`;
+    const video = this.videoEl()?.nativeElement;
+
+    if (this.loadedStreamKey() === key && this.liveStreamUrl() && video) {
+      await video.play().catch(() => undefined);
+      return;
+    }
+
+    this.streamLoading.set(true);
+    try {
+      const res = await firstValueFrom(
+        this.http.post<PlayEpisodeResponse>(`/api/episodes/${episodeId}/play`, {
+          videoLang: lang,
+        }),
+      );
+      this.auth.updateQuota(res.quota);
+      this.loadedStreamKey.set(key);
+      this.liveStreamUrl.set(res.streamProxyUrl);
+      this.subtitleProxyUrl.set(res.subtitleProxyUrl);
+      this.attachHlsStream(res.streamProxyUrl);
+    } catch (err) {
+      const e = err as { status?: number; error?: { code?: string; message?: string; quota?: QuotaInfo } };
+      if (e.status === 401 && e.error?.code === 'LOGIN_REQUIRED_FOR_QUOTA') {
+        this.messages.add({
+          severity: 'warn',
+          summary: this.i18n.lang() === 'id' ? 'Login Gratis untuk 10 Ep/Hari' : 'Sign in for 10 Ep/Day',
+          detail: e.error.message,
+          life: 4000,
+        });
+        this.auth.openAuthModal('login');
+      } else if (e.status === 403 && e.error?.code === 'QUOTA_EXCEEDED') {
+        if (e.error.quota) this.auth.updateQuota(e.error.quota);
+        void this.billing.openVipModal(e.error.quota ?? null);
+      } else {
+        this.onVideoError();
+      }
+    } finally {
+      this.streamLoading.set(false);
+    }
+  }
+
+  private attachHlsStream(streamUrl: string): void {
+    const video = this.videoEl()?.nativeElement;
+    if (!video) return;
+    this.destroyHls();
+
+    if (Hls.isSupported()) {
+      const hls = new Hls({ xhrSetup: (xhr) => { xhr.withCredentials = true; } });
+      hls.loadSource(streamUrl);
+      hls.attachMedia(video);
+      hls.on(Hls.Events.MANIFEST_PARSED, () => {
+        void video.play().catch(() => undefined);
+      });
+      hls.on(Hls.Events.ERROR, (_, data) => {
+        if (data.fatal) {
+          this.onVideoError();
+        }
+      });
+      this.hls = hls;
+      return;
+    }
+
+    if (video.canPlayType('application/vnd.apple.mpegurl')) {
+      video.src = streamUrl;
+      void video.play().catch(() => undefined);
+    }
+  }
+
+  private destroyHls(): void {
+    if (this.hls) {
+      this.hls.destroy();
+      this.hls = null;
+    }
+  }
+
+  private reportViewEvent(watchSeconds: number, completed: boolean): void {
+    const d = this.drama();
+    if (!d || !this.auth.apiReachable() || !this.detailData()) return;
+    void firstValueFrom(
+      this.http.post('/api/events/view', {
+        dramaId: d.id,
+        episodeNumber: this.episodeNumber(),
+        watchSeconds,
+        completed,
+      }),
+    ).catch(() => undefined);
+  }
+
+  private formatCommentDate(iso: string): string {
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return iso;
+    return d.toLocaleDateString(this.i18n.lang() === 'id' ? 'id-ID' : 'en-US', {
+      day: 'numeric',
+      month: 'short',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  }
+
   private stop(reset: boolean): void {
     if (this.timer) clearInterval(this.timer);
     this.timer = null;
+    const video = this.videoEl()?.nativeElement;
+    if (video && !video.paused) {
+      video.pause();
+    }
     this.playing.set(false);
-    if (reset) this.progress.set(0);
+    if (reset) {
+      this.progress.set(0);
+      this.videoCurrentSec.set(0);
+      this.videoDurationSec.set(0);
+      this.liveStreamUrl.set(null);
+      this.subtitleProxyUrl.set(null);
+      this.loadedStreamKey.set(null);
+      this.destroyHls();
+    }
   }
 
   private formatTime(seconds: number): string {

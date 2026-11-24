@@ -1,0 +1,193 @@
+<p-dialog
+  [visible]="auth.authModalOpen()"
+  (visibleChange)="$event ? auth.authModalOpen.set(true) : auth.closeAuthModal()"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [header]="dialogTitle()"
+  [style]="{ width: 'min(420px, 94vw)' }"
+>
+  <div class="space-y-4 pt-1">
+    @if (auth.authModalMode() !== '2fa') {
+      <div
+        class="grid grid-cols-2 gap-1.5 p-1 rounded-xl border"
+        style="background: var(--d-surface-2); border-color: var(--d-border);"
+      >
+        <button
+          type="button"
+          class="py-2 rounded-lg text-xs font-extrabold cursor-pointer transition"
+          [style.background]="auth.authModalMode() === 'login' ? 'var(--d-accent)' : 'transparent'"
+          [style.color]="auth.authModalMode() === 'login' ? '#fff' : 'var(--d-muted)'"
+          (click)="switchMode('login')"
+        >
+          {{ 'auth.loginTab' | transloco }}
+        </button>
+        <button
+          type="button"
+          class="py-2 rounded-lg text-xs font-extrabold cursor-pointer transition"
+          [style.background]="auth.authModalMode() === 'register' ? 'var(--d-accent)' : 'transparent'"
+          [style.color]="auth.authModalMode() === 'register' ? '#fff' : 'var(--d-muted)'"
+          (click)="switchMode('register')"
+        >
+          {{ 'auth.registerTab' | transloco }}
+        </button>
+      </div>
+    }
+
+    @if (auth.authError(); as err) {
+      <div
+        class="px-3 py-2.5 rounded-xl border text-xs font-semibold"
+        style="background: var(--d-rose-soft); border-color: var(--d-rose); color: var(--d-rose);"
+      >
+        {{ err }}
+      </div>
+    }
+
+    @if (auth.authModalMode() === 'login') {
+      <form class="space-y-3" (ngSubmit)="submitLogin()">
+        <div>
+          <label class="block text-xs font-bold mb-1">{{ 'auth.emailLabel' | transloco }}</label>
+          <input
+            pInputText
+            type="email"
+            name="email"
+            required
+            autocomplete="email"
+            [ngModel]="email()"
+            (ngModelChange)="email.set($event)"
+            placeholder="nama@email.com"
+            class="w-full"
+          />
+        </div>
+        <div>
+          <label class="block text-xs font-bold mb-1">{{ 'auth.passwordLabel' | transloco }}</label>
+          <input
+            pInputText
+            type="password"
+            name="password"
+            required
+            autocomplete="current-password"
+            [ngModel]="password()"
+            (ngModelChange)="password.set($event)"
+            placeholder="••••••••"
+            class="w-full"
+          />
+        </div>
+        <button
+          pButton
+          type="submit"
+          class="w-full"
+          [loading]="auth.loading()"
+        >
+          {{ 'auth.loginSubmit' | transloco }}
+        </button>
+      </form>
+    } @else if (auth.authModalMode() === 'register') {
+      <form class="space-y-3" (ngSubmit)="submitRegister()">
+        <div>
+          <label class="block text-xs font-bold mb-1">{{ 'auth.nameLabel' | transloco }}</label>
+          <input
+            pInputText
+            type="text"
+            name="name"
+            required
+            autocomplete="name"
+            [ngModel]="name()"
+            (ngModelChange)="name.set($event)"
+            [placeholder]="'auth.namePlaceholder' | transloco"
+            class="w-full"
+          />
+        </div>
+        <div>
+          <label class="block text-xs font-bold mb-1">{{ 'auth.emailLabel' | transloco }}</label>
+          <input
+            pInputText
+            type="email"
+            name="regEmail"
+            required
+            autocomplete="email"
+            [ngModel]="email()"
+            (ngModelChange)="email.set($event)"
+            placeholder="nama@email.com"
+            class="w-full"
+          />
+        </div>
+        <div>
+          <label class="block text-xs font-bold mb-1">{{ 'auth.passwordLabel' | transloco }}</label>
+          <input
+            pInputText
+            type="password"
+            name="regPassword"
+            required
+            minlength="8"
+            autocomplete="new-password"
+            [ngModel]="password()"
+            (ngModelChange)="password.set($event)"
+            [placeholder]="'auth.passwordMinHint' | transloco"
+            class="w-full"
+          />
+        </div>
+        <button
+          pButton
+          type="submit"
+          class="w-full"
+          [loading]="auth.loading()"
+        >
+          {{ 'auth.registerSubmit' | transloco }}
+        </button>
+      </form>
+    } @else {
+      <form class="space-y-3" (ngSubmit)="submitTotp()">
+        <p class="text-xs m-0" style="color: var(--d-muted);">
+          {{ 'auth.twoFactorDesc' | transloco }}
+        </p>
+        <div>
+          <label class="block text-xs font-bold mb-1">{{ 'auth.otpLabel' | transloco }}</label>
+          <input
+            pInputText
+            type="text"
+            name="totp"
+            inputmode="numeric"
+            autocomplete="one-time-code"
+            [ngModel]="totpCode()"
+            (ngModelChange)="totpCode.set($event)"
+            placeholder="123456"
+            class="w-full font-mono-tech text-center tracking-widest"
+          />
+        </div>
+        <button
+          pButton
+          type="submit"
+          class="w-full"
+          [loading]="auth.loading()"
+        >
+          {{ 'auth.verifyOtp' | transloco }}
+        </button>
+      </form>
+    }
+
+    @if (auth.authModalMode() !== '2fa') {
+      <div class="relative py-1 flex items-center gap-2">
+        <span class="flex-1 h-px" style="background: var(--d-border);"></span>
+        <span class="text-[11px] font-semibold" style="color: var(--d-muted);">
+          {{ 'auth.orContinueWith' | transloco }}
+        </span>
+        <span class="flex-1 h-px" style="background: var(--d-border);"></span>
+      </div>
+
+      <button
+        type="button"
+        class="w-full py-2.5 px-3 rounded-xl border text-xs font-bold flex items-center justify-center gap-2 cursor-pointer transition hover:opacity-90"
+        style="background: var(--d-surface-2); border-color: var(--d-border-strong); color: var(--d-fg);"
+        (click)="auth.signInWithGoogle()"
+      >
+        <i class="pi pi-google text-xs"></i>
+        <span>{{ 'auth.googleButton' | transloco }}</span>
+      </button>
+
+      <p class="text-[11px] text-center m-0" style="color: var(--d-muted);">
+        {{ 'auth.freeQuotaNote' | transloco }}
+      </p>
+    }
+  </div>
+</p-dialog>

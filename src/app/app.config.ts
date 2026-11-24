@@ -1,3 +1,4 @@
+import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
 import { ViewportScroller } from '@angular/common';
 import {
   ApplicationConfig,
@@ -15,12 +16,16 @@ import Aura from '@primeuix/themes/aura';
 import { routes } from './app.routes';
 import { PRIMEUI_LICENSE_KEY } from './core/license';
 import { I18nLoader } from './core/i18n/i18n.loader';
+import { apiCredentialsInterceptor } from './core/interceptors/api-credentials.interceptor';
+import { AuthService } from './core/services/auth.service';
+import { CatalogService } from './core/services/catalog.service';
 import { I18nService, SITE_LANGS } from './core/services/i18n.service';
 import { provideServiceWorker } from '@angular/service-worker';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
+    provideHttpClient(withFetch(), withInterceptors([apiCredentialsInterceptor])),
     provideTransloco({
       config: {
         availableLangs: SITE_LANGS.map((l) => l.id),
@@ -32,6 +37,8 @@ export const appConfig: ApplicationConfig = {
       loader: I18nLoader,
     }),
     provideAppInitializer(() => inject(I18nService).init()),
+    provideAppInitializer(() => inject(AuthService).init()),
+    provideAppInitializer(() => inject(CatalogService).init()),
     // The header is sticky (68px). Without an offset, anchored headings end up underneath it.
     provideAppInitializer(() => inject(ViewportScroller).setOffset([0, 84])),
     provideRouter(

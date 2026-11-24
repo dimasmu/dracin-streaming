@@ -1,14 +1,26 @@
 {
   "name": "dracin",
   "version": "0.0.0",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "dev:api": "npm --workspace=apps/api run dev",
+    "build:api": "npm --workspace=apps/api run build",
+    "test:api": "npm --workspace=apps/api run test",
+    "db:generate": "npm --workspace=packages/db run generate",
+    "db:migrate": "npm --workspace=packages/db run migrate",
+    "db:push": "npm --workspace=packages/db run push",
+    "db:seed": "npm --workspace=packages/db run seed",
+    "seed:admin": "npm --workspace=apps/api run seed:admin"
   },
-  "private": true,
   "packageManager": "npm@12.0.2",
   "dependencies": {
     "@angular/cdk": "^22.3.0",
@@ -21,6 +33,7 @@
     "@angular/service-worker": "^22.3.0",
     "@jsverse/transloco": "^8.4.0",
     "@primeuix/themes": "^3.1.1",
+    "hls.js": "^1.7.4",
     "primeicons": "^8.0.2",
     "primeng": "^22.1.5",
     "rxjs": "~7.8.0",

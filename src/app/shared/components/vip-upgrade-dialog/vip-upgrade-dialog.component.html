@@ -1,0 +1,103 @@
+<p-dialog
+  [visible]="billing.vipModalOpen()"
+  (visibleChange)="$event ? billing.vipModalOpen.set(true) : billing.closeVipModal()"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [header]="'vip.title' | transloco"
+  [style]="{ width: 'min(460px, 94vw)' }"
+>
+  <div class="space-y-4 pt-1">
+    @if (billing.quotaContext(); as q) {
+      <div
+        class="px-3.5 py-2.5 rounded-xl border text-xs leading-relaxed"
+        style="background: var(--d-gold-soft); border-color: var(--d-gold); color: var(--d-fg);"
+      >
+        <strong>{{ 'vip.quotaReachedTitle' | transloco }}</strong>
+        <p class="m-0 mt-1" style="color: var(--d-muted);">
+          {{ 'vip.quotaReachedDesc' | transloco: { used: q.usedToday, limit: q.dailyLimit ?? 10 } }}
+        </p>
+      </div>
+    }
+
+    @if (activePlan(); as plan) {
+      <div
+        class="p-4 rounded-2xl border space-y-3"
+        style="background: var(--d-surface-2); border-color: var(--d-border-strong);"
+      >
+        <div class="flex items-baseline justify-between gap-2">
+          <div>
+            <span class="text-sm font-extrabold">{{ plan.name }}</span>
+            <p class="text-[11px] m-0 mt-0.5" style="color: var(--d-muted);">
+              {{ plan.durationDays }} {{ 'vip.daysAccess' | transloco }}
+            </p>
+          </div>
+          <div class="text-right">
+            <span class="text-lg font-extrabold" style="color: var(--d-accent);">
+              {{ formatIdr(plan.priceIdr) }}
+            </span>
+            <span class="text-[11px]" style="color: var(--d-muted);">/bln</span>
+          </div>
+        </div>
+
+        <ul class="space-y-1.5 m-0 p-0 list-none text-xs">
+          @for (feat of plan.features; track feat) {
+            <li class="flex items-start gap-2">
+              <i class="pi pi-check-circle text-xs mt-0.5" style="color: var(--d-accent);"></i>
+              <span>{{ feat }}</span>
+            </li>
+          }
+        </ul>
+      </div>
+    }
+
+    <div class="space-y-1.5">
+      <p class="text-xs font-bold m-0">{{ 'vip.chooseGateway' | transloco }}</p>
+      <div class="grid grid-cols-3 gap-2">
+        @for (p of providers; track p.id) {
+          <button
+            type="button"
+            class="p-2.5 rounded-xl border text-left cursor-pointer transition"
+            [style.background]="billing.selectedProvider() === p.id ? 'var(--d-accent-soft)' : 'var(--d-surface-2)'"
+            [style.border-color]="billing.selectedProvider() === p.id ? 'var(--d-accent)' : 'var(--d-border)'"
+            (click)="billing.selectedProvider.set(p.id)"
+          >
+            <div class="text-xs font-extrabold">{{ p.label }}</div>
+            <div class="text-[10px] mt-0.5 truncate" style="color: var(--d-muted);">{{ p.desc }}</div>
+          </button>
+        }
+      </div>
+    </div>
+
+    @if (billing.checkoutError(); as err) {
+      <div
+        class="px-3 py-2 rounded-xl border text-xs font-semibold"
+        style="background: var(--d-rose-soft); border-color: var(--d-rose); color: var(--d-rose);"
+      >
+        {{ err }}
+      </div>
+    }
+
+    <div class="flex items-center justify-end gap-2 pt-1">
+      <button
+        pButton
+        type="button"
+        size="small"
+        severity="secondary"
+        [outlined]="true"
+        (click)="billing.closeVipModal()"
+      >
+        {{ 'vip.waitTomorrow' | transloco }}
+      </button>
+      <button
+        pButton
+        type="button"
+        size="small"
+        [loading]="billing.checkingOut()"
+        (click)="checkout()"
+      >
+        {{ auth.isAuthenticated() ? ('vip.payNow' | transloco) : ('nav.signIn' | transloco) }}
+      </button>
+    </div>
+  </div>
+</p-dialog>
